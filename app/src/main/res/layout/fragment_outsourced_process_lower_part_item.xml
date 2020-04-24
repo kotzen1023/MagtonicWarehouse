@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content" android:orientation="horizontal" android:layout_width="fill_parent">
+
+    <TextView android:text="header"
+            android:id="@+id/outSourcedProcessLowerItemDetailHeader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textStyle="bold"
+            android:textColor="@color/md_black_1000"
+            android:textSize="@dimen/text_size_25"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:layout_weight="1">
+    </TextView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+        <TextView android:text= "contentStatic"
+                android:id="@+id/outSourcedProcessLowerItemDetailContentStatic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/text_size_30"
+                android:gravity="center"
+                android:layout_weight="1">
+        </TextView>
+
+        <TextView android:text= "content"
+                android:id="@+id/outSourcedProcessLowerItemDetailContentDynamic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="@dimen/text_size_30"
+                android:gravity="center"
+                android:layout_weight="1">
+        </TextView>
+    </LinearLayout>
+
+
+    <LinearLayout
+            android:id="@+id/outSourcedProcessLowerItemDetailLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+        <EditText
+                android:id="@+id/outSourcedProcessLowerItemDetailEdit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingLeft="20dp"
+                android:inputType="textEmailAddress"
+                android:textSize="@dimen/text_size_30"
+
+                android:layout_gravity="center" />
+
+        <Button
+                android:id="@+id/outSourcedProcessLowerItemDetailBtnOk"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:text="Ok"/>
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

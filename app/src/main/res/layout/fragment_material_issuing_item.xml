@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent">
+
+    <TextView android:text="header"
+              android:id="@+id/materialItemDetailHeader"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:textStyle="bold"
+              android:textColor="@color/md_black_1000"
+              android:textSize="@dimen/text_size_30"
+              android:gravity="center_vertical"
+              android:paddingLeft="10dp"
+              android:layout_weight="2">
+    </TextView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:gravity="center">
+
+        <ImageView
+                android:id="@+id/materialShortageIcon"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/distribution_03"
+                android:visibility="gone"/>
+
+        <TextView android:text="content"
+                  android:id="@+id/materialItemDetailContent"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:textSize="@dimen/text_size_25"
+                  android:gravity="center_vertical"
+                  android:paddingLeft="20dp"
+                  android:layout_weight="1"
+                  android:visibility="visible">
+        </TextView>
+        <LinearLayout
+                android:id="@+id/materialItemDetailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:visibility="gone">
+
+            <EditText
+                    android:id="@+id/materialItemDetailEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingLeft="20dp"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/text_size_25"
+                    android:layout_gravity="center" />
+
+            <Button
+                    android:id="@+id/materialItemDetailBtnOk"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:text="Ok"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+
+
+
+</LinearLayout>

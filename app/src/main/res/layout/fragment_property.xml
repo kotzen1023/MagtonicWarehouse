@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="?attr/actionBarSize"
+                android:id="@+id/property_list_container">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:focusableInTouchMode="true">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="vertical">
+
+            <EditText
+                    android:id="@+id/editTextProperty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/property_barcode_input_hint"
+                    android:textSize="@dimen/text_size_25"
+                    android:textAlignment="center"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minLines="1"
+                    android:lines="1"
+                    android:layout_weight="1"/>
+
+        </LinearLayout>
+
+
+
+
+
+        <LinearLayout
+                android:id="@+id/linearLayoutProperty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+            <ListView
+                    android:id="@+id/listViewProperty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="gone">
+
+            </ListView>
+
+            <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewPagerProperty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+
+            </androidx.viewpager.widget.ViewPager>
+
+            <LinearLayout
+                    android:id="@+id/layoutBottomProperty"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal">
+
+                <Button
+                        android:id="@+id/btnPropertyClear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/text_size_20"
+                        android:text="@string/clear"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

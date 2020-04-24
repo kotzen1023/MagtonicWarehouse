@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/main_seek_bar"
+          android:title="quick"
+          android:icon="@drawable/baseline_settings_ethernet_white_24"
+          android:visible="false"
+          app:showAsAction="always"/>
+
+    <item android:id="@+id/main_hide_or_show_keyboard"
+          android:title="@string/hide_keyboard"
+          android:icon="@drawable/baseline_keyboard_hide_white_24"
+          android:visible="false"
+          app:showAsAction="always"/>
+
+    <item android:id="@+id/main_set_bluetooth_printer"
+          android:icon="@drawable/baseline_settings_bluetooth_white_24"
+          android:title="@string/bluetooth_setting"
+          android:visible="false"
+          app:showAsAction="collapseActionView"/>
+
+    <item android:id="@+id/main_receipt_setting"
+            android:icon="@drawable/baseline_autorenew_white_24"
+            android:title="@string/receipt_setting_title"
+            android:visible="false"
+            app:showAsAction="collapseActionView"/>
+
+    <item android:id="@+id/main_draw_pen_or_eraser"
+            android:icon="@drawable/eraser_white"
+            android:visible="false"
+            app:showAsAction="always"/>
+
+</menu>

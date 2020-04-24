@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    defaultConfig {
+        applicationId "com.magtonic.magtonicwarehouse"
+        versionCode 1
+        versionName "1.7"
+
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == "com.android.support") {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "26.+"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.appcompat:appcompat:$androidx_app_compat_version"
+    //implementation 'com.android.support:appcompat-v7:29.0.0'
+    implementation "com.google.android.material:material:$androidx_material_version"
+    //implementation 'com.android.support:design:29.0.0'
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
+    testImplementation "junit:junit:$junit_version"
+    //implementation 'androidx.viewpager2:viewpager2:1.0.0-beta05'
+    androidTestImplementation "androidx.test:runner:$test_runner_version"
+    //androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    //androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_core_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_core_version"
+    //implementation 'com.pddstudio:encrypted-preferences:1.2.0'
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    //implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "com.squareup.okio:okio:$okio_version"
+
+    implementation "org.apache.commons:commons-lang3:$commons_lang3_version"
+    //implementation "org.apache.directory.studio:org.apache.commons.io:$apache_common_io"
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    api "com.google.code.gson:gson:$gson_version"
+
+    //lifecycle test
+    implementation "androidx.lifecycle:lifecycle-extensions:$arch_lifecycle_version"
+    implementation files('libs/java-json.jar')
+    implementation 'commons-net:commons-net:3.6'
+
+    //annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
+    //implementation "androidx.percentlayout:percentlayout:$androidx_percentlayout_version"
+}

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="?attr/actionBarSize"
+        android:id="@+id/outsourced_process_container">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:focusableInTouchMode="true">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:orientation="vertical">
+
+            <EditText
+                    android:id="@+id/editTextOutsourcedProcess"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/outsource_supplier_input_hint"
+                    android:textSize="@dimen/text_size_25"
+                    android:textAlignment="center"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minLines="1"
+                    android:lines="1"
+                    android:layout_weight="1"/>
+            <LinearLayout
+                    android:id="@+id/linearLayoutSupplierHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="invisible">
+
+                <TextView android:text="@string/outsource_send_no"
+                        android:id="@+id/outSourcedProcessSupplierHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textStyle="bold"
+                        android:textColor="@color/md_black_1000"
+                        android:textSize="@dimen/text_size_25"
+                        android:gravity="center"
+                        android:paddingLeft="10dp"
+                        android:layout_weight="1">
+                </TextView>
+
+                <TextView android:text="@string/outsource_work_order"
+                        android:id="@+id/outSourcedProcessSupplierContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/text_size_25"
+                        android:gravity="center"
+                        android:paddingLeft="10dp"
+                        android:layout_weight="1">
+                </TextView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/linearLayoutDetailHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="gone">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+
+                    <TextView android:text="@string/outsource_work_with_part_no"
+                            android:id="@+id/outSourcedProcessDetailHeader"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_black_1000"
+                            android:textSize="@dimen/text_size_25"
+                            android:gravity="center"
+                            android:paddingLeft="5dp"
+                            android:layout_weight="1">
+                    </TextView>
+
+                    <TextView android:text="@string/outsource_part_name"
+                            android:id="@+id/outSourcedProcessDetailContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="@dimen/text_size_25"
+                            android:gravity="center"
+                            android:layout_weight="1">
+                    </TextView>
+                </LinearLayout>
+
+                <TextView android:text="@string/outsource_quantity"
+                        android:id="@+id/outSourcedProcessDetailQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/text_size_25"
+                        android:gravity="center"
+
+                        android:layout_weight="2">
+                </TextView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <View
+                android:id="@+id/viewLine"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_weight="0"
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
+
+        <LinearLayout
+                android:id="@+id/linearLayoutOutsourcedProcess"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+            <ListView
+                    android:id="@+id/listViewOutsourceListBySupplier"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+            </ListView>
+            <ListView
+                    android:id="@+id/listViewOutsourceDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

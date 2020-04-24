@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="?attr/actionBarSize"
+                android:id="@+id/login_container">
+
+    <LinearLayout
+            android:id="@+id/linearLayoutLogin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:id="@+id/btnTop"
+                    android:visibility="invisible"/>
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imgLogo"
+                    android:src="@drawable/first_load_view_logo"/>
+        </LinearLayout>
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/accountInput"
+                android:hint="@string/login_account"
+        />
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/passwordInput"
+                android:hint="@string/login_password"/>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:id="@+id/btnBottom"
+                    android:visibility="invisible"/>
+        </LinearLayout>
+
+        <!--CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/scm_login_keep_account_password"
+            android:id="@+id/checkBoxKeep"
+            android:checked="false"
+            /-->
+
+        <!--CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/macauto_login_autologin"
+            android:id="@+id/checkBoxAutoLogin"
+            android:checked="false"
+            /-->
+
+
+        <!--LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/btnhide"
+                android:visibility="invisible"/>
+        </LinearLayout-->
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
+
+            <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_confirm"
+                    android:id="@+id/btnLoginConfirm"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:layout_weight="1" />
+
+            <!--Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/scm_clear"
+                android:id="@+id/btnLoginClear"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1" /-->
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

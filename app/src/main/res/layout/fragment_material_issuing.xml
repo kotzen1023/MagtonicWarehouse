@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="?attr/actionBarSize"
+                android:id="@+id/material_issuing_container">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:focusableInTouchMode="true">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="vertical">
+
+            <EditText
+                    android:id="@+id/editTextMaterial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/receipt_barcode_input_hint"
+                    android:textSize="@dimen/text_size_25"
+                    android:textAlignment="center"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minLines="1"
+                    android:lines="1"
+                    android:layout_weight="1"/>
+
+            <!--LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:text="No."
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
+                        android:gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <Spinner
+                        android:id="@+id/spinnerNum"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+
+                </Spinner>
+            </LinearLayout-->
+
+        </LinearLayout>
+
+
+
+
+
+        <LinearLayout
+                android:id="@+id/linearLayoutMaterial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+            <ListView
+                    android:id="@+id/listViewMaterial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="gone">
+
+            </ListView>
+
+            <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+            android:layout_weight="1">
+
+
+            </androidx.viewpager.widget.ViewPager>
+
+            <LinearLayout
+                    android:id="@+id/layoutBottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal">
+
+                <Button
+                        android:id="@+id/btnMaterialClear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/text_size_20"
+                        android:text="@string/clear"/>
+
+                <Button
+                        android:id="@+id/btnMaterialSave"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/text_size_20"
+                        android:text="@string/material_confirm" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
