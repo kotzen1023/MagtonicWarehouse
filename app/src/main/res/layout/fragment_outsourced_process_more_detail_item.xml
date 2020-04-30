@@ -14,7 +14,7 @@
                 android:layout_height="match_parent"
                 android:textStyle="bold"
                 android:textColor="@color/md_black_1000"
-                android:textSize="@dimen/text_size_25"
+                android:textSize="@dimen/text_size_30"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
                 android:layout_weight="1">

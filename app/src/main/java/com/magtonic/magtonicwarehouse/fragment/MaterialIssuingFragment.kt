@@ -113,7 +113,7 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
             modifyList.clear()
 
 
-            val item0 = RJMaterial()
+            /*val item0 = RJMaterial()
             item0.sfs01 = "item0_sfs01"
             item0.sfs02 = "item0_sfs02"
             item0.sfs04 = "item0_sfs04"
@@ -163,7 +163,7 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
 
             for (i in 0 until materialList.size) {
                 modifyList.add(false)
-            }
+            }*/
 
             pagerAdapter = MaterialDetailAdapter(materialIssuingContext, materialList, modifyList)
             viewPager!!.adapter = pagerAdapter as PagerAdapter

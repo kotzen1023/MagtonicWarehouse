@@ -593,6 +593,10 @@ class OutsourcedProcessingFragment : Fragment() {
     override fun onDestroyView() {
         Log.i(mTAG, "onDestroy")
 
+        val hideIntent = Intent()
+        hideIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK
+        outsourcedProcessContext!!.sendBroadcast(hideIntent)
+
         if (isRegister && mReceiver != null) {
             try {
                 outsourcedProcessContext!!.unregisterReceiver(mReceiver)
