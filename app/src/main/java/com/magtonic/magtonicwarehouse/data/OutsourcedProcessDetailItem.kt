@@ -1,7 +1,7 @@
 package com.magtonic.magtonicwarehouse.data
 
-class OutsourcedProcessOrderDetailItem(data1: String, data2: String, data3: String, data4: String,
-                                       data5: String, data6: String, data7: String, data8: String) {
+class OutsourcedProcessDetailItem(data1: String, data2: String, data3: String, data4: String,
+                                  data5: String, data6: String, data7: String, data8: String) {
     private var data1: String = ""
     private var data2: String = ""
     private var data3: String = ""

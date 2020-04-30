@@ -9,10 +9,11 @@
             android:layout_weight="1">
 
         <TextView android:text="header"
-                android:id="@+id/outSourcedProcessOrderDetailHeader"
+                android:id="@+id/outSourcedProcessMoreDetailHeader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textStyle="bold"
+                android:textColor="@color/md_black_1000"
                 android:textSize="@dimen/text_size_25"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
@@ -20,7 +21,7 @@
         </TextView>
 
         <TextView android:text="content"
-                android:id="@+id/outSourcedProcessOrderDetailContent"
+                android:id="@+id/outSourcedProcessMoreDetailContent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textSize="@dimen/text_size_25"
@@ -29,19 +30,5 @@
                 android:layout_weight="1">
         </TextView>
     </LinearLayout>
-
-    <TextView android:text="quantity"
-            android:id="@+id/outSourcedProcessOrderDetailQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="@dimen/text_size_25"
-            android:gravity="center"
-            android:layout_weight="2">
-    </TextView>
-
-
-
-
-
 
 </LinearLayout>

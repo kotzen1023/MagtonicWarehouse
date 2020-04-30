@@ -26,7 +26,6 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOr
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderListBySupplier
 
 import com.magtonic.magtonicwarehouse.R
-import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -38,8 +37,9 @@ class OutsourcedProcessingFragment : Fragment() {
 
     //private var outsourcedProcessLowerPartItemAdapter: OutsourcedProcessLowerPartItemAdapter? = null
     //private var outsourcedProcessTopItemAdapter: OutsourcedProcessTopItemAdapter? = null
-    private var outsourcedProcessOrderDetailItemAdapter: OutsourcedProcessOrderDetailItemAdapter? = null
+    private var outsourcedProcessDetailItemAdapter: OutsourcedProcessDetailItemAdapter? = null
     private var outsourcedProcessSupplierItemAdapter: OutsourcedProcessSupplierItemAdapter? = null
+    private var outsourcedProcessMoreDetailAdapter: OutsourcedProcessMoreDetailAdapter? = null
     //private var btnOutsourcedProcessMain: Button? = null
     //private var btnOutsourcedProcessLower: Button? = null
 
@@ -54,12 +54,15 @@ class OutsourcedProcessingFragment : Fragment() {
     //private var listView: ListView? = null
     private var listViewBySupplier: ListView? = null
     private var listViewDetail: ListView? = null
+    private var listViewMoreDetail: ListView? = null
     private var progressBar: ProgressBar? = null
     private var relativeLayout: RelativeLayout? = null
+    private var imageViewPrev: ImageView? = null
 
     var outsourcedProcessTopList = ArrayList<OutsourcedProcessTopItem>()
     var outsourcedProcessLowerList = ArrayList<OutsourcedProcessLowerPartItem>()
-    var outsourcedProcessDetailList = ArrayList<OutsourcedProcessOrderDetailItem>()
+    var outsourcedProcessDetailList = ArrayList<OutsourcedProcessDetailItem>()
+    var outsourcedProcessMoreDetailList = ArrayList<OutsourcedProcessMoreDetailItem>()
     var outsourcedProcessListBySupplier = ArrayList<OutsourcedProcessSupplierItem>()
 
     private var listViewTop: ListView?= null
@@ -72,6 +75,8 @@ class OutsourcedProcessingFragment : Fragment() {
 
     private val colorCodePink = Color.parseColor("#D81B60")
     private val colorCodeBlue = Color.parseColor("#1976D2")
+
+    private var currentSendOrder: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +101,7 @@ class OutsourcedProcessingFragment : Fragment() {
         linearLayoutSupplierHeader = view.findViewById(R.id.linearLayoutSupplierHeader)
         linearLayoutDetailHeader = view.findViewById(R.id.linearLayoutDetailHeader)
         viewLine = view.findViewById(R.id.viewLine)
+        imageViewPrev = view.findViewById(R.id.imageViewPrev)
         //layoutLowerItemHeader = view.findViewById(R.id.layoutLowerItemHeader)
         progressBar = ProgressBar(outsourcedProcessContext, null, android.R.attr.progressBarStyleLarge)
         val params = RelativeLayout.LayoutParams(MainActivity.screenHeight / 4, MainActivity.screenWidth / 4)
@@ -118,16 +124,12 @@ class OutsourcedProcessingFragment : Fragment() {
 
         listViewBySupplier = view!!.findViewById(R.id.listViewOutsourceListBySupplier)
         listViewDetail = view!!.findViewById(R.id.listViewOutsourceDetail)
+        listViewMoreDetail = view!!.findViewById(R.id.listViewOutsourceMoreDetail)
 
         listViewBySupplier!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
-
-        }
-
-        listViewBySupplier!!.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, position, _ -> // Process the long-click
-
-            Log.d(mTAG, "long click $position")
+            currentSendOrder = outsourcedProcessListBySupplier[position].getData2()
 
             progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
             progressBar!!.visibility = View.VISIBLE
@@ -136,14 +138,21 @@ class OutsourcedProcessingFragment : Fragment() {
                 outsourcedProcessDetailList.clear()
             }
 
-            if (outsourcedProcessOrderDetailItemAdapter != null) {
-                outsourcedProcessOrderDetailItemAdapter!!.notifyDataSetChanged()
+            if (outsourcedProcessDetailItemAdapter != null) {
+                outsourcedProcessDetailItemAdapter!!.notifyDataSetChanged()
             }
 
             val searchIntent = Intent()
             searchIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER
             searchIntent.putExtra("SEND_ORDER", outsourcedProcessListBySupplier[position].getData2())
             outsourcedProcessContext?.sendBroadcast(searchIntent)
+        }
+
+        listViewBySupplier!!.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, position, _ -> // Process the long-click
+
+            Log.d(mTAG, "long click $position")
+
+
 
             true
         }
@@ -151,7 +160,11 @@ class OutsourcedProcessingFragment : Fragment() {
         listViewDetail!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
-
+            val moreDetailIntent = Intent()
+            moreDetailIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH
+            moreDetailIntent.putExtra("SEND_ORDER", currentSendOrder)
+            moreDetailIntent.putExtra("INDEX", position.toString())
+            outsourcedProcessContext?.sendBroadcast(moreDetailIntent)
         }
 
         //listViewLower = view.findViewById(R.id.listViewOutsourcedProcessLower)
@@ -202,8 +215,12 @@ class OutsourcedProcessingFragment : Fragment() {
             listViewBySupplier!!.adapter = outsourcedProcessSupplierItemAdapter
             
             //detail
-            outsourcedProcessOrderDetailItemAdapter = OutsourcedProcessOrderDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_order_item, outsourcedProcessDetailList)
-            listViewDetail!!.adapter = outsourcedProcessOrderDetailItemAdapter
+            outsourcedProcessDetailItemAdapter = OutsourcedProcessDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_detail_item, outsourcedProcessDetailList)
+            listViewDetail!!.adapter = outsourcedProcessDetailItemAdapter
+
+            //more detail
+            outsourcedProcessMoreDetailAdapter = OutsourcedProcessMoreDetailAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_more_detail_item, outsourcedProcessMoreDetailList)
+            listViewMoreDetail!!.adapter = outsourcedProcessMoreDetailAdapter
         }
 
         //detect soft keyboard
@@ -271,14 +288,14 @@ class OutsourcedProcessingFragment : Fragment() {
                     }
 
                     outsourcedProcessDetailList.clear()
-                    if (outsourcedProcessOrderDetailItemAdapter != null) {
-                        outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
+                    if (outsourcedProcessDetailItemAdapter != null) {
+                        outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                     }
 
                     listViewBySupplier!!.visibility = View.VISIBLE
                     listViewDetail!!.visibility = View.GONE
 
-                    isOutSourcedInDetail = false
+                    isOutSourcedInDetail = 0
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
@@ -313,14 +330,14 @@ class OutsourcedProcessingFragment : Fragment() {
                     }
 
                     outsourcedProcessDetailList.clear()
-                    if (outsourcedProcessOrderDetailItemAdapter != null) {
-                        outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
+                    if (outsourcedProcessDetailItemAdapter != null) {
+                        outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                     }
 
                     listViewBySupplier!!.visibility = View.VISIBLE
                     listViewDetail!!.visibility = View.GONE
 
-                    isOutSourcedInDetail = false
+                    isOutSourcedInDetail = 0
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
@@ -345,7 +362,15 @@ class OutsourcedProcessingFragment : Fragment() {
 
         }
 
+        imageViewPrev!!.setOnClickListener {
+            val backIntent = Intent()
+            backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+            outsourcedProcessContext!!.sendBroadcast(backIntent)
 
+            val hideIntent = Intent()
+            hideIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK
+            outsourcedProcessContext!!.sendBroadcast(hideIntent)
+        }
 
 
         /*btnSign!!.setOnClickListener {
@@ -416,7 +441,9 @@ class OutsourcedProcessingFragment : Fragment() {
                                 val outsourcedProcessSupplierItem = OutsourcedProcessSupplierItem(rjOutSourceProcessedBySupplier.data1, rjOutSourceProcessedBySupplier.data2, rjOutSourceProcessedBySupplier.data3)
                                 outsourcedProcessListBySupplier.add(outsourcedProcessSupplierItem)
                             }
-
+                            /*
+                            val outsourcedProcessSupplierItem = OutsourcedProcessSupplierItem(rjOutSourceProcessedBySupplier.data1, rjOutSourceProcessedBySupplier.data2, rjOutSourceProcessedBySupplier.data3)
+                            outsourcedProcessListBySupplier.add(outsourcedProcessSupplierItem)*/
                         }
 
                         if (outsourcedProcessListBySupplier.size > 0) {
@@ -445,7 +472,7 @@ class OutsourcedProcessingFragment : Fragment() {
 
                         for (rjOutSourceProcessed in outsourcedProcessOrderList) {
 
-                            val outsourcedProcessDetailItem = OutsourcedProcessOrderDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
+                            val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
                                 rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
                             outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
                         }
@@ -457,15 +484,65 @@ class OutsourcedProcessingFragment : Fragment() {
                             listViewBySupplier!!.visibility = View.GONE
                             listViewDetail!!.visibility = View.VISIBLE
 
-                            isOutSourcedInDetail = true
+                            isOutSourcedInDetail = 1
                         }
 
 
-                        if (outsourcedProcessOrderDetailItemAdapter != null) {
-                            outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
+                        if (outsourcedProcessDetailItemAdapter != null) {
+                            outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                         }
 
 
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH")
+
+                        val sendOrder = intent.getStringExtra("SEND_ORDER")
+                        val idxString = intent.getStringExtra("INDEX")
+
+                        val idx = idxString?.toInt()
+
+
+                        if (isKeyBoardShow) {
+                            val hideIntent = Intent()
+                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                            outsourcedProcessContext!!.sendBroadcast(hideIntent)
+                        }
+
+                        outsourcedProcessMoreDetailList.clear()
+
+                        if (idx != null) {
+                            val item0 = OutsourcedProcessMoreDetailItem("發料單號", sendOrder)
+                            outsourcedProcessMoreDetailList.add(item0)
+                            val item1 = OutsourcedProcessMoreDetailItem("項次", outsourcedProcessDetailList[idx].getData1())
+                            outsourcedProcessMoreDetailList.add(item1)
+                            val item2 = OutsourcedProcessMoreDetailItem("工單編號", outsourcedProcessDetailList[idx].getData2())
+                            outsourcedProcessMoreDetailList.add(item2)
+                            val item3 = OutsourcedProcessMoreDetailItem("料件編號", outsourcedProcessDetailList[idx].getData3())
+                            outsourcedProcessMoreDetailList.add(item3)
+                            val item4 = OutsourcedProcessMoreDetailItem("發料數量", outsourcedProcessDetailList[idx].getData4())
+                            outsourcedProcessMoreDetailList.add(item4)
+                            val item5 = OutsourcedProcessMoreDetailItem("發料單位", outsourcedProcessDetailList[idx].getData5())
+                            outsourcedProcessMoreDetailList.add(item5)
+                            val item6 = OutsourcedProcessMoreDetailItem("品名", outsourcedProcessDetailList[idx].getData6())
+                            outsourcedProcessMoreDetailList.add(item6)
+                            val item7 = OutsourcedProcessMoreDetailItem("規格", outsourcedProcessDetailList[idx].getData7())
+                            outsourcedProcessMoreDetailList.add(item7)
+                            val item8 = OutsourcedProcessMoreDetailItem("過帳否", outsourcedProcessDetailList[idx].getData8())
+                            outsourcedProcessMoreDetailList.add(item8)
+                        }
+
+                        linearLayoutDetailHeader!!.visibility = View.INVISIBLE
+
+                        //viewLine!!.visibility = View.VISIBLE
+                        listViewDetail!!.visibility = View.GONE
+                        listViewMoreDetail!!.visibility = View.VISIBLE
+
+                        isOutSourcedInDetail = 2
+
+                        if (outsourcedProcessMoreDetailAdapter != null) {
+                            outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+                        }
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST")
@@ -475,8 +552,20 @@ class OutsourcedProcessingFragment : Fragment() {
                         //viewLine!!.visibility = View.VISIBLE
                         listViewBySupplier!!.visibility = View.VISIBLE
                         listViewDetail!!.visibility = View.GONE
+                        listViewMoreDetail!!.visibility = View.GONE
 
-                        isOutSourcedInDetail = false
+                        isOutSourcedInDetail = 0
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST")
+
+                        linearLayoutDetailHeader!!.visibility = View.VISIBLE
+                        linearLayoutSupplierHeader!!.visibility = View.GONE
+                        //viewLine!!.visibility = View.VISIBLE
+                        listViewBySupplier!!.visibility = View.GONE
+                        listViewDetail!!.visibility = View.VISIBLE
+                        listViewMoreDetail!!.visibility = View.GONE
+
+                        isOutSourcedInDetail = 1
                     }
 
                 }
@@ -490,7 +579,9 @@ class OutsourcedProcessingFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_CONNECTION_TIMEOUT)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST)
             outsourcedProcessContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")

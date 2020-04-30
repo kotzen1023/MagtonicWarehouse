@@ -3,16 +3,10 @@ package com.magtonic.magtonicwarehouse.data
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.Typeface.BOLD
-import android.icu.text.RelativeDateTimeFormatter
-import android.os.Build
-import android.text.Html
-import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import android.util.Log
 
 
 import android.view.LayoutInflater
@@ -24,20 +18,20 @@ import android.widget.TextView
 import com.magtonic.magtonicwarehouse.R
 import java.util.*
 
-class OutsourcedProcessOrderDetailItemAdapter (context: Context?, resource: Int, objects: ArrayList<OutsourcedProcessOrderDetailItem>) :
-    ArrayAdapter<OutsourcedProcessOrderDetailItem>(context as Context, resource, objects) {
-    private val mTAG = OutsourcedProcessOrderDetailItemAdapter::class.java.name
+class OutsourcedProcessDetailItemAdapter (context: Context?, resource: Int, objects: ArrayList<OutsourcedProcessDetailItem>) :
+    ArrayAdapter<OutsourcedProcessDetailItem>(context as Context, resource, objects) {
+    private val mTAG = OutsourcedProcessDetailItemAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val items: ArrayList<OutsourcedProcessOrderDetailItem> = objects
+    private val items: ArrayList<OutsourcedProcessDetailItem> = objects
     private val mContext = context
 
     override fun getCount(): Int {
         return items.size
     }
 
-    override fun getItem(position: Int): OutsourcedProcessOrderDetailItem? {
+    override fun getItem(position: Int): OutsourcedProcessDetailItem? {
         return items[position]
     }
 

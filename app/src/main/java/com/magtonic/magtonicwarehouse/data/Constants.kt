@@ -132,7 +132,10 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessScanBarcode"
             const val ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessFragmentRefresh"
             const val ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessFragmentDetailRefresh"
+            const val ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessFragmentMoreDetailRefresh"
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToSupplierList"
+            const val ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToDetailList"
+            const val ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessHideFabBack"
 
             const val ACTION_OUTSOURCED_PROCESS_MODIFY_CHANGED : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessModifyChanged"
             const val ACTION_OUTSOURCED_PROCESS_NO_CHANGED : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessModifyNoChanged"

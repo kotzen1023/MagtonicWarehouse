@@ -59,7 +59,6 @@ import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.ME
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_STATE_CHANGE
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_TOAST
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_WRITE
-import com.magtonic.magtonicwarehouse.data.OutsourcedProcessOrderDetailItem
 
 import com.magtonic.magtonicwarehouse.fragment.*
 import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.currentMaterialPage
@@ -184,7 +183,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //OutsourcedProcess
         @JvmStatic var outsourcedProcessOrderList = ArrayList<RJOutSourced>()
         @JvmStatic var outsourcedProcessOrderListBySupplier = ArrayList<RJSupplier>()
-        @JvmStatic var isOutSourcedInDetail: Boolean = false
+        @JvmStatic var isOutSourcedInDetail: Int = 0
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -216,7 +215,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var fabPrint: FloatingActionButton? = null
     var fabPrintAgain: FloatingActionButton? = null
     var fabWifi: FloatingActionButton? = null
-
+    var fabBack: FloatingActionButton? = null
 
 
 
@@ -440,8 +439,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }*/
         }
 
+        fabBack = findViewById(R.id.fabBack)
+        fabBack!!.setOnClickListener {
+            Log.d(mTAG, "===> fabBack")
+
+            if (isOutSourcedInDetail == 1) {
+                fabBack!!.visibility = View.GONE
+
+                val backIntent = Intent()
+                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+                sendBroadcast(backIntent)
+            } else { //isOutSourcedInDetail == 2
+
+                val backIntent = Intent()
+                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
+                sendBroadcast(backIntent)
+            }
 
 
+        }
         //permission
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1572,6 +1588,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Log.e(mTAG, "topic = $topic")
                         Log.e(mTAG, "description = $description")
                         Log.e(mTAG, "sign = $sign")*/
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK")
+
+                        fabBack!!.visibility = View.GONE
+
                     }
                 }
 
@@ -1803,6 +1824,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
+
 
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
@@ -1867,9 +1890,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
 
-        if (isOutSourcedInDetail) { //if in outsourced detail
+        if (isOutSourcedInDetail == 1) { //if in outsourced detail
+
+            fabBack!!.visibility = View.GONE
+
             val backIntent = Intent()
             backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+            sendBroadcast(backIntent)
+        } else if (isOutSourcedInDetail == 2) {
+            val backIntent = Intent()
+            backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
             sendBroadcast(backIntent)
         } else {
             showExitConfirmDialog()
@@ -4454,7 +4484,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
                                 outsourcedProcessOrderList.add(rjOutSourceProcessedList.dataList[0])
-
+                                fabBack!!.visibility = View.VISIBLE
                             } else {
 
                                 Log.e(mTAG, "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedList.dataList[0].result2}")
@@ -4476,6 +4506,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     Log.e(mTAG, "rjOutSourceProcessed.result = ${rjOutSourceProcessed.result2}")
                                 }
                             }
+
+                            fabBack!!.visibility = View.VISIBLE
 
                             val successIntent = Intent()
                             successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
