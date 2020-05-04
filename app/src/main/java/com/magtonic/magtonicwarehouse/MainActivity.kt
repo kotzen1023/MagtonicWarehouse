@@ -676,6 +676,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_USER_INPUT_SEARCH, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_USER_INPUT_SEARCH")
 
+                        //for outsourced process
+                        if (fabBack!!.visibility == View.VISIBLE) {
+                            fabBack!!.visibility = View.GONE
+                        }
+
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
 
                         val inputNo = intent.getStringExtra("INPUT_NO")
@@ -1519,16 +1524,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         successIntent.action = Constants.ACTION.ACTION_GUEST_FRAGMENT_REFRESH
                         mContext!!.sendBroadcast(successIntent)
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED")
-
-                        isBarcodeScanning = false
-                        //val noExistIntent = Intent()
-                        //noExistIntent.action = Constants.ACTION.ACTION_GUEST_LIST_CLEAR
-                        //mContext!!.sendBroadcast(noExistIntent)
-
-                        val errorString = intent.getStringExtra("result2")
-                        toast(errorString as String)
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_GUEST_IN_OR_LEAVE_ACTION")
 
@@ -1814,7 +1809,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //guest
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST)
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_SUCCESS)
-            filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED)
+            //filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED)
             filter.addAction(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_ACTION)
             filter.addAction(Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_LIST_ACTION)
             filter.addAction(Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION)
@@ -4321,10 +4316,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 mContext!!.sendBroadcast(successIntent)*/
                             } else {
 
+                                isBarcodeScanning = false
+                                //val errorString = intent.getStringExtra("result2")
+                                val errorString = rjGuestList.dataList[0].result2
+                                toast(errorString)
+
+
                                 val errorIntent = Intent()
                                 errorIntent.action = Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED
-                                errorIntent.putExtra("result2", rjGuestList.dataList[0].result2)
+                                //errorIntent.putExtra("result2", rjGuestList.dataList[0].result2)
                                 mContext!!.sendBroadcast(errorIntent)
+
 
 
 

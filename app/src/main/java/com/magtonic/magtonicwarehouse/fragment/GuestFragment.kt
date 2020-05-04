@@ -510,6 +510,10 @@ class GuestFragment : Fragment() {
                         progressBar!!.visibility = View.GONE
 
                         startTimer()
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED")
+
+                        progressBar!!.visibility = View.GONE
                     }
 
                 }
@@ -530,6 +534,7 @@ class GuestFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_GUEST_SHOW_LEAVE_ACTION)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST)
+            filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED)
 
             //filter.addAction(Constants.ACTION.ACTION_RECEIPT_ALREADY_UPLOADED_SEND_TO_FRAGMENT)
             guestContext?.registerReceiver(mReceiver, filter)

@@ -292,8 +292,14 @@ class OutsourcedProcessingFragment : Fragment() {
                         outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                     }
 
+                    outsourcedProcessMoreDetailList.clear()
+                    if (outsourcedProcessMoreDetailAdapter != null) {
+                        outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+                    }
+
                     listViewBySupplier!!.visibility = View.VISIBLE
                     listViewDetail!!.visibility = View.GONE
+                    listViewMoreDetail!!.visibility = View.GONE
 
                     isOutSourcedInDetail = 0
 
@@ -301,6 +307,10 @@ class OutsourcedProcessingFragment : Fragment() {
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
                     searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
                     outsourcedProcessContext?.sendBroadcast(searchIntent)
+
+                    //val hideIntent = Intent()
+                    //hideIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK
+                    //outsourcedProcessContext?.sendBroadcast(hideIntent)
 
                     true
                 }
@@ -334,8 +344,14 @@ class OutsourcedProcessingFragment : Fragment() {
                         outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                     }
 
+                    outsourcedProcessMoreDetailList.clear()
+                    if (outsourcedProcessMoreDetailAdapter != null) {
+                        outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+                    }
+
                     listViewBySupplier!!.visibility = View.VISIBLE
                     listViewDetail!!.visibility = View.GONE
+                    listViewMoreDetail!!.visibility = View.GONE
 
                     isOutSourcedInDetail = 0
 
@@ -343,6 +359,10 @@ class OutsourcedProcessingFragment : Fragment() {
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
                     searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
                     outsourcedProcessContext?.sendBroadcast(searchIntent)
+
+                    //val hideIntent = Intent()
+                    //hideIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK
+                    //outsourcedProcessContext?.sendBroadcast(hideIntent)
 
                     true
                 }
