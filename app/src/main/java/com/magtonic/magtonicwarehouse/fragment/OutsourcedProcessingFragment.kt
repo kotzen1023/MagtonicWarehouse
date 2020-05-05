@@ -1,6 +1,6 @@
 package com.magtonic.magtonicwarehouse.fragment
 
-import android.app.AlertDialog
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,7 +9,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import android.text.InputType
+
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -43,14 +43,14 @@ class OutsourcedProcessingFragment : Fragment() {
     //private var btnOutsourcedProcessMain: Button? = null
     //private var btnOutsourcedProcessLower: Button? = null
 
-    private var btnSign: Button? = null
+    //private var btnSign: Button? = null
 
     private var barcodeInput: EditText? = null
     private var linearLayout: LinearLayout? = null
     private var linearLayoutSupplierHeader: LinearLayout? = null
     private var linearLayoutDetailHeader: LinearLayout? = null
     private var viewLine: View?=null
-    private var layoutLowerItemHeader: LinearLayout? = null
+    //private var layoutLowerItemHeader: LinearLayout? = null
     //private var listView: ListView? = null
     private var listViewBySupplier: ListView? = null
     private var listViewDetail: ListView? = null
@@ -59,22 +59,22 @@ class OutsourcedProcessingFragment : Fragment() {
     private var relativeLayout: RelativeLayout? = null
     private var imageViewPrev: ImageView? = null
 
-    var outsourcedProcessTopList = ArrayList<OutsourcedProcessTopItem>()
-    var outsourcedProcessLowerList = ArrayList<OutsourcedProcessLowerPartItem>()
+    //var outsourcedProcessTopList = ArrayList<OutsourcedProcessTopItem>()
+    //var outsourcedProcessLowerList = ArrayList<OutsourcedProcessLowerPartItem>()
     var outsourcedProcessDetailList = ArrayList<OutsourcedProcessDetailItem>()
     var outsourcedProcessMoreDetailList = ArrayList<OutsourcedProcessMoreDetailItem>()
     var outsourcedProcessListBySupplier = ArrayList<OutsourcedProcessSupplierItem>()
 
-    private var listViewTop: ListView?= null
-    private var listViewLower: ListView?= null
+    //private var listViewTop: ListView?= null
+    //private var listViewLower: ListView?= null
     private var mReceiver: BroadcastReceiver? = null
     private var isRegister = false
 
-    private var currentClickItem: Int = 0
+    //private var currentClickItem: Int = 0
     private var toastHandle: Toast? = null
 
     private val colorCodePink = Color.parseColor("#D81B60")
-    private val colorCodeBlue = Color.parseColor("#1976D2")
+    //private val colorCodeBlue = Color.parseColor("#1976D2")
 
     private var currentSendOrder: String = ""
 
@@ -123,8 +123,8 @@ class OutsourcedProcessingFragment : Fragment() {
         //listViewTop = view!!.findViewById(R.id.listViewOutsourcedProcessTop)
 
         listViewBySupplier = view!!.findViewById(R.id.listViewOutsourceListBySupplier)
-        listViewDetail = view!!.findViewById(R.id.listViewOutsourceDetail)
-        listViewMoreDetail = view!!.findViewById(R.id.listViewOutsourceMoreDetail)
+        listViewDetail = view.findViewById(R.id.listViewOutsourceDetail)
+        listViewMoreDetail = view.findViewById(R.id.listViewOutsourceMoreDetail)
 
         listViewBySupplier!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
@@ -445,7 +445,7 @@ class OutsourcedProcessingFragment : Fragment() {
                         }
 
                         for (rjOutSourceProcessedBySupplier in outsourcedProcessOrderListBySupplier) {
-                            var found: Boolean = false
+                            var found = false
                             //found same send material order
                             for (i in 0 until outsourcedProcessListBySupplier.size) {
                                 if (rjOutSourceProcessedBySupplier.data1 == outsourcedProcessListBySupplier[i].getData1() &&
@@ -532,7 +532,7 @@ class OutsourcedProcessingFragment : Fragment() {
                         outsourcedProcessMoreDetailList.clear()
 
                         if (idx != null) {
-                            val item0 = OutsourcedProcessMoreDetailItem("發料單號", sendOrder)
+                            val item0 = OutsourcedProcessMoreDetailItem("發料單號", sendOrder as String)
                             outsourcedProcessMoreDetailList.add(item0)
                             val item1 = OutsourcedProcessMoreDetailItem("項次", outsourcedProcessDetailList[idx].getData1())
                             outsourcedProcessMoreDetailList.add(item1)
@@ -655,7 +655,7 @@ class OutsourcedProcessingFragment : Fragment() {
         toastHandle = toast
     }
 
-    private fun showUploadToERPDialog(part_no: String, position: Int) {
+    /*private fun showUploadToERPDialog(part_no: String, position: Int) {
 
         // get prompts.xml view
         /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
@@ -741,5 +741,5 @@ class OutsourcedProcessingFragment : Fragment() {
         alertDialogBuilder.show()
 
 
-    }
+    }*/
 }
