@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.magtonic.magtonicwarehouse"
         versionCode 1
-        versionName "1.7"
+        versionName "1.8"
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion

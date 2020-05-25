@@ -24,7 +24,7 @@
                     android:hint="@string/outsource_supplier_input_hint"
                     android:textSize="@dimen/text_size_25"
                     android:textAlignment="center"
-                    android:inputType="text"
+                    android:inputType="numberDecimal"
                     android:maxLines="1"
                     android:minLines="1"
                     android:lines="1"
@@ -133,9 +133,8 @@
             <ListView
                     android:id="@+id/listViewOutsourceListBySupplier"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"/>
 
-            </ListView>
             <ListView
                     android:id="@+id/listViewOutsourceDetail"
                     android:layout_width="match_parent"

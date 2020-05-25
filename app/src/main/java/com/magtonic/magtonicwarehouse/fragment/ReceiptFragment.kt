@@ -402,6 +402,8 @@ class ReceiptFragment : Fragment() {
 
                         progressBar!!.visibility = View.GONE
 
+                        toast(getString(R.string.connect_timeout))
+
                         showButtonStatusByState()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true)) {
@@ -806,19 +808,6 @@ class ReceiptFragment : Fragment() {
                         progressBar!!.visibility = View.GONE
 
                         showButtonStatusByState()
-
-                        /*
-                        //btnUpload!!.isEnabled  = false
-                        //btnUpload!!.text = getString(R.string.btn_status_uploaded)
-                        //btnUpload!!.setTextColor(Color.BLACK)
-                        //btnUpload!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
-                        btnUpload!!.visibility = View.GONE
-                        //show upload confirm button
-                        btnConfim!!.isEnabled = false
-                        btnConfim!!.text = getString(R.string.receipt_confirm_success)
-                        btnConfim!!.setTextColor(Color.BLACK)
-                        btnConfim!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
-                        btnConfim!!.visibility = View.VISIBLE*/
                     }
 
                 }

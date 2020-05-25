@@ -137,6 +137,8 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToDetailList"
             const val ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessHideFabBack"
 
+            const val ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSignDialogAction"
+
             const val ACTION_OUTSOURCED_PROCESS_MODIFY_CHANGED : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessModifyChanged"
             const val ACTION_OUTSOURCED_PROCESS_NO_CHANGED : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessModifyNoChanged"
             const val ACTION_OUTSOURCED_PROCESS_MOVE_TO_POSITION : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessMoveToPosition"
@@ -153,6 +155,8 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadAction"
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadFailed"
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
+
+
         }
 
     }

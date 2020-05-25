@@ -178,5 +178,10 @@
     <string name="outsource_send_no">發料單號</string>
     <string name="outsource_work_order">工單號碼</string>
     <string name="outsource_work_with_part_no">工單/料號</string>
+    <string name="connect_timeout">連線逾時。請檢查網路或防火牆設定。</string>
+    <string name="outsourced_process_dialog_msg">為此張委外發料單簽名?</string>
+    <string name="outsourced_process_dialog_send_no_header">發料單號</string>
+    <string name="outsourced_process_dialog_work_order_header">工單號碼</string>
+    <string name="outsourced_process_send_order_sign_confirm">發料單簽名確認</string>
 
 </resources>

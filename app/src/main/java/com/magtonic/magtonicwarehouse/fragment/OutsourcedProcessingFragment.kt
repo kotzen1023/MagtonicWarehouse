@@ -1,6 +1,7 @@
 package com.magtonic.magtonicwarehouse.fragment
 
 
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,7 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOr
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderListBySupplier
 
 import com.magtonic.magtonicwarehouse.R
+import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -77,6 +79,7 @@ class OutsourcedProcessingFragment : Fragment() {
     //private val colorCodeBlue = Color.parseColor("#1976D2")
 
     private var currentSendOrder: String = ""
+    private var currentSelectSendOrder: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +131,8 @@ class OutsourcedProcessingFragment : Fragment() {
 
         listViewBySupplier!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
+
+            currentSelectSendOrder = position
 
             currentSendOrder = outsourcedProcessListBySupplier[position].getData2()
 
@@ -586,6 +591,10 @@ class OutsourcedProcessingFragment : Fragment() {
                         listViewMoreDetail!!.visibility = View.GONE
 
                         isOutSourcedInDetail = 1
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION")
+
+                        showSignDialog()
                     }
 
                 }
@@ -602,6 +611,7 @@ class OutsourcedProcessingFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION)
             outsourcedProcessContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")
@@ -655,30 +665,32 @@ class OutsourcedProcessingFragment : Fragment() {
         toastHandle = toast
     }
 
-    /*private fun showUploadToERPDialog(part_no: String, position: Int) {
+    private fun showSignDialog() {
 
         // get prompts.xml view
         /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
         View promptView = layoutInflater.inflate(R.layout.input_dialog, null);*/
-        val promptView = View.inflate(outsourcedProcessContext, R.layout.fragment_outsourced_process_lower_dialog, null)
+        val promptView = View.inflate(outsourcedProcessContext, R.layout.outsourced_process_sign_dialog, null)
 
         val alertDialogBuilder = AlertDialog.Builder(outsourcedProcessContext).create()
         alertDialogBuilder.setView(promptView)
 
         //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
-        val textViewMsg = promptView.findViewById<TextView>(R.id.textViewDialogLower)
-        val textViewShouldHeader = promptView.findViewById<TextView>(R.id.textViewDialogLowerShouldOfferHeader)
-        val textViewShouldContent = promptView.findViewById<TextView>(R.id.textViewDialogLowerShouldOfferContent)
-        val textViewActualHeader = promptView.findViewById<TextView>(R.id.textViewDialogLowerActualOfferHeader)
-        val textViewActualContent = promptView.findViewById<EditText>(R.id.textViewDialogLowerActualOfferContent)
+        //val textViewMsg = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessDialogMsg)
+        //val textViewOutsourcedProcessSendOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessSendOrderHeader)
+        val textViewOutsourcedProcessSendOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessSendOrderContent)
+        //val textViewOutsourcedProcessWorkOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderHeader)
+        val textViewOutsourcedProcessWorkOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderContent)
         val btnCancel = promptView.findViewById<Button>(R.id.btnDialogCancel)
         val btnConfirm = promptView.findViewById<Button>(R.id.btnDialogConfirm)
 
-        Log.e(mTAG, "getContentStatic = ${outsourcedProcessLowerList[position].getContentStatic()}")
-        textViewMsg.text = part_no
-        textViewShouldContent.text = outsourcedProcessLowerList[position].getContentStatic()
-        textViewActualContent.inputType = (InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
-        textViewActualContent.setText(outsourcedProcessLowerList[position].getContentDynamic())
+        Log.e(mTAG, "send No. = $currentSendOrder")
+
+        textViewOutsourcedProcessSendOrderContent.text = currentSendOrder
+        textViewOutsourcedProcessWorkOrderContent.text = outsourcedProcessListBySupplier[currentSelectSendOrder].getData3()
+        //textViewShouldContent.text = outsourcedProcessLowerList[position].getContentStatic()
+        //textViewActualContent.inputType = (InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
+        //textViewActualContent.setText(outsourcedProcessLowerList[position].getContentDynamic())
 
         btnCancel.text = getString(R.string.cancel)
         btnConfirm.text = getString(R.string.confirm)
@@ -686,17 +698,19 @@ class OutsourcedProcessingFragment : Fragment() {
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)
         btnCancel!!.setOnClickListener {
-            val noModifyIntent = Intent()
+            /*val noModifyIntent = Intent()
             noModifyIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_NO_CHANGED
             noModifyIntent.putExtra("INDEX", position)
-            outsourcedProcessContext!!.sendBroadcast(noModifyIntent)
+            outsourcedProcessContext!!.sendBroadcast(noModifyIntent)*/
 
             alertDialogBuilder.dismiss()
         }
         btnConfirm!!.setOnClickListener {
 
-
-
+            val intent = Intent(outsourcedProcessContext, SignActivity::class.java)
+            intent.putExtra("SEND_ORDER", currentSendOrder)
+            startActivity(intent)
+            /*
             val oldString: String = textViewShouldContent.text.toString()
             val newString: String = textViewActualContent.text.toString()
 
@@ -734,12 +748,12 @@ class OutsourcedProcessingFragment : Fragment() {
                 alertDialogBuilder.dismiss()
             } else {
                 toast("實發數量不可超過應發數量")
-            }
+            }*/
 
-
+            alertDialogBuilder.dismiss()
         }
         alertDialogBuilder.show()
 
 
-    }*/
+    }
 }

@@ -183,5 +183,10 @@
     <string name="outsource_send_no">Send No.</string>
     <string name="outsource_work_order">Work Order</string>
     <string name="outsource_work_with_part_no">Work Order/Part No.</string>
+    <string name="connect_timeout">Connectiton timeout. Please check your network or firewall configuration.</string>
+    <string name="outsourced_process_dialog_msg">Sign this order?</string>
+    <string name="outsourced_process_dialog_send_no_header">Send Order</string>
+    <string name="outsourced_process_dialog_work_order_header">Work Order</string>
+    <string name="outsourced_process_send_order_sign_confirm">Signature Confirm</string>
 
 </resources>

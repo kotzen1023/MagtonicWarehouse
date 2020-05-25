@@ -4,6 +4,7 @@ package com.magtonic.magtonicwarehouse.data
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.ProgressBar
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPConnectionClosedException
@@ -24,6 +25,7 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
     private var filename: String? =null
     private var path: String? = null
     var mContext: Context? = null
+
 
     init {
         this.mContext = context

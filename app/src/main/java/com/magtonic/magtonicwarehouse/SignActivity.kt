@@ -21,25 +21,23 @@ import androidx.appcompat.app.AppCompatActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isEraser
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penColor
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penWidth
-import com.magtonic.magtonicwarehouse.data.Constants
-import com.magtonic.magtonicwarehouse.data.FTPUtils
-import com.magtonic.magtonicwarehouse.data.FileUtils
-
-import com.magtonic.magtonicwarehouse.data.PaintBoard
-import org.apache.commons.net.ftp.FTPClient
-
+import com.magtonic.magtonicwarehouse.data.*
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class SignActivity : AppCompatActivity() {
     private val mTAG = SignActivity::class.java.name
 
-    private var progressBar: ProgressBar? = null
+    var progressBar: ProgressBar? = null
     private var relativeLayout: RelativeLayout? = null
-    private var linearLayout: LinearLayout? = null
+    private var linearLayoutSign: LinearLayout? = null
+    private var linearLayoutUpload: LinearLayout? = null
+
+
 
     private var signContext: Context? = null
 
@@ -56,19 +54,33 @@ class SignActivity : AppCompatActivity() {
     private var btnClear: Button?= null
     private var btnSave: Button?=null
     private var btnPrev: Button?=null
+    private var btnSignConfirm: Button?=null
 
     private val fileUtils: FileUtils?= FileUtils()
     private var uploadSuccess: Boolean = false
 
+    private var linearLayoutSignDetailList: LinearLayout?= null
+    private var imageViewShowSignature: ImageView?=null
+    private var uploadSignName: String = ""
+    private var sendOrder: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign)
 
+        val intent = this.intent
+        sendOrder = intent.getStringExtra("SEND_ORDER")
+        Log.e(mTAG, "sendOrder = $sendOrder")
+
         signContext = applicationContext
 
         relativeLayout = findViewById(R.id.sign_container)
-        linearLayout = findViewById(R.id.linearLayoutSign)
+        linearLayoutSign = findViewById(R.id.linearLayoutSign)
+        linearLayoutUpload = findViewById(R.id.linearLayoutUpload)
+
+        linearLayoutSignDetailList = findViewById(R.id.linearLayoutSignDetailList)
+        imageViewShowSignature = findViewById(R.id.imageViewShowSignature)
+
         progressBar = ProgressBar(signContext, null, android.R.attr.progressBarStyleLarge)
         val params = RelativeLayout.LayoutParams(MainActivity.screenHeight / 4, MainActivity.screenWidth / 4)
         params.addRule(RelativeLayout.CENTER_IN_PARENT)
@@ -85,6 +97,7 @@ class SignActivity : AppCompatActivity() {
         btnClear = findViewById(R.id.signBtnClear)
         btnSave = findViewById(R.id.signBtnSave)
         btnPrev = findViewById(R.id.signBtnPrev)
+        btnSignConfirm = findViewById(R.id.signConfirm)
 
         btnClear!!.setOnClickListener {
             paintBoard!!.clear()
@@ -98,6 +111,13 @@ class SignActivity : AppCompatActivity() {
             paintBoard!!.undo()
         }
 
+        btnSignConfirm!!.setOnClickListener {
+            val confirmIntent = Intent()
+            confirmIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION
+            confirmIntent.putExtra("SEND_ORDER", sendOrder)
+            confirmIntent.putExtra("SIGN_FILE_NAME", uploadSignName)
+            signContext!!.sendBroadcast(confirmIntent)
+        }
 
         //for action bar
         val actionBar: androidx.appcompat.app.ActionBar? = supportActionBar
@@ -136,7 +156,47 @@ class SignActivity : AppCompatActivity() {
                         progressBar!!.visibility = View.GONE
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE")
-                        finish()
+
+                        linearLayoutSign!!.visibility = View.GONE
+                        linearLayoutUpload!!.visibility = View.VISIBLE
+
+                        val promptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+
+                        val sendOrderHeader = promptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                        val sendOrderContent = promptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+                        sendOrderHeader.text = getString(R.string.outsource_send_no)
+                        sendOrderContent.text = sendOrder
+                        linearLayoutSignDetailList!!.addView(promptView)
+
+                        val headerPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item_header, null)
+                        val barHeader = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailHeader)
+                        val barContent = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentStatic)
+                        val barQuantity = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentDynamic)
+
+                        barHeader.text = getString(R.string.outsource_part_no)
+                        barContent.text = getString(R.string.outsource_part_name)
+                        barQuantity.text = getString(R.string.outsource_quantity)
+                        linearLayoutSignDetailList!!.addView(headerPromptView)
+
+                        for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
+
+                            //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
+                            //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
+                            //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
+                            val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
+
+                            val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
+                            val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
+                            val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
+
+                            itemHeader.text = rjOutSourceProcessed.data3
+                            itemContent.text = rjOutSourceProcessed.data6
+                            itemQuantity.text = rjOutSourceProcessed.data4
+
+                            linearLayoutSignDetailList!!.addView(insidePromptView)
+                        }
+
+                        imageViewShowSignature!!.setImageBitmap(paintBoard!!.bitmap)
                     }
 
                 }
@@ -416,8 +476,11 @@ class SignActivity : AppCompatActivity() {
         }
         btnConfirm!!.setOnClickListener {
 
+            val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+            val currentDateAndTime: String = sdf.format(Date())
 
-            val fileName = (System.currentTimeMillis() / 1000).toString() + ".jpg"
+            //val fileName = (System.currentTimeMillis() / 1000).toString() + ".jpg"
+            uploadSignName = "$currentDateAndTime.jpg"
 
             val scaledWidth = 320.0 //stick height to 512
             //val scaledHeight = 512.0 //stick height to 512
@@ -430,12 +493,12 @@ class SignActivity : AppCompatActivity() {
             val scaledImage = Bitmap.createScaledBitmap(paintBoard!!.bitmap, scaledWidth.toInt(), scaledHeight.toInt(), false)
 
             //saveBitmap(drawContext as Context, paintBoard!!.bitmap, CompressFormat.JPEG,"image/jpeg", fileName)
-            val path = saveBitmap(this@SignActivity as Context, scaledImage, Bitmap.CompressFormat.JPEG,"image/jpeg", fileName)
+            val path = saveBitmap(this@SignActivity as Context, scaledImage, Bitmap.CompressFormat.JPEG,"image/jpeg", uploadSignName)
 
             if (path != "")
             {
                 progressBar!!.visibility = View.VISIBLE
-                val ftpUtils = FTPUtils(signContext as Context,"192.1.1.121", 21, "iepftp", "T69924056Ftp", fileName, path)
+                val ftpUtils = FTPUtils(signContext as Context,"192.1.1.121", 21, "iepftp", "T69924056Ftp", uploadSignName, path)
                 val ftpTask = FtpTask()
                 ftpTask.execute(ftpUtils)
             } else {
@@ -456,6 +519,11 @@ class SignActivity : AppCompatActivity() {
     //private class FtpTask : AsyncTask<FTPUtils, Void?, FTPClient>() {
     private class FtpTask : AsyncTask<FTPUtils, Void?, Context>() {
 
+        override fun onPreExecute() {
+
+
+            super.onPreExecute()
+        }
 
         override fun onPostExecute(context: Context) {
             Log.v("FTPTask", "task complete")

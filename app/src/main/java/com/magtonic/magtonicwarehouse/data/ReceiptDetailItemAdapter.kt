@@ -13,9 +13,7 @@ import android.view.ViewGroup
 
 import android.widget.*
 import com.magtonic.magtonicwarehouse.R
-
-
-import java.util.ArrayList
+import java.util.*
 
 class ReceiptDetailItemAdapter(context: Context?, resource: Int, objects: ArrayList<ReceiptDetailItem>) :
     ArrayAdapter<ReceiptDetailItem>(context as Context, resource, objects) {
@@ -129,7 +127,7 @@ class ReceiptDetailItemAdapter(context: Context?, resource: Int, objects: ArrayL
 
                 if (!oldString.contentEquals(newString)) {
                     //content changed
-                    receiptDetailItem.setContent(holder.itemEdit.text.toString())
+                    receiptDetailItem.setContent(holder.itemEdit.text.toString().toUpperCase(Locale.ROOT))
                     receiptDetailItem.getEditText()!!.setText(holder.itemEdit.text.toString())
                     receiptDetailItem.setChange(true)
 

@@ -38,7 +38,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:paddingLeft="20dp"
-                android:inputType="textEmailAddress"
+                android:inputType="textCapCharacters"
                 android:textSize="@dimen/text_size_30"
 
                 android:layout_gravity="center" />

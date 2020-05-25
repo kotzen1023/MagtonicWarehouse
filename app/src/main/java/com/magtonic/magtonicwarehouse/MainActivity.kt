@@ -70,6 +70,7 @@ import com.magtonic.magtonicwarehouse.model.send.*
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
 import com.magtonic.magtonicwarehouse.model.sys.User
 import com.magtonic.magtonicwarehouse.model.ui.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 import okhttp3.Call
 import okhttp3.Callback
@@ -216,7 +217,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var fabPrintAgain: FloatingActionButton? = null
     var fabWifi: FloatingActionButton? = null
     var fabBack: FloatingActionButton? = null
-
+    var fabSign: FloatingActionButton? = null
 
 
     //val receiptUploadedList = ArrayList<ItemReceipt>()
@@ -445,6 +446,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             if (isOutSourcedInDetail == 1) {
                 fabBack!!.visibility = View.GONE
+                fabSign!!.visibility = View.GONE
 
                 val backIntent = Intent()
                 backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
@@ -455,6 +457,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
                 sendBroadcast(backIntent)
             }
+
+        }
+
+        fabSign = findViewById(R.id.fabSign)
+        fabSign!!.setOnClickListener {
+            val showIntent = Intent()
+            showIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION
+            sendBroadcast(showIntent)
 
 
         }
@@ -679,6 +689,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //for outsourced process
                         if (fabBack!!.visibility == View.VISIBLE) {
                             fabBack!!.visibility = View.GONE
+                            fabSign!!.visibility = View.GONE
                         }
 
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
@@ -1571,23 +1582,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         getOutSourcedProcessDetail(sendOrder)
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION")
-
-                        val id = intent.getStringExtra("ID")
-                        val topic = intent.getStringExtra("TOPIC")
-                        val description = intent.getStringExtra("DESCRIPTION")
-                        //val sign = intent.getStringExtra("SIGN")
-
-                        /*Log.e(mTAG, "id = $id")
-                        Log.e(mTAG, "topic = $topic")
-                        Log.e(mTAG, "description = $description")
-                        Log.e(mTAG, "sign = $sign")*/
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK")
 
                         fabBack!!.visibility = View.GONE
+                        fabSign!!.visibility = View.GONE
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION")
 
+                        val sendOrder = intent.getStringExtra("SEND_ORDER")
+                        val uploadSignFileName = intent.getStringExtra("SIGN_FILE_NAME")
+
+                        confirmOutSourcedProcessSign(sendOrder as String , uploadSignFileName as  String, user!!.userAccount)
                     }
                 }
 
@@ -1888,6 +1894,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (isOutSourcedInDetail == 1) { //if in outsourced detail
 
             fabBack!!.visibility = View.GONE
+            fabSign!!.visibility = View.GONE
 
             val backIntent = Intent()
             backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
@@ -4487,6 +4494,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                 outsourcedProcessOrderList.add(rjOutSourceProcessedList.dataList[0])
                                 fabBack!!.visibility = View.VISIBLE
+                                fabSign!!.visibility = View.VISIBLE
                             } else {
 
                                 Log.e(mTAG, "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedList.dataList[0].result2}")
@@ -4510,6 +4518,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             }
 
                             fabBack!!.visibility = View.VISIBLE
+                            fabSign!!.visibility = View.VISIBLE
 
                             val successIntent = Intent()
                             successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
@@ -4597,6 +4606,66 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             mContext!!.sendBroadcast(successIntent)
                         }
 
+                    }
+
+
+                } catch (e: Exception) {
+                    Log.e(mTAG, "ex = $e")
+                    //system error
+                    //toast(getString(R.string.toast_server_error))
+                    //val failIntent = Intent()
+                    //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    //sendBroadcast(failIntent)
+                }
+            }
+
+
+        }//onResponse
+    }
+
+    fun confirmOutSourcedProcessSign(outSourcedSendOrder: String, signFileName: String, userName: String) {
+        Log.e(mTAG, "=== confirmOutSourcedProcessSign start ===")
+
+        Log.e(mTAG, "outSourcedSendOrder = $outSourcedSendOrder, signFileName = $signFileName, userName = $userName")
+
+        val para = HttpOutsourcedProcessSignConfirmGetPara()
+        para.data1 = outSourcedSendOrder
+        para.data2 = signFileName
+        para.data3 = userName
+        ApiFunc().confirmOutSourcedProcessSign(para, confirmOutSourcedProcessSignCallback)
+    }
+
+    private var confirmOutSourcedProcessSignCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+
+            runOnUiThread(netErrRunnable)
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
+            val res = ReceiveTransform.restoreToJsonStr(response.body!!.string())
+            Log.e(mTAG, "res = $res")
+            //val res = ReceiveTransform.restoreToJsonStr(response.body()!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    //==== receive single record start ====
+                    val rjOutSourcedConfirm: RJOutSourcedConfirm = Gson().fromJson(res, RJOutSourcedConfirm::class.java) as RJOutSourcedConfirm
+
+                    if (rjOutSourcedConfirm.result == "0") {
+                        val successIntent = Intent()
+                        successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
+                        mContext!!.sendBroadcast(successIntent)
+                    } else {
+                        val failedIntent = Intent()
+                        failedIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED
+                        mContext!!.sendBroadcast(failedIntent)
+
+                        toast(rjOutSourcedConfirm.result2)
                     }
 
 
@@ -5049,9 +5118,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-        var msg = "1. 新增\"設定\"讓使用者決定手動或自動確認\n"
-        msg += "2. 修改數量時，小數點無法使用的問題\n"
-        msg += "3. 新增上傳確認失敗的提示對話方塊\n"
+        var msg = "1. 修改數量時，小數點無法使用的問題\n"
+        msg += "2. 新增上傳確認失敗的提示對話方塊\n"
+        msg += "3. 將輸入欄位預設都為大寫輸入\n"
 
         textViewFixMsg.text = msg
 

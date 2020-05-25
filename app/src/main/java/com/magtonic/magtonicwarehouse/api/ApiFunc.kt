@@ -70,6 +70,8 @@ class ApiFunc {
 
     private val apiStrOutsourcedProcessBySupplierNo = iepIP + "webs_app_sfpp02"
 
+    private val apiStrOutsourcedProcessSignConfirm = iepIP + "webs_app_sfpp03"
+
     private object ContentType {
 
         const val title = "Content-Type"
@@ -134,9 +136,14 @@ class ApiFunc {
         postWithParaPJsonStr(apiStrOutsourcedProcessBySupplierNo, Gson().toJson(getPara), callback)
     }
 
+    fun confirmOutSourcedProcessSign(getPara: HttpOutsourcedProcessSignConfirmGetPara, callback: Callback) {
+        postWithParaPJsonStr(apiStrOutsourcedProcessSignConfirm, Gson().toJson(getPara), callback)
+    }
+
     // post with only one para  "p_json"
     private fun postWithParaPJsonStr(url: String, jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")
+        //Log.e(mTAG, "send jsonStr = $jsonStr")
         val body = FormBody.Builder()
             .add("p_json", jsonStr)
             .build()
