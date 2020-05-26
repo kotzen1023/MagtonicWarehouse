@@ -10,7 +10,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -25,12 +24,12 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isOutSourcedInDetail
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderList
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderListBySupplier
-
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class OutsourcedProcessingFragment : Fragment() {
@@ -81,6 +80,10 @@ class OutsourcedProcessingFragment : Fragment() {
     private var currentSendOrder: String = ""
     private var currentSelectSendOrder: Int = -1
 
+    private val outsourcedSupplierHashMap = HashMap<String, String>()
+    private val outsourcedSupplierNameList = ArrayList<String>()
+    var currentSelectedSupplier: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -96,6 +99,41 @@ class OutsourcedProcessingFragment : Fragment() {
     ): View? {
 
         Log.d(mTAG, "onCreateView")
+
+        //create list
+        outsourcedSupplierHashMap.clear()
+        outsourcedSupplierHashMap["萬興"] = "24924616"
+        outsourcedSupplierHashMap["信旭"] = "22549100"
+        outsourcedSupplierHashMap["順升昌"] = "84431670"
+        outsourcedSupplierHashMap["廈興"] = "28861417"
+        outsourcedSupplierHashMap["迦賢"] = "23082263"
+        outsourcedSupplierHashMap["鋐偉"] = "20294906"
+        outsourcedSupplierHashMap["宏通"] = "10475032"
+        outsourcedSupplierHashMap["弘福興"] = "42929389"
+        outsourcedSupplierHashMap["原茂"] = "37577167"
+        outsourcedSupplierHashMap["佳滿利"] = "27800461"
+        outsourcedSupplierHashMap["日鋒"] = "97199386"
+        outsourcedSupplierHashMap["鈺晃"] = "25081394"
+        outsourcedSupplierHashMap["錦一"] = "53152589"
+        outsourcedSupplierHashMap["盛豐"] = "89342228"
+        outsourcedSupplierHashMap["鴻通海"] = "16660219"
+
+        outsourcedSupplierNameList.clear()
+        outsourcedSupplierNameList.add("萬興")
+        outsourcedSupplierNameList.add("信旭")
+        outsourcedSupplierNameList.add("順升昌")
+        outsourcedSupplierNameList.add("廈興")
+        outsourcedSupplierNameList.add("迦賢")
+        outsourcedSupplierNameList.add("鋐偉")
+        outsourcedSupplierNameList.add("宏通")
+        outsourcedSupplierNameList.add("弘福興")
+        outsourcedSupplierNameList.add("原茂")
+        outsourcedSupplierNameList.add("佳滿利")
+        outsourcedSupplierNameList.add("日鋒")
+        outsourcedSupplierNameList.add("鈺晃")
+        outsourcedSupplierNameList.add("錦一")
+        outsourcedSupplierNameList.add("盛豐")
+        outsourcedSupplierNameList.add("鴻通海")
 
         val view = inflater.inflate(R.layout.fragment_outsourced_process, container, false)
 
@@ -132,25 +170,31 @@ class OutsourcedProcessingFragment : Fragment() {
         listViewBySupplier!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
-            currentSelectSendOrder = position
+            if (!outsourcedProcessListBySupplier[position].getIsSigned()) {
+                currentSelectSendOrder = position
 
-            currentSendOrder = outsourcedProcessListBySupplier[position].getData2()
+                currentSendOrder = outsourcedProcessListBySupplier[position].getData2()
 
-            progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
-            progressBar!!.visibility = View.VISIBLE
+                progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
+                progressBar!!.visibility = View.VISIBLE
 
-            if (outsourcedProcessDetailList.size > 0) {
-                outsourcedProcessDetailList.clear()
+                if (outsourcedProcessDetailList.size > 0) {
+                    outsourcedProcessDetailList.clear()
+                }
+
+                if (outsourcedProcessDetailItemAdapter != null) {
+                    outsourcedProcessDetailItemAdapter!!.notifyDataSetChanged()
+                }
+
+                val searchIntent = Intent()
+                searchIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER
+                searchIntent.putExtra("SEND_ORDER", outsourcedProcessListBySupplier[position].getData2())
+                outsourcedProcessContext?.sendBroadcast(searchIntent)
+            } else {
+                toast(getString(R.string.outsourced_process_sign_is_signed_already))
             }
 
-            if (outsourcedProcessDetailItemAdapter != null) {
-                outsourcedProcessDetailItemAdapter!!.notifyDataSetChanged()
-            }
 
-            val searchIntent = Intent()
-            searchIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER
-            searchIntent.putExtra("SEND_ORDER", outsourcedProcessListBySupplier[position].getData2())
-            outsourcedProcessContext?.sendBroadcast(searchIntent)
         }
 
         listViewBySupplier!!.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, position, _ -> // Process the long-click
@@ -595,6 +639,37 @@ class OutsourcedProcessingFragment : Fragment() {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION")
 
                         showSignDialog()
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS")
+
+                        val sendOrder = intent.getStringExtra("SEND_ORDER")
+
+                        toast(getString(R.string.outsourced_process_sign_confirm, sendOrder))
+
+                        Log.d(mTAG, "sendOrder = $sendOrder")
+
+
+                        for (i in 0 until outsourcedProcessListBySupplier.size) {
+                            Log.e(mTAG, outsourcedProcessListBySupplier[i].getData1())
+                            if (outsourcedProcessListBySupplier[i].getData2() == sendOrder) {
+                                outsourcedProcessListBySupplier[i].setIsSigned(true)
+                            }
+                            Log.e(mTAG, "outsourcedProcessListBySupplier[$i] = ${outsourcedProcessListBySupplier[i].getIsSigned()}")
+                        }
+
+                        listViewBySupplier!!.invalidateViews()
+
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+                        outsourcedProcessContext!!.sendBroadcast(backIntent)
+
+                        val hideIntent = Intent()
+                        hideIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK
+                        outsourcedProcessContext!!.sendBroadcast(hideIntent)
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG")
+
+                        showSupplierDialog()
                     }
 
                 }
@@ -612,6 +687,8 @@ class OutsourcedProcessingFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG)
             outsourcedProcessContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")
@@ -749,6 +826,110 @@ class OutsourcedProcessingFragment : Fragment() {
             } else {
                 toast("實發數量不可超過應發數量")
             }*/
+
+            alertDialogBuilder.dismiss()
+        }
+        alertDialogBuilder.show()
+
+
+    }
+
+    private fun showSupplierDialog() {
+
+        // get prompts.xml view
+        /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);*/
+        val promptView = View.inflate(outsourcedProcessContext, R.layout.outsourced_process_supplier_dialog, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(outsourcedProcessContext).create()
+        alertDialogBuilder.setView(promptView)
+
+        //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
+        //val textViewMsg = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessDialogMsg)
+        //val textViewOutsourcedProcessSendOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessSendOrderHeader)
+        val spinnerSupplier = promptView.findViewById<Spinner>(R.id.spinnerSupplier)
+        //val textViewOutsourcedProcessWorkOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderHeader)
+        //val textViewOutsourcedProcessWorkOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderContent)
+        val btnCancel = promptView.findViewById<Button>(R.id.btnOutSourcedDialogCancel)
+        val btnConfirm = promptView.findViewById<Button>(R.id.btnOutSourcedDialogConfirm)
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameList)
+        spinnerSupplier.adapter = adapter
+
+        spinnerSupplier.setSelection(currentSelectedSupplier)
+
+        spinnerSupplier?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                barcodeInput!!.setText(outsourcedSupplierHashMap[outsourcedSupplierNameList[position]])
+
+                currentSelectedSupplier = position
+
+
+
+
+            }
+
+        }
+        //Log.e(mTAG, "send No. = $currentSendOrder")
+
+        //textViewOutsourcedProcessSendOrderContent.text = currentSendOrder
+        //textViewOutsourcedProcessWorkOrderContent.text = outsourcedProcessListBySupplier[currentSelectSendOrder].getData3()
+        //textViewShouldContent.text = outsourcedProcessLowerList[position].getContentStatic()
+        //textViewActualContent.inputType = (InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
+        //textViewActualContent.setText(outsourcedProcessLowerList[position].getContentDynamic())
+
+        //btnCancel.text = getString(R.string.cancel)
+        //btnConfirm.text = getString(R.string.confirm)
+
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+        btnCancel!!.setOnClickListener {
+
+
+            alertDialogBuilder.dismiss()
+        }
+        btnConfirm!!.setOnClickListener {
+
+            linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
+            linearLayoutDetailHeader!!.visibility = View.GONE
+            viewLine!!.visibility = View.GONE
+
+            progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
+            progressBar!!.visibility = View.VISIBLE
+
+            /*outsourcedProcessDetailList.clear()
+            if (outsourcedProcessOrderDetailItemAdapter != null) {
+                outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
+            }*/
+            outsourcedProcessListBySupplier.clear()
+            if (outsourcedProcessSupplierItemAdapter != null) {
+                outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
+            }
+
+            outsourcedProcessDetailList.clear()
+            if (outsourcedProcessDetailItemAdapter != null) {
+                outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
+            }
+
+            outsourcedProcessMoreDetailList.clear()
+            if (outsourcedProcessMoreDetailAdapter != null) {
+                outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+            }
+
+            listViewBySupplier!!.visibility = View.VISIBLE
+            listViewDetail!!.visibility = View.GONE
+            listViewMoreDetail!!.visibility = View.GONE
+
+            isOutSourcedInDetail = 0
+
+            val searchIntent = Intent()
+            searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
+            searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+            outsourcedProcessContext?.sendBroadcast(searchIntent)
+
 
             alertDialogBuilder.dismiss()
         }

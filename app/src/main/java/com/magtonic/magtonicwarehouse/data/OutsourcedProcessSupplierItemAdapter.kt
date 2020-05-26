@@ -1,10 +1,12 @@
 package com.magtonic.magtonicwarehouse.data
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import com.magtonic.magtonicwarehouse.R
 import java.util.ArrayList
@@ -54,6 +56,12 @@ class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, ob
 
         val outsourcedProcessOrderDetailItem = items[position]
         //if (receiptDetailItem != null) {
+        if (outsourcedProcessOrderDetailItem.getIsSigned()) {
+            //holder.itemSigned.visibility = View.VISIBLE
+            view.setBackgroundColor(Color.YELLOW)
+        } else
+            view.setBackgroundColor(Color.TRANSPARENT)
+
         holder.itemHeader.text = outsourcedProcessOrderDetailItem.getData2()
         holder.itemContent.text = outsourcedProcessOrderDetailItem.getData3()
 
@@ -65,6 +73,7 @@ class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, ob
     }
 
     class ViewHolder (view: View) {
+        //var itemSigned: ImageView = view.findViewById(R.id.outSourcedProcessIsSigned)
         var itemHeader: TextView = view.findViewById(R.id.outSourcedProcessSendMaterialHeader)
         var itemContent: TextView = view.findViewById(R.id.outSourcedProcessWorkOrderContent)
     }

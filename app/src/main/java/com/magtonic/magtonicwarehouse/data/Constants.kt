@@ -156,7 +156,7 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadFailed"
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
 
-
+            const val ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSupplierDialog"
         }
 
     }

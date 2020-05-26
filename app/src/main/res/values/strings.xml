@@ -188,5 +188,13 @@
     <string name="outsourced_process_dialog_send_no_header">Send Order</string>
     <string name="outsourced_process_dialog_work_order_header">Work Order</string>
     <string name="outsourced_process_send_order_sign_confirm">Signature Confirm</string>
+    <string name="outsourced_process_sign_upload_success">Sign upload success</string>
+    <string name="outsourced_process_sign_upload_failed">Sign upload failed</string>
+    <string name="outsourced_process_sign_upload_confirm_failed">Sign upload confirm failed</string>
+    <string name="outsourced_process_sign_upload_confirm_success">Sign upload confirm success</string>
+    <string name="outsourced_process_sign_is_signed_already">This order is signed</string>
+    <string name="outsourced_process_sign_confirm">Order %s sign is confirm</string>
+    <string name="outsourced_process_supplier">Supplier</string>
+    <string name="outsourced_process_dialog_select_supplier">Select supplier</string>
 
 </resources>

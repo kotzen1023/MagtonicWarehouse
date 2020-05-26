@@ -31,4 +31,10 @@
             android:visible="false"
             app:showAsAction="always"/>
 
+    <item android:id="@+id/main_supplier_list"
+            android:icon="@drawable/baseline_list_white_24"
+            android:title="@string/outsourced_process_supplier"
+            android:visible="false"
+            app:showAsAction="always"/>
+
 </menu>

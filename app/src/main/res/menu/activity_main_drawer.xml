@@ -61,7 +61,11 @@
                 android:icon="@drawable/baseline_info_black_48"
                 android:title="@string/nav_about"
                 android:visible="true"/>
-
+        <item
+                android:id="@+id/nav_outsourced"
+                android:icon="@drawable/baseline_edit_black_48"
+                android:title="@string/nav_outsourced"
+                android:visible="true"/>
 
         <!--item android:title="@string/nav_others">
             <menu>

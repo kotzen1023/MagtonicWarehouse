@@ -148,6 +148,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var menuItemSeekBar: MenuItem? = null
     private var menuItemReceiptSetting: MenuItem? = null
     private var menuItemEraser: MenuItem? = null
+    private var menuItemOutSourcedSupplier: MenuItem? = null
 
     companion object {
         @JvmStatic var screenWidth: Int = 0
@@ -185,6 +186,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var outsourcedProcessOrderList = ArrayList<RJOutSourced>()
         @JvmStatic var outsourcedProcessOrderListBySupplier = ArrayList<RJSupplier>()
         @JvmStatic var isOutSourcedInDetail: Int = 0
+        @JvmStatic var currentOutSourcedSendOrder: String = ""
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -1171,6 +1173,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = true
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1209,6 +1212,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1236,6 +1240,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1263,6 +1268,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1291,6 +1297,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1386,6 +1393,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1415,6 +1423,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1446,6 +1455,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemEraser!!.isVisible = true
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1477,6 +1487,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemEraser!!.isVisible = false
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
+                        menuItemOutSourcedSupplier!!.isVisible = true
 
                         //start with receipt fragment
                         var fragment: Fragment? = null
@@ -1592,6 +1603,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         val sendOrder = intent.getStringExtra("SEND_ORDER")
                         val uploadSignFileName = intent.getStringExtra("SIGN_FILE_NAME")
+
+                        currentOutSourcedSendOrder = sendOrder
 
                         confirmOutSourcedProcessSign(sendOrder as String , uploadSignFileName as  String, user!!.userAccount)
                     }
@@ -1823,8 +1836,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //outsourced process
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION)
-            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
-            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+            //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
+            //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
 
 
@@ -1918,6 +1931,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuItemSeekBar = menu.findItem(R.id.main_seek_bar)
         menuItemReceiptSetting = menu.findItem(R.id.main_receipt_setting)
         menuItemEraser = menu.findItem(R.id.main_draw_pen_or_eraser)
+        menuItemOutSourcedSupplier = menu.findItem(R.id.main_supplier_list)
 
         return true
     }
@@ -1969,6 +1983,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isEraser = !isEraser
 
 
+            }
+
+            R.id.main_supplier_list-> {
+                val showIntent = Intent()
+                showIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG
+                sendBroadcast(showIntent)
             }
         }
 
@@ -2029,6 +2049,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.menu.getItem(8).isChecked = false //setting
         navView!!.menu.getItem(9).isChecked = false //guest
         navView!!.menu.getItem(10).isChecked = false //about
+        navView!!.menu.getItem(11).isChecked = false //outsourced
         //navView!!.menu.getItem(4).subMenu.getItem(0).isChecked = false //tag printer
         //navView!!.menu.getItem(4).subMenu.getItem(1).isChecked = false //logout
         //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = false //login
@@ -2059,6 +2080,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = true
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
+
                 title = getString(R.string.nav_receipt) +" - "+ statusTitle
                 fragmentClass = ReceiptFragment::class.java
                 menuItem.isChecked = true
@@ -2085,6 +2108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 //title = getString(R.string.nav_storage) +" - "+ statusTitle
                 title = getString(R.string.nav_storage)
                 fragmentClass = StorageFragment::class.java
@@ -2102,6 +2126,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_material_issuing)
                 fragmentClass = MaterialIssuingFragment::class.java
                 menuItem.isChecked = true
@@ -2118,6 +2143,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_property)
                 fragmentClass = PropertyFragment::class.java
                 menuItem.isChecked = true
@@ -2134,6 +2160,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_home)
                 fragmentClass = HomeGridFragment::class.java
                 menuItem.isChecked = true
@@ -2150,6 +2177,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_login)
                 fragmentClass = LoginFragment::class.java
                 menuItem.isChecked = true
@@ -2194,6 +2222,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_printer)
                 fragmentClass = SettingFragment::class.java
                 menuItem.isChecked = true
@@ -2221,6 +2250,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_setting)
                 fragmentClass = UserSettingFragment::class.java
                 menuItem.isChecked = true
@@ -2238,10 +2268,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_guest)
                 fragmentClass = GuestFragment::class.java
                 menuItem.isChecked = true
                 currentFrag = CurrentFragment.GUEST_FRAGMENT
+
+                //must hide fab print
+                //fabPrint!!.visibility = View.GONE
+                fabPrint!!.hide()
+                isBarcodeScanning = false
+            }
+            R.id.nav_outsourced -> {
+                menuItemKeyboard!!.isVisible = false
+                menuItemBluetooth!!.isVisible = false
+                menuItemSeekBar!!.isVisible = false
+                menuItemReceiptSetting!!.isVisible = false
+                menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = true
+                title = getString(R.string.nav_outsourced)
+                fragmentClass = OutsourcedProcessingFragment::class.java
+                menuItem.isChecked = true
+                currentFrag = CurrentFragment.OUTSOURCED_FRAGMENT
 
                 //must hide fab print
                 //fabPrint!!.visibility = View.GONE
@@ -4659,6 +4707,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (rjOutSourcedConfirm.result == "0") {
                         val successIntent = Intent()
                         successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
+                        successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
                         mContext!!.sendBroadcast(successIntent)
                     } else {
                         val failedIntent = Intent()

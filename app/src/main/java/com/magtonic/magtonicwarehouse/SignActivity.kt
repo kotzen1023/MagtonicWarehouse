@@ -13,18 +13,21 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isEraser
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penColor
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penWidth
-import com.magtonic.magtonicwarehouse.data.*
+import com.magtonic.magtonicwarehouse.data.Constants
+import com.magtonic.magtonicwarehouse.data.FTPUtils
+import com.magtonic.magtonicwarehouse.data.FileUtils
+import com.magtonic.magtonicwarehouse.data.PaintBoard
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.OutputStream
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,7 +39,7 @@ class SignActivity : AppCompatActivity() {
     private var relativeLayout: RelativeLayout? = null
     private var linearLayoutSign: LinearLayout? = null
     private var linearLayoutUpload: LinearLayout? = null
-
+    private var toastHandle: Toast? = null
 
 
     private var signContext: Context? = null
@@ -63,6 +66,8 @@ class SignActivity : AppCompatActivity() {
     private var imageViewShowSignature: ImageView?=null
     private var uploadSignName: String = ""
     private var sendOrder: String = ""
+
+    private var signImageUriPath: Uri ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +117,8 @@ class SignActivity : AppCompatActivity() {
         }
 
         btnSignConfirm!!.setOnClickListener {
+            progressBar!!.visibility = View.VISIBLE
+
             val confirmIntent = Intent()
             confirmIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION
             confirmIntent.putExtra("SEND_ORDER", sendOrder)
@@ -149,13 +156,27 @@ class SignActivity : AppCompatActivity() {
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED")
                         progressBar!!.visibility = View.GONE
+
+                        toast(getString(R.string.outsourced_process_sign_upload_failed))
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS")
 
                         uploadSuccess = true
-                        progressBar!!.visibility = View.GONE
+                        //progressBar!!.visibility = View.GONE
+                        toast(getString(R.string.outsourced_process_sign_upload_success))
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE")
+
+                        //delete image
+
+                        deleteImage()
+                        /*if (!ret) {
+                            Log.e(mTAG, "Delete $signImageAbsolutePath success!")
+                        } else {
+                            Log.e(mTAG, "delete $signImageAbsolutePath failed")
+                        }*/
+
+                        progressBar!!.visibility = View.GONE
 
                         linearLayoutSign!!.visibility = View.GONE
                         linearLayoutUpload!!.visibility = View.VISIBLE
@@ -197,6 +218,18 @@ class SignActivity : AppCompatActivity() {
                         }
 
                         imageViewShowSignature!!.setImageBitmap(paintBoard!!.bitmap)
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED")
+
+                        progressBar!!.visibility = View.GONE
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS")
+
+
+
+                        progressBar!!.visibility = View.GONE
+                        finish()
                     }
 
                 }
@@ -212,7 +245,8 @@ class SignActivity : AppCompatActivity() {
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE)
 
-            //filter.addAction(Constants.ACTION.ACTION_RECEIPT_ALREADY_UPLOADED_SEND_TO_FRAGMENT)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
             signContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")
@@ -325,10 +359,16 @@ class SignActivity : AppCompatActivity() {
             val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             uri = resolver.insert(contentUri, contentValues)
 
+            signImageUriPath = uri
+
             Log.e(mTAG, "Uri = $uri")
             path = getRealPathFromURI(context, uri) as String
+
+
             //val path2 = getRealPathFromURI2(context, uri)
             Log.e(mTAG, "path = $path")
+
+
             //Log.e(mTAG, "path2 = $path2")
             if (uri == null) {
                 throw IOException("Failed to create new MediaStore record.")
@@ -398,6 +438,14 @@ class SignActivity : AppCompatActivity() {
         signContext!!.sendBroadcast(testIntent)*/
 
         return path
+    }
+
+    private fun deleteImage() {
+
+        val resolver = signContext!!.contentResolver
+        val ret = resolver.delete (signImageUriPath as Uri,null ,null );
+
+        Log.e(mTAG, "ret = $ret")
     }
 
     private fun getRealPathFromURI(context: Context, contentUri: Uri?
@@ -514,6 +562,21 @@ class SignActivity : AppCompatActivity() {
         alertDialogBuilder.show()
 
 
+    }
+
+    private fun toast(message: String) {
+
+        if (toastHandle != null)
+            toastHandle!!.cancel()
+
+        val toast = Toast.makeText(signContext, message, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+        val group = toast.view as ViewGroup
+        val textView = group.getChildAt(0) as TextView
+        textView.textSize = 30.0f
+        toast.show()
+
+        toastHandle = toast
     }
 
     //private class FtpTask : AsyncTask<FTPUtils, Void?, FTPClient>() {

@@ -6,6 +6,6 @@
           android:ellipsize="marquee"
           android:gravity="center"
           android:singleLine="true"
-          android:textSize="@dimen/text_size_25"
+          android:textSize="@dimen/text_size_30"
           android:textStyle="bold" >
 </TextView>
