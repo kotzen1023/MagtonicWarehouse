@@ -26,6 +26,12 @@
             android:visible="false"
             app:showAsAction="collapseActionView"/>
 
+    <item android:id="@+id/main_receipt_show_confirm_failed"
+            android:icon="@drawable/baseline_history_white_24"
+            android:title="@string/receipt_confirm_failed_history"
+            android:visible="false"
+            app:showAsAction="collapseActionView"/>
+
     <item android:id="@+id/main_draw_pen_or_eraser"
             android:icon="@drawable/eraser_white"
             android:visible="false"

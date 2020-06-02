@@ -162,9 +162,9 @@
     <string name="guest_in_no">編號</string>
     <string name="guest_in_or_out_dialog_in_date">入廠日期</string>
     <string name="nav_paint">手寫簽名</string>
-    <string name="draw_save_title">確定存檔?</string>
+    <string name="draw_save_title">簽名存檔並上傳?</string>
     <string name="draw_clear_screen">清除螢幕</string>
-    <string name="draw_save_file">儲存檔案</string>
+    <string name="draw_save_file">簽名上傳</string>
     <string name="btn_prev">上一步</string>
     <string name="btn_ok">好</string>
     <string name="receipt_uploaded_confirm_failed_info">上傳確認失敗，請按確認按鈕重新確認。</string>
@@ -191,5 +191,6 @@
     <string name="outsourced_process_sign_confirm">發料單 %s 簽名已確認</string>
     <string name="outsourced_process_supplier">供應商</string>
     <string name="outsourced_process_dialog_select_supplier">請選擇供應商</string>
+    <string name="receipt_confirm_failed_history">確認失敗紀錄</string>
 
 </resources>

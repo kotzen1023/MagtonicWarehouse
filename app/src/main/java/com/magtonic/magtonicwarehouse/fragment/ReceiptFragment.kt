@@ -1,42 +1,39 @@
 package com.magtonic.magtonicwarehouse.fragment
 
 
+//import android.support.v4.app.Fragment
+
+
 import android.app.AlertDialog
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
-
-
-
 import android.os.Bundle
-//import android.support.v4.app.Fragment
-import androidx.fragment.app.Fragment
-
-
-
 import android.util.Log
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
-
+import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity
-
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReceiptUploadAutoConfirm
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isWifiConnected
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.itemReceipt
-
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.printerStatus
-
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.bluetoothchat.BluetoothChatService
-
 import com.magtonic.magtonicwarehouse.data.Constants
 import com.magtonic.magtonicwarehouse.data.ReceiptDetailItem
 import com.magtonic.magtonicwarehouse.data.ReceiptDetailItemAdapter
-
 import com.magtonic.magtonicwarehouse.model.ui.ItemReceipt
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -87,6 +84,11 @@ class ReceiptFragment : Fragment() {
     ): View? {
 
         Log.d(mTAG, "onCreateView")
+
+        //val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+        //val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
+        //Log.e(mTAG, "currentDate = $currentDate, currentTime = $currentTime")
 
         val view = inflater.inflate(R.layout.fragment_receipt, container, false)
 

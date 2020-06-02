@@ -167,7 +167,7 @@
     <string name="guest_in_no">No.</string>
     <string name="guest_in_or_out_dialog_in_date">In Date</string>
     <string name="nav_paint">Signature</string>
-    <string name="draw_save_title">Save file?</string>
+    <string name="draw_save_title">Save signature and upload?</string>
     <string name="draw_clear_screen">Clean</string>
     <string name="draw_save_file">Save</string>
     <string name="btn_prev">Prev</string>
@@ -196,5 +196,6 @@
     <string name="outsourced_process_sign_confirm">Order %s sign is confirm</string>
     <string name="outsourced_process_supplier">Supplier</string>
     <string name="outsourced_process_dialog_select_supplier">Select supplier</string>
+    <string name="receipt_confirm_failed_history">Confirm failed history</string>
 
 </resources>

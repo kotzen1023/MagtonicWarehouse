@@ -37,6 +37,7 @@
         </activity>
         <activity android:name=".bluetoothchat.DeviceListActivity" android:screenOrientation="portrait"/>
         <activity android:name=".SignActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".ShowReceiptConfirmFailedActivity" android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -59,6 +59,7 @@ import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.ME
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_STATE_CHANGE
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_TOAST
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_WRITE
+import com.magtonic.magtonicwarehouse.data.ReceiptConfirmFailLog
 
 import com.magtonic.magtonicwarehouse.fragment.*
 import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.currentMaterialPage
@@ -149,6 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var menuItemReceiptSetting: MenuItem? = null
     private var menuItemEraser: MenuItem? = null
     private var menuItemOutSourcedSupplier: MenuItem? = null
+    private var menuItemShowReceiptConfirmFailed: MenuItem? = null
 
     companion object {
         @JvmStatic var screenWidth: Int = 0
@@ -158,6 +160,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var printerStatus: Int = BluetoothChatService.STATE_NONE
         @JvmStatic var user: User? = null
         @JvmStatic var itemReceipt: ItemReceipt? = null //for receipt
+        @JvmStatic var confirmFailLogList: ArrayList<ReceiptConfirmFailLog> = ArrayList()
+        //@JvmStatic var isReceiptConfirmFailedLogInDetail: Int = 0
         //@JvmStatic var itemReceiptStorage: ItemStorage? = null //for storage
         @JvmStatic var isKeyBoardShow: Boolean = false
         @JvmStatic var isWifiConnected: Boolean = false
@@ -446,20 +450,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fabBack!!.setOnClickListener {
             Log.d(mTAG, "===> fabBack")
 
-            if (isOutSourcedInDetail == 1) {
-                fabBack!!.visibility = View.GONE
-                fabSign!!.visibility = View.GONE
+            when (currentFrag) {
 
-                val backIntent = Intent()
-                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
-                sendBroadcast(backIntent)
-            } else { //isOutSourcedInDetail == 2
+                CurrentFragment.OUTSOURCED_FRAGMENT -> {
+                    if (isOutSourcedInDetail == 1) {
+                        fabBack!!.visibility = View.GONE
+                        fabSign!!.visibility = View.GONE
 
-                val backIntent = Intent()
-                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
-                sendBroadcast(backIntent)
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+                        sendBroadcast(backIntent)
+                    } else { //isOutSourcedInDetail == 2
+
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
+                        sendBroadcast(backIntent)
+                    }
+                }
             }
-
         }
 
         fabSign = findViewById(R.id.fabSign)
@@ -1172,6 +1180,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = true
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = true
+                        menuItemShowReceiptConfirmFailed!!.isVisible = true
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1211,6 +1220,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1239,6 +1249,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1267,6 +1278,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1296,6 +1308,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = true
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1392,6 +1405,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1422,6 +1436,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1452,6 +1467,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = true
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -1484,6 +1500,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemBluetooth!!.isVisible = false
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -1838,6 +1855,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION)
             //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
             //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
 
 
@@ -1920,6 +1938,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             showExitConfirmDialog()
         }
 
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -1932,6 +1952,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuItemReceiptSetting = menu.findItem(R.id.main_receipt_setting)
         menuItemEraser = menu.findItem(R.id.main_draw_pen_or_eraser)
         menuItemOutSourcedSupplier = menu.findItem(R.id.main_supplier_list)
+        menuItemShowReceiptConfirmFailed = menu.findItem(R.id.main_receipt_show_confirm_failed)
 
         return true
     }
@@ -1963,6 +1984,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             R.id.main_receipt_setting-> {
                 showSettingReceiptDialog()
+            }
+
+            R.id.main_receipt_show_confirm_failed-> {
+                val intent = Intent(this, ShowReceiptConfirmFailedActivity::class.java)
+                startActivity(intent)
             }
 
             R.id.main_draw_pen_or_eraser-> {
@@ -2079,6 +2105,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = true
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = true
+                menuItemShowReceiptConfirmFailed!!.isVisible = true
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -2107,6 +2134,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 //title = getString(R.string.nav_storage) +" - "+ statusTitle
@@ -2125,6 +2153,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_material_issuing)
@@ -2142,6 +2171,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_property)
@@ -2159,6 +2189,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_home)
@@ -2176,6 +2207,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_login)
@@ -2221,6 +2253,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = true
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_printer)
@@ -2249,6 +2282,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_setting)
@@ -2267,6 +2301,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_guest)
@@ -2284,6 +2319,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = true
                 title = getString(R.string.nav_outsourced)
@@ -3591,25 +3627,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 itemReceipt!!.state = ItemReceipt.ItemState.CONFIRMED
 
                             val successIntent = Intent()
-                            successIntent.action =
-                                Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS
+                            successIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS
                             sendBroadcast(successIntent)
 
                         } else {
-                            var errorString: String =
-                                getString(R.string.receipt_confirm_fail) + rjReceiptUploadConfirm.code + " " + rjReceiptUploadConfirm.description
+                            val currentDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                            val currentTime: String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
+                            //add this to failLogList
+                            val receiptConfirmFailLog = ReceiptConfirmFailLog(rjReceiptUploadConfirm.code, itemReceipt!!.receiveNum, currentDate, currentTime, rjReceiptUploadConfirm.description)
+                            confirmFailLogList.add(receiptConfirmFailLog)
+
+                            var errorString: String = getString(R.string.receipt_confirm_fail) + rjReceiptUploadConfirm.code + " " + rjReceiptUploadConfirm.description
 
                             if (itemReceipt != null) {
                                 errorString += " " + getString(R.string.receipt_confirm_receipt_no) + " " + itemReceipt!!.receiveNum
                             }
+
+
 
                             toast(errorString)
                             if (itemReceipt != null)
                                 itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
 
                             val failedIntent = Intent()
-                            failedIntent.action =
-                                Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
+                            failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
                             sendBroadcast(failedIntent)
                         }
                     }

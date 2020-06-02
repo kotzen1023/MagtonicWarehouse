@@ -867,9 +867,6 @@ class OutsourcedProcessingFragment : Fragment() {
 
                 currentSelectedSupplier = position
 
-
-
-
             }
 
         }

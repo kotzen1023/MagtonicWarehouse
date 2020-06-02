@@ -54,6 +54,10 @@ class Constants {
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_ACTION: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmAction"
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmSuccess"
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmFailed"
+            //20200601
+            const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_HISTORY : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedHistory"
+            const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_MORE_DETAIL : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedMoreDetail"
+            const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_BACK_TO_HISTORY_LIST : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedBackToHistoryList"
 
             //storage
             const val ACTION_STORAGE_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.StorageScanBarcode"
@@ -135,6 +139,7 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessFragmentMoreDetailRefresh"
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToSupplierList"
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToDetailList"
+
             const val ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessHideFabBack"
 
             const val ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSignDialogAction"
