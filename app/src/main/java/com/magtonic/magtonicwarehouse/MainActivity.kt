@@ -1608,7 +1608,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         val sendOrder = intent.getStringExtra("SEND_ORDER")
 
-                        getOutSourcedProcessDetail(sendOrder)
+                        getOutSourcedProcessDetail(sendOrder as String)
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK")
@@ -1621,7 +1621,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val sendOrder = intent.getStringExtra("SEND_ORDER")
                         val uploadSignFileName = intent.getStringExtra("SIGN_FILE_NAME")
 
-                        currentOutSourcedSendOrder = sendOrder
+                        currentOutSourcedSendOrder = sendOrder as String
 
                         confirmOutSourcedProcessSign(sendOrder as String , uploadSignFileName as  String, user!!.userAccount)
                     }

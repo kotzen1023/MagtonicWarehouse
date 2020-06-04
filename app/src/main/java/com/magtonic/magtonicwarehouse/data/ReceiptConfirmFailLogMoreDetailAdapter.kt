@@ -11,12 +11,12 @@ import java.util.ArrayList
 
 class ReceiptConfirmFailLogMoreDetailAdapter (context: Context?, resource: Int, objects: ArrayList<ReceiptConfirmFailLogMoreDetail>) :
     ArrayAdapter<ReceiptConfirmFailLogMoreDetail>(context as Context, resource, objects) {
-    private val mTAG = ReceiptConfirmFailLogMoreDetailAdapter::class.java.name
+    //private val mTAG = ReceiptConfirmFailLogMoreDetailAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<ReceiptConfirmFailLogMoreDetail> = objects
-    private val mContext = context
+    //private val mContext = context
 
     override fun getCount(): Int {
         return items.size

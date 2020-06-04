@@ -10,12 +10,12 @@ import java.util.*
 
 class ReceiptConfirmFailLogAdapter (context: Context?, resource: Int, objects: ArrayList<ReceiptConfirmFailLog>) :
     ArrayAdapter<ReceiptConfirmFailLog>(context as Context, resource, objects) {
-    private val mTAG = ReceiptConfirmFailLogAdapter::class.java.name
+    //private val mTAG = ReceiptConfirmFailLogAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<ReceiptConfirmFailLog> = objects
-    private val mContext = context
+    //private val mContext = context
 
 
     override fun getCount(): Int {

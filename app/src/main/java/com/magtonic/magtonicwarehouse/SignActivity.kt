@@ -24,10 +24,10 @@ import com.magtonic.magtonicwarehouse.data.FTPUtils
 import com.magtonic.magtonicwarehouse.data.FileUtils
 import com.magtonic.magtonicwarehouse.data.PaintBoard
 import java.io.ByteArrayOutputStream
-import java.io.File
+
 import java.io.IOException
 import java.io.OutputStream
-import java.net.URI
+
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -74,7 +74,7 @@ class SignActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign)
 
         val intent = this.intent
-        sendOrder = intent.getStringExtra("SEND_ORDER")
+        sendOrder = intent.getStringExtra("SEND_ORDER") as String
         Log.e(mTAG, "sendOrder = $sendOrder")
 
         signContext = applicationContext
@@ -392,50 +392,17 @@ class SignActivity : AppCompatActivity() {
         }
 
 
-        /*val scaledHeight = 512.0 //stick height to 512
-        val aspectRatio =  paintBoard!!.height / scaledHeight
-
-        val scaledWidth = paintBoard!!.width / aspectRatio
-
-        Log.d(mTAG, "scaledHeight = $scaledHeight, aspectRatio = $aspectRatio, scaledWidth = $scaledWidth")
-
-        val scaledImage = Bitmap.createScaledBitmap(bitmap, scaledWidth.toInt(), scaledHeight.toInt(), false)
-        */
-
+        /*
         bitmap.compress(format, 100, byteArrayOutputStream)
         //scaledImage.compress(format, 100, byteArrayOutputStream)
         val imageByteArray = byteArrayOutputStream.toByteArray()
 
         Log.e(mTAG, "imageByteArray size = ${imageByteArray.size}")
 
-
-
-
-        //val dataString = String(imageByteArray, Charset.forName("ISO-8859-1"))
-        //Log.e(mTAG, "dataString = $dataString")
         MainActivity.base64 = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
         val decodeByeArray: ByteArray = Base64.decode(MainActivity.base64, Base64.DEFAULT)
         Log.e(mTAG, "base64 size = ${MainActivity.base64.length}")
-
-        //for (i in base64.length-10 until base64.length) {
-        /*for (i in 0 until MainActivity.base64.length) {
-            System.out.print(MainActivity.base64[i].toChar())
-        }*/
-
-        //Log.d(mTAG, "base64 String = ${MainActivity.base64}")
-
-        //Log.e(mTAG, "decodeByeArray size = ${decodeByeArray.size}")
-
-        //Log.e(mTAG, "dataString = $dataString")
-        //test for save sign
-
-        /*val testIntent = Intent()
-        testIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION
-        testIntent.putExtra("ID", "testID")
-        testIntent.putExtra("TOPIC", "testTopic")
-        testIntent.putExtra("DESCRIPTION", "testDescription")
-        //testIntent.putExtra("SIGN", base64)
-        signContext!!.sendBroadcast(testIntent)*/
+        */
 
         return path
     }

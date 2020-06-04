@@ -1,8 +1,6 @@
 package com.magtonic.magtonicwarehouse.fragment
 
 
-//import android.support.v4.app.Fragment
-
 
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
@@ -13,6 +11,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -33,7 +32,7 @@ import com.magtonic.magtonicwarehouse.data.Constants
 import com.magtonic.magtonicwarehouse.data.ReceiptDetailItem
 import com.magtonic.magtonicwarehouse.data.ReceiptDetailItemAdapter
 import com.magtonic.magtonicwarehouse.model.ui.ItemReceipt
-import java.text.SimpleDateFormat
+
 import java.util.*
 
 
@@ -106,6 +105,7 @@ class ReceiptFragment : Fragment() {
         }
         progressBar!!.visibility = View.GONE
         barcodeInput = view.findViewById(R.id.editTextReceipt)
+
         btnUpload = view.findViewById(R.id.btnUpload)
         buttonTextColor = btnUpload!!.textColors
         btnConfim = view.findViewById(R.id.btnReceiptUploadConfirm)
