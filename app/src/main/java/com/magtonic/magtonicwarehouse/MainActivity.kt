@@ -560,23 +560,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(1).isVisible = true //receipt
                         navView!!.menu.getItem(2).isVisible = true //storage
                         navView!!.menu.getItem(3).isVisible = true //material
-                        navView!!.menu.getItem(4).isVisible = true //property
-                        navView!!.menu.getItem(5).isVisible = true //printer
-                        navView!!.menu.getItem(6).isVisible = true //logout
-                        navView!!.menu.getItem(7).isVisible = false //login
+                        navView!!.menu.getItem(4).isVisible = true //outsourced
+                        navView!!.menu.getItem(5).isVisible = true //property
+                        navView!!.menu.getItem(6).isVisible = false //login
+                        navView!!.menu.getItem(7).isVisible = true //printer
                         navView!!.menu.getItem(8).isVisible = true //setting
                         navView!!.menu.getItem(9).isVisible = true //guest
                         navView!!.menu.getItem(10).isVisible = true //about
-
-
-                        //navView!!.menu.getItem(0).isVisible = true //receipt
-                        //navView!!.menu.getItem(1).isVisible = true //storage
-                        //navView!!.menu.getItem(2).isVisible = true //material issuing
-                        //navView!!.menu.getItem(3).isVisible = true //property
-                        //navView!!.menu.getItem(4).subMenu.getItem(1).isVisible = true //logout
-                        //navView!!.menu.getItem(4).subMenu.getItem(2).isVisible = false //login
-                        //navView!!.menu.getItem(4).subMenu.getItem(3).isVisible = true //home
-                        //navView!!.menu.getItem(4).subMenu.getItem(4).isVisible = true //user setting
+                        navView!!.menu.getItem(11).isVisible = true //logout
 
                         //hide keyboard
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
@@ -607,24 +598,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(1).isChecked = false //receipt
                         navView!!.menu.getItem(2).isChecked = false //storage
                         navView!!.menu.getItem(3).isChecked = false //material
-                        navView!!.menu.getItem(4).isChecked = false //property
-                        navView!!.menu.getItem(5).isChecked = false //printer
-                        navView!!.menu.getItem(6).isChecked = false //logout
-                        navView!!.menu.getItem(7).isChecked = false //login
+                        navView!!.menu.getItem(4).isChecked = false //outsourced
+                        navView!!.menu.getItem(5).isChecked = false //property
+                        navView!!.menu.getItem(6).isChecked = false //login
+                        navView!!.menu.getItem(7).isChecked = false //printer
                         navView!!.menu.getItem(8).isChecked = false //setting
                         navView!!.menu.getItem(9).isChecked = false //guest
                         navView!!.menu.getItem(10).isChecked = false //about
+                        navView!!.menu.getItem(11).isChecked = false //logout
 
-                        //navView!!.menu.getItem(0).isChecked = false //receipt
-                        //navView!!.menu.getItem(1).isChecked = false //storage
-                        //navView!!.menu.getItem(2).isChecked = false //material issuing
-                        //navView!!.menu.getItem(3).isChecked = false //property
-                        //navView!!.menu.getItem(4).subMenu.getItem(0).isChecked = false //tag printer
-                        //navView!!.menu.getItem(4).subMenu.getItem(1).isChecked = false //logout
-                        //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = false //login
-                        //navView!!.menu.getItem(4).subMenu.getItem(3).isChecked = true //home
-                        //navView!!.menu.getItem(4).subMenu.getItem(4).isChecked = false //about
-                        //navView!!.menu.getItem(4).subMenu.getItem(5).isChecked = false //user setting
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_LOGIN_FAILED, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_LOGIN_FAILED")
                         //hide
@@ -655,22 +638,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(1).isVisible = false //receipt
                         navView!!.menu.getItem(2).isVisible = false //storage
                         navView!!.menu.getItem(3).isVisible = false //material
-                        navView!!.menu.getItem(4).isVisible = false //property
-                        navView!!.menu.getItem(5).isVisible = true //printer
-                        navView!!.menu.getItem(6).isVisible = false //logout
-                        navView!!.menu.getItem(7).isVisible = true //login
+                        navView!!.menu.getItem(4).isVisible = false //oustsourced
+                        navView!!.menu.getItem(5).isVisible = false //property
+                        navView!!.menu.getItem(6).isVisible = true //login
+                        navView!!.menu.getItem(7).isVisible = true //printer
                         navView!!.menu.getItem(8).isVisible = false //setting
                         navView!!.menu.getItem(9).isVisible = false //guest
                         navView!!.menu.getItem(10).isVisible = true //about
+                        navView!!.menu.getItem(11).isVisible = false //logout
 
-                        //navView!!.menu.getItem(0).isVisible = false //receipt
-                        //navView!!.menu.getItem(1).isVisible = false //storage
-                        //navView!!.menu.getItem(2).isVisible = false //material issuing
-                        //navView!!.menu.getItem(3).isVisible = false //property
-                        //navView!!.menu.getItem(4).subMenu.getItem(1).isVisible = false //logout
-                        //navView!!.menu.getItem(4).subMenu.getItem(2).isVisible = true //login
-                        //navView!!.menu.getItem(4).subMenu.getItem(3).isVisible = false //home
-                        //navView!!.menu.getItem(4).subMenu.getItem(4).isVisible = false //user setting
+
                         var fragment: Fragment? = null
                         val fragmentClass = LoginFragment::class.java
 
@@ -686,8 +663,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
 
-                        navView!!.menu.getItem(7).isChecked = true //login
-                        //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = true //login
+                        navView!!.menu.getItem(6).isChecked = true //login
+
                         title = resources.getString(R.string.nav_login)
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HIDE_KEYBOARD, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HIDE_KEYBOARD")
@@ -1498,7 +1475,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         title = getString(R.string.nav_outsourced)
 
                         menuItemBluetooth!!.isVisible = false
-                        menuItemKeyboard!!.isVisible = false
+                        menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemEraser!!.isVisible = false
@@ -2068,20 +2045,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.menu.getItem(1).isChecked = false //receipt
         navView!!.menu.getItem(2).isChecked = false //storage
         navView!!.menu.getItem(3).isChecked = false //material
-        navView!!.menu.getItem(4).isChecked = false //property
-        navView!!.menu.getItem(5).isChecked = false //printer
-        navView!!.menu.getItem(6).isChecked = false //logout
-        navView!!.menu.getItem(7).isChecked = false //login
+        navView!!.menu.getItem(4).isChecked = false //outsourced
+        navView!!.menu.getItem(5).isChecked = false //property
+        navView!!.menu.getItem(6).isChecked = false //login
+        navView!!.menu.getItem(7).isChecked = false //printer
         navView!!.menu.getItem(8).isChecked = false //setting
         navView!!.menu.getItem(9).isChecked = false //guest
         navView!!.menu.getItem(10).isChecked = false //about
-        navView!!.menu.getItem(11).isChecked = false //outsourced
-        //navView!!.menu.getItem(4).subMenu.getItem(0).isChecked = false //tag printer
-        //navView!!.menu.getItem(4).subMenu.getItem(1).isChecked = false //logout
-        //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = false //login
-        //navView!!.menu.getItem(4).subMenu.getItem(3).isChecked = false //home
-        //navView!!.menu.getItem(4).subMenu.getItem(4).isChecked = false //about
-        //navView!!.menu.getItem(4).subMenu.getItem(5).isChecked = false //user setting
+        navView!!.menu.getItem(11).isChecked = false //logout
 
         var statusTitle = ""
         when(printerStatus) {
@@ -2315,7 +2286,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isBarcodeScanning = false
             }
             R.id.nav_outsourced -> {
-                menuItemKeyboard!!.isVisible = false
+                menuItemKeyboard!!.isVisible = true
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
@@ -2632,29 +2603,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
             fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
 
-            //navView!!.menu.getItem(0).isChecked = false //receipt
-            //navView!!.menu.getItem(1).isChecked = false //storage
-            //navView!!.menu.getItem(2).isChecked = false //material issuing
-            //navView!!.menu.getItem(3).isChecked = false //property
 
             navView!!.menu.getItem(0).isChecked = false //home
             navView!!.menu.getItem(1).isChecked = false //receipt
             navView!!.menu.getItem(2).isChecked = false //storage
             navView!!.menu.getItem(3).isChecked = false //material
-            navView!!.menu.getItem(4).isChecked = false //property
-            navView!!.menu.getItem(5).isChecked = false //printer
-            navView!!.menu.getItem(6).isChecked = false //logout
-            navView!!.menu.getItem(7).isChecked = true //login
+            navView!!.menu.getItem(4).isChecked = false //outsourced
+            navView!!.menu.getItem(5).isChecked = false //property
+            navView!!.menu.getItem(6).isChecked = true //login
+            navView!!.menu.getItem(7).isChecked = false //printer
             navView!!.menu.getItem(8).isChecked = false //setting
             navView!!.menu.getItem(9).isChecked = false //guest
             navView!!.menu.getItem(10).isChecked = false //about
+            navView!!.menu.getItem(11).isChecked = false //logout
 
-            //navView!!.menu.getItem(4).subMenu.getItem(0).isChecked = false //tag printer
-            //navView!!.menu.getItem(4).subMenu.getItem(1).isChecked = false //logout
-            //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = true //login
-            //navView!!.menu.getItem(4).subMenu.getItem(3).isChecked = false //home
-            //navView!!.menu.getItem(4).subMenu.getItem(4).isChecked = false //about
-            //navView!!.menu.getItem(4).subMenu.getItem(5).isChecked = false //user setting
+
         } else {
             //show home
             //set username
@@ -2674,22 +2637,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(1).isVisible = true //receipt
             navView!!.menu.getItem(2).isVisible = true //storage
             navView!!.menu.getItem(3).isVisible = true //material
-            navView!!.menu.getItem(4).isVisible = true //property
-            navView!!.menu.getItem(5).isVisible = true //printer
-            navView!!.menu.getItem(6).isVisible = true //logout
-            navView!!.menu.getItem(7).isVisible = false //login
+            navView!!.menu.getItem(4).isVisible = true //outsourced
+            navView!!.menu.getItem(5).isVisible = true //property
+            navView!!.menu.getItem(6).isVisible = false //login
+            navView!!.menu.getItem(7).isVisible = true //printer
             navView!!.menu.getItem(8).isVisible = true //setting
             navView!!.menu.getItem(9).isVisible = true //guest
             navView!!.menu.getItem(10).isVisible = true //about
+            navView!!.menu.getItem(11).isVisible = true //logout
 
-            //navView!!.menu.getItem(0).isVisible = true //receipt
-            //navView!!.menu.getItem(1).isVisible = true //storage
-            //navView!!.menu.getItem(2).isVisible = true //material issuing
-            //navView!!.menu.getItem(3).isVisible = true //property
-            //navView!!.menu.getItem(4).subMenu.getItem(1).isVisible = true //logout
-            //navView!!.menu.getItem(4).subMenu.getItem(2).isVisible = false //login
-            //navView!!.menu.getItem(4).subMenu.getItem(3).isVisible = true //home
-            //navView!!.menu.getItem(4).subMenu.getItem(4).isVisible = true //user setting
+
 
             var fragment: Fragment? = null
             val fragmentClass: Class<*>
@@ -2709,24 +2666,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(1).isChecked = false //receipt
             navView!!.menu.getItem(2).isChecked = false //storage
             navView!!.menu.getItem(3).isChecked = false //material
-            navView!!.menu.getItem(4).isChecked = false //property
-            navView!!.menu.getItem(5).isChecked = false //printer
-            navView!!.menu.getItem(6).isChecked = false //logout
-            navView!!.menu.getItem(7).isChecked = false //login
+            navView!!.menu.getItem(4).isChecked = false //outsourced
+            navView!!.menu.getItem(5).isChecked = false //property
+            navView!!.menu.getItem(6).isChecked = false //login
+            navView!!.menu.getItem(7).isChecked = false //printer
             navView!!.menu.getItem(8).isChecked = false //setting
             navView!!.menu.getItem(9).isChecked = false //guest
             navView!!.menu.getItem(10).isChecked = false //about
+            navView!!.menu.getItem(11).isChecked = false //logout
 
-            //navView!!.menu.getItem(0).isChecked = false //receipt
-            //navView!!.menu.getItem(1).isChecked = false //storage
-            //navView!!.menu.getItem(2).isChecked = false //material issuing
-            //navView!!.menu.getItem(3).isChecked = false //property
-            //navView!!.menu.getItem(4).subMenu.getItem(0).isChecked = false //tag printer
-            //navView!!.menu.getItem(4).subMenu.getItem(1).isChecked = false //logout
-            //navView!!.menu.getItem(4).subMenu.getItem(2).isChecked = false //login
-            //navView!!.menu.getItem(4).subMenu.getItem(3).isChecked = true //home
-            //navView!!.menu.getItem(4).subMenu.getItem(4).isChecked = false //about
-            //navView!!.menu.getItem(4).subMenu.getItem(5).isChecked = false //user setting
+
         }
 
         //init bluetooth

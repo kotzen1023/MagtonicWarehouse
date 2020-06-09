@@ -42,4 +42,9 @@
     <dimen name="toast_text_size">12sp</dimen>
     <dimen name="chinese_text_spec_and_name">16sp</dimen>
     <dimen name="item_receipt_text">20sp</dimen>
+    <dimen name="item_height">80dp</dimen>
+    <!--  dialog -->
+    <dimen name="dialog_content_text">25sp</dimen>
+    <!--  list view -->
+    <dimen name="list_item_content_size">25sp</dimen>
 </resources>

@@ -59,6 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textSize="@dimen/text_size_25"
+                    android:textStyle="bold"
                     android:layout_weight="1"/>
         </LinearLayout>
 

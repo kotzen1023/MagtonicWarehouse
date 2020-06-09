@@ -300,6 +300,8 @@ class OutsourcedProcessingFragment : Fragment() {
             linearLayout!!.getWindowVisibleDisplayFrame(r)
             val screenHeight = linearLayout!!.rootView.height
             val keypadHeight = screenHeight - r.bottom
+            val temp = screenHeight * 0.15
+            Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
             isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
 
             /*if (isKeyBoardShow) {
@@ -487,11 +489,7 @@ class OutsourcedProcessingFragment : Fragment() {
 
                         progressBar!!.visibility = View.GONE
 
-                        if (isKeyBoardShow) {
-                            val hideIntent = Intent()
-                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
-                            outsourcedProcessContext!!.sendBroadcast(hideIntent)
-                        }
+
 
                         for (rjOutSourceProcessedBySupplier in outsourcedProcessOrderListBySupplier) {
                             var found = false
@@ -523,6 +521,12 @@ class OutsourcedProcessingFragment : Fragment() {
 
                         if (outsourcedProcessSupplierItemAdapter != null) {
                             outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
+                        }
+
+                        if (isKeyBoardShow) {
+                            val hideIntent = Intent()
+                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                            outsourcedProcessContext!!.sendBroadcast(hideIntent)
                         }
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH, ignoreCase = true)) {

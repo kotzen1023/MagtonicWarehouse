@@ -24,26 +24,25 @@
                 android:icon="@drawable/baseline_unarchive_black_48"
                 android:title="@string/nav_material_issuing"
                 android:visible="false"/>
-
+        <item
+                android:id="@+id/nav_outsourced"
+                android:icon="@drawable/baseline_edit_black_48"
+                android:title="@string/nav_outsourced"
+                android:visible="false"/>
         <item
                 android:id="@+id/nav_property"
                 android:icon="@drawable/baseline_monetization_on_black_48"
                 android:title="@string/nav_property"
                 android:visible="false"/>
         <item
-                android:id="@+id/nav_tag_printer"
-                android:icon="@drawable/baseline_local_printshop_black_48"
-                android:title="@string/nav_printer"
-                android:visible="false"/>
-        <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/baseline_exit_to_app_black_48"
-                android:title="@string/nav_logout"
-                android:visible="false"/>
-        <item
                 android:id="@+id/nav_login"
                 android:icon="@drawable/baseline_touch_app_black_48"
                 android:title="@string/nav_login"
+                android:visible="true"/>
+        <item
+                android:id="@+id/nav_tag_printer"
+                android:icon="@drawable/baseline_local_printshop_black_48"
+                android:title="@string/nav_printer"
                 android:visible="true"/>
 
         <item
@@ -56,16 +55,17 @@
                 android:icon="@drawable/baseline_transfer_within_a_station_black_48"
                 android:title="@string/nav_guest"
                 android:visible="false"/>
+
         <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/baseline_info_black_48"
                 android:title="@string/nav_about"
                 android:visible="true"/>
         <item
-                android:id="@+id/nav_outsourced"
-                android:icon="@drawable/baseline_edit_black_48"
-                android:title="@string/nav_outsourced"
-                android:visible="true"/>
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/baseline_exit_to_app_black_48"
+                android:title="@string/nav_logout"
+                android:visible="false"/>
 
         <!--item android:title="@string/nav_others">
             <menu>

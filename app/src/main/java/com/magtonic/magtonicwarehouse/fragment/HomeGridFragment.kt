@@ -47,6 +47,9 @@ class HomeGridFragment : Fragment() {
         val item2 = HomeGridItem("Material", R.drawable.baseline_unarchive_black_48, R.string.nav_material_issuing)
         appList.add(item2)
 
+        val item10 = HomeGridItem("OutSourced", R.drawable.baseline_edit_black_48, R.string.nav_outsourced)
+        appList.add(item10)
+
         val item3 = HomeGridItem("Property", R.drawable.baseline_monetization_on_black_48, R.string.nav_property)
         appList.add(item3)
 
@@ -62,14 +65,15 @@ class HomeGridFragment : Fragment() {
         val item7 = HomeGridItem("Supplier", R.drawable.baseline_transfer_within_a_station_black_48, R.string.nav_guest)
         appList.add(item7)
 
+
+
         val item8 = HomeGridItem("About", R.drawable.baseline_info_black_48, R.string.nav_about)
         appList.add(item8)
 
         /*val item9 = HomeGridItem("Paint", R.drawable.baseline_edit_black_48, R.string.nav_paint)
         appList.add(item9)*/
 
-        val item10 = HomeGridItem("OutSourced", R.drawable.baseline_edit_black_48, R.string.nav_outsourced)
-        appList.add(item10)
+
 
 
 
