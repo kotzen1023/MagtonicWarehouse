@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.fragment.app.Fragment
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.isLogEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReceiptUploadAutoConfirm
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.data.Constants
@@ -34,8 +35,10 @@ class UserSettingFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_user_setting, container, false)
         val receiptAutoConfirmUploaded = view.findViewById<CheckBox>(R.id.checkBoxReceiptAutoConfirmUploaded)
+        val logEnable = view.findViewById<CheckBox>(R.id.checkBoxLogEnable)
 
         receiptAutoConfirmUploaded.isChecked = isReceiptUploadAutoConfirm
+        logEnable.isChecked = isLogEnable
 
         receiptAutoConfirmUploaded.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
@@ -45,6 +48,19 @@ class UserSettingFragment : Fragment() {
             } else {
                 val successIntent = Intent()
                 successIntent.action = Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF
+                userSettingContext!!.sendBroadcast(successIntent)
+            }
+
+        }
+
+        logEnable.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                val successIntent = Intent()
+                successIntent.action = Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON
+                userSettingContext!!.sendBroadcast(successIntent)
+            } else {
+                val successIntent = Intent()
+                successIntent.action = Constants.ACTION.ACTION_SETTING_LOG_ENABLE_OFF
                 userSettingContext!!.sendBroadcast(successIntent)
             }
 

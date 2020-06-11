@@ -6,8 +6,8 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:orientation="horizontal">
+            android:layout_height="120dp"
+            android:orientation="vertical">
 
         <CheckBox
                 android:id="@+id/checkBoxReceiptAutoConfirmUploaded"
@@ -15,7 +15,17 @@
                 android:layout_height="match_parent"
                 android:text="@string/setting_receipt_upload_auto_confirm"
                 android:paddingLeft="10dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1"/>
+
+        <CheckBox
+                android:id="@+id/checkBoxLogEnable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/log_enable"
+                android:paddingLeft="10dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_weight="1"/>
 
     </LinearLayout>
 

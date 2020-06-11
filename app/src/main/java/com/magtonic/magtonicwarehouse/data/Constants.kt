@@ -118,6 +118,8 @@ class Constants {
             //user setting
             const val ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON : String ="com.magtonic.MagtonicWarehoouse.SettingReceiptAutoConfirmUploadedOn"
             const val ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingReceiptAutoConfirmUploadedOff"
+            const val ACTION_SETTING_LOG_ENABLE_ON : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOn"
+            const val ACTION_SETTING_LOG_ENABLE_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOff"
             //guest
             const val ACTION_GUEST_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.GuestScanBarcode"
             const val ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST : String = "com.magtonic.MagtonicWarehoouse.GuestGetCurrentPlantGuestList"

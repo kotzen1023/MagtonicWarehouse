@@ -197,5 +197,6 @@
     <string name="outsourced_process_supplier">Supplier</string>
     <string name="outsourced_process_dialog_select_supplier">Select supplier</string>
     <string name="receipt_confirm_failed_history">Confirm failed history</string>
+    <string name="log_enable">Log file enable</string>
 
 </resources>

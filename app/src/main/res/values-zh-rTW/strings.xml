@@ -192,5 +192,6 @@
     <string name="outsourced_process_supplier">供應商</string>
     <string name="outsourced_process_dialog_select_supplier">請選擇供應商</string>
     <string name="receipt_confirm_failed_history">確認失敗紀錄</string>
+    <string name="log_enable">啟用Log</string>
 
 </resources>

@@ -25,9 +25,9 @@
 
             <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="60dp"
                     android:orientation="horizontal"
-                    android:layout_weight="9">
+                    >
 
                 <Button
                         android:id="@+id/signBtnPrev"
@@ -35,14 +35,14 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:text="@string/btn_prev"
-                        android:textSize="@dimen/text_size_25"/>
+                        android:textSize="@dimen/text_size_20"/>
 
                 <Button
                         android:id="@+id/signBtnClear"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/draw_clear_screen"
-                        android:textSize="@dimen/text_size_25"
+                        android:textSize="@dimen/text_size_20"
                         android:layout_weight="1"/>
 
                 <Button
@@ -50,7 +50,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/draw_save_file"
-                        android:textSize="@dimen/text_size_25"
+                        android:textSize="@dimen/text_size_20"
                         android:layout_weight="1"/>
             </LinearLayout>
         </LinearLayout>

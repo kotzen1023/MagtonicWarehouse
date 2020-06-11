@@ -71,7 +71,7 @@ import com.magtonic.magtonicwarehouse.model.send.*
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
 import com.magtonic.magtonicwarehouse.model.sys.User
 import com.magtonic.magtonicwarehouse.model.ui.*
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 import okhttp3.Call
 import okhttp3.Callback
@@ -191,6 +191,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var outsourcedProcessOrderListBySupplier = ArrayList<RJSupplier>()
         @JvmStatic var isOutSourcedInDetail: Int = 0
         @JvmStatic var currentOutSourcedSendOrder: String = ""
+        //log
+        @JvmStatic var isLogEnable: Boolean = true
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -268,6 +270,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         password = pref!!.getString(User.PASSWORD, "") as String
         username = pref!!.getString(User.USER_NAME, "") as String
         isReceiptUploadAutoConfirm = pref!!.getBoolean("IS_RECEIPT_UPLOAD_AUTO_CONFIRM", true)
+        isLogEnable = pref!!.getBoolean("IS_LOG_ENABLE", true)
+
         isSecurityGuard = pref!!.getBoolean("IS_SECURITY_GUARD", false)
 
 
@@ -484,7 +488,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             checkAndRequestPermissions()
         } else {
             initView()
-            initLog()
+            if (isLogEnable)
+                initLog()
         }
 
         //Log.d(mTAG, "isLogin = $isLogin")
@@ -1189,6 +1194,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentFrag = CurrentFragment.RECEIPT_FRAGMENT
                         isBarcodeScanning = false
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_STORAGE_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_STORAGE_ACTION")
 
@@ -1217,6 +1225,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         currentFrag = CurrentFragment.STORAGE_FRAGMENT
                         isBarcodeScanning = false
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_MATERIAL_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_MATERIAL_ACTION")
@@ -1247,6 +1258,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentFrag = CurrentFragment.MATERIAL_ISSUING_FRAGMENT
                         isBarcodeScanning = false
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_PROPERTY_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_PROPERTY_ACTION")
 
@@ -1276,6 +1290,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentFrag = CurrentFragment.PROPERTY_FRAGMENT
                         isBarcodeScanning = false
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_TAG_PRINTER_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_TAG_PRINTER_ACTION")
                         isBarcodeScanning = false
@@ -1304,6 +1321,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
 
                         currentFrag = CurrentFragment.PRINTER_FRAGMENT
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_LOGOUT_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_LOGOUT_ACTION")
@@ -1402,6 +1422,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         currentFrag = CurrentFragment.USER_SETTING_FRAGMENT
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_GUEST_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_GUEST_ACTION")
@@ -1433,6 +1455,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         currentFrag = CurrentFragment.GUEST_FRAGMENT
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_PAINT_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_PAINT_ACTION")
@@ -1499,6 +1523,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         currentFrag = CurrentFragment.OUTSOURCED_FRAGMENT
 
+                        //hide print again button
+                        fabPrintAgain!!.hide()
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON")
@@ -1517,6 +1543,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         editor = pref!!.edit()
                         editor!!.putBoolean("IS_RECEIPT_UPLOAD_AUTO_CONFIRM", isReceiptUploadAutoConfirm)
                         editor!!.apply()
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SETTING_LOG_ENABLE_ON")
+
+                        isLogEnable = true
+                        //save
+                        editor = pref!!.edit()
+                        editor!!.putBoolean("IS_LOG_ENABLE", isLogEnable)
+                        editor!!.apply()
+
+                        initLog()
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_OFF, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SETTING_LOG_ENABLE_OFF")
+
+                        isLogEnable = false
+                        //save
+                        editor = pref!!.edit()
+                        editor!!.putBoolean("IS_LOG_ENABLE", isLogEnable)
+                        editor!!.apply()
+
+                        process!!.destroy()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST")
 
@@ -1819,6 +1867,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //user setting
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON)
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF)
+            filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON)
+            filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_OFF)
             //guest
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST)
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_SUCCESS)
@@ -2098,7 +2148,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
                 isBarcodeScanning = false
-
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_storage -> {
                 menuItemKeyboard!!.isVisible = true
@@ -2118,6 +2169,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_material_issuing -> {
                 menuItemKeyboard!!.isVisible = true
@@ -2136,6 +2189,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_property -> {
                 menuItemKeyboard!!.isVisible = true
@@ -2154,6 +2209,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_home -> {
                 menuItemKeyboard!!.isVisible = false
@@ -2172,6 +2229,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_login -> {
                 menuItemKeyboard!!.isVisible = true
@@ -2190,6 +2249,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_logout -> {
                 isBarcodeScanning = false
@@ -2233,6 +2294,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 currentFrag = CurrentFragment.PRINTER_FRAGMENT
 
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_about -> {
                 isBarcodeScanning = false
@@ -2266,6 +2329,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fabPrint!!.hide()
 
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_guest -> {
                 menuItemKeyboard!!.isVisible = false
@@ -2284,6 +2349,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
             R.id.nav_outsourced -> {
                 menuItemKeyboard!!.isVisible = true
@@ -2302,6 +2369,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
                 isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
             }
         }
 
@@ -2736,6 +2805,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //process = Runtime.getRuntime().exec("logcat -d -f " + outputFile.getAbsolutePath());
             process = Runtime.getRuntime().exec("logcat -c")
             process = Runtime.getRuntime().exec("logcat -f $outputFile")
+
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -3540,6 +3610,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.e(mTAG, "confirmUploadReceiptCallback onResponse : "+response.body.toString())
             val resXmlString = ReceiveTransform.restoreToJsonStr2(response.body!!.string()) //transfer response.body must outside of the runOnUiThread
 
+            val currentDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val currentTime: String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 Log.e(mTAG, "===>confirmUploadReceiptCallback : onResponse start")
@@ -3550,11 +3623,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     res = res.replace("&gt;", ">")
                     Log.e(mTAG, "res = $res")
 
+
+
                     if (res.contentEquals("Proxy encountered error during request processing")) {
                         toast(getString(R.string.receipt_upload_confirm_retry))
 
                         if (itemReceipt != null)
                             itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
+
+                        //add this to failLogList
+                        val receiptConfirmFailLog = ReceiptConfirmFailLog("Proxy Error", itemReceipt!!.receiveNum, currentDate, currentTime, "Proxy encountered error during request processing")
+                        confirmFailLogList.add(receiptConfirmFailLog)
 
                         val failedIntent = Intent()
                         failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
@@ -3580,8 +3659,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             sendBroadcast(successIntent)
 
                         } else {
-                            val currentDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                            val currentTime: String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
 
                             //add this to failLogList
                             val receiptConfirmFailLog = ReceiptConfirmFailLog(rjReceiptUploadConfirm.code, itemReceipt!!.receiveNum, currentDate, currentTime, rjReceiptUploadConfirm.description)
@@ -3611,6 +3689,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     if (itemReceipt != null)
                         itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
+
+                    //add this to failLogList
+                    val receiptConfirmFailLog = ReceiptConfirmFailLog("Exception", itemReceipt!!.receiveNum, currentDate, currentTime, e.toString().substring(0,64))
+                    confirmFailLogList.add(receiptConfirmFailLog)
 
                     val failedIntent = Intent()
                     failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED

@@ -46,6 +46,7 @@ class OutsourcedProcessingFragment : Fragment() {
 
     //private var btnSign: Button? = null
 
+    private var textViewSupplier: TextView? = null
     private var barcodeInput: EditText? = null
     private var linearLayout: LinearLayout? = null
     private var linearLayoutSupplierHeader: LinearLayout? = null
@@ -155,6 +156,7 @@ class OutsourcedProcessingFragment : Fragment() {
             Log.e(mTAG, "localRelativeLayout = null")
         }
         progressBar!!.visibility = View.GONE
+        textViewSupplier = view.findViewById(R.id.textViewOutsourcedProcess)
         barcodeInput = view.findViewById(R.id.editTextOutsourcedProcess)
         //btnOutsourcedProcessMain = view.findViewById(R.id.btnOutsourcedProcessMain)
         //btnOutsourcedProcessLower = view.findViewById(R.id.btnOutsourcedProcessLower)
@@ -300,13 +302,17 @@ class OutsourcedProcessingFragment : Fragment() {
             linearLayout!!.getWindowVisibleDisplayFrame(r)
             val screenHeight = linearLayout!!.rootView.height
             val keypadHeight = screenHeight - r.bottom
-            val temp = screenHeight * 0.15
-            Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
+            //val temp = screenHeight * 0.15
+            //Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
             isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
 
+
+
             /*if (isKeyBoardShow) {
-                if (outsourcedProcessLowerList.size > 0) {
-                    outsourcedProcessLowerList[currentClickItem].getEditText()!!.requestFocus()
+                if (!barcodeInput!!.isFocused) {
+                    val hideIntent = Intent()
+                    hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                    outsourcedProcessContext!!.sendBroadcast(hideIntent)
                 }
 
             }*/
@@ -893,6 +899,9 @@ class OutsourcedProcessingFragment : Fragment() {
             alertDialogBuilder.dismiss()
         }
         btnConfirm!!.setOnClickListener {
+
+            textViewSupplier!!.visibility = View.VISIBLE
+            textViewSupplier!!.text = outsourcedSupplierNameList[currentSelectedSupplier]
 
             linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
             linearLayoutDetailHeader!!.visibility = View.GONE
