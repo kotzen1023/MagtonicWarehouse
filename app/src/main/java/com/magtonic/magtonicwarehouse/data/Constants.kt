@@ -108,10 +108,12 @@ class Constants {
             const val ACTION_HOME_GO_TO_OUTSOURCED_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToOutsourcedAction"
             //property
             const val ACTION_PROPERTY_FRAGMENT_REFRESH : String ="com.magtonic.MagtonicWarehoouse.PropertyFragmentRefresh"
+            const val ACTION_PROPERTY_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.PropertyMoreDetailRefresh"
             const val ACTION_PROPERTY_NO_NOT_EXIST : String = "com.magtonic.MagtonicWarehoouse.PropertyNoNotExist"
             const val ACTION_PROPERTY_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.PropertyScanBarcode"
             const val ACTION_PROPERTY_MODIFY_CHANGED : String = "com.magtonic.MagtonicWarehoouse.PropertyModifyChanged"
             const val ACTION_PROPERTY_MODIFY_NO_CHANGED : String = "com.magtonic.MagtonicWarehoouse.PropertyModifyNoChanged"
+            const val ACTION_PROPERTY_BACK_TO_LIST : String = "com.magtonic.MagtonicWarehoouse.PropertyBackToList"
             //const val ACTION_PROPERTY_SEEK_BAR_SELECT_PAGE_ACTION: String = "com.magtonic.MagtonicWarehoouse.PropertySeekbarSelectPageAction"
             //const val ACTION_PROPERTY_SEEK_BAR_SHOW_ACTION: String = "com.magtonic.MagtonicWarehoouse.PropertySeekbarShowAction"
             //const val ACTION_PROPERTY_SEEK_BAR_HIDE_ACTION: String = "com.magtonic.MagtonicWarehoouse.PropertySeekbarHideAction"
@@ -142,6 +144,7 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToSupplierList"
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToDetailList"
 
+            const val ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessShoeFabBack"
             const val ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessHideFabBack"
 
             const val ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSignDialogAction"

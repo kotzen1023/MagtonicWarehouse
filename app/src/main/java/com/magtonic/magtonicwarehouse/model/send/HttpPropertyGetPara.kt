@@ -1,5 +1,5 @@
 package com.magtonic.magtonicwarehouse.model.send
 
-class HttpPropertyGetPara : HttpParaBase() {
+class HttpPropertyGetPara {
     var p_faj02 = ""
 }

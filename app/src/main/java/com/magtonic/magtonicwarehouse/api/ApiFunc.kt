@@ -23,7 +23,7 @@ class ApiFunc {
     private val realIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2"
     private val iepIP = "http://192.1.1.121/webs.asmx/"
     private val apiTestSign = "http://192.1.16.152:8080/JerseyExample/rest/data/getdata"
-
+    private val outsideIP = "http://61.216.114.217/asmx/WebService.asmx/"
     //api http address string define
 
     //1.Login
@@ -56,7 +56,7 @@ class ApiFunc {
     private val apiStrUpdateMaterialSend = baseIP + "Upd_sfs05"
 
     //property
-    private val apiStrGetPropertyFun = baseIP + "Sel_faj"
+    private val apiStrGetPropertyFun = outsideIP + "Sel_faj"
 
     //private val apiStrGuestInOrOut = iepIP + "webs_app_car001"
 
@@ -107,8 +107,10 @@ class ApiFunc {
     }
 
     //property
-    fun getProperty(para: HttpPropertyGetPara, callback: Callback) {
-        postWithParaPFAJ02Str(apiStrGetPropertyFun, Gson().toJson(para), callback)
+    //fun getProperty(para: HttpPropertyGetPara, callback: Callback) {
+    fun getProperty(para: String, callback: Callback) {
+        //postWithParaPFAJ02Str(apiStrGetPropertyFun, Gson().toJson(para), callback)
+        postWithParaPFAJ02Str(apiStrGetPropertyFun, para, callback)
     }
 
     //guest
@@ -177,6 +179,8 @@ class ApiFunc {
 
     private fun postWithParaPFAJ02Str(url: String, jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")
+        //Log.e(mTAG, "=======> $jsonStr" )
+
         val body = FormBody.Builder()
             .add("p_faj02", jsonStr)
             .build()

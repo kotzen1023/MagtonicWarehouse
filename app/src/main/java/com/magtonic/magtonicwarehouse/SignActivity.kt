@@ -491,11 +491,10 @@ class SignActivity : AppCompatActivity() {
         }
         btnConfirm!!.setOnClickListener {
 
-            val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-            val currentDateAndTime: String = sdf.format(Date())
-
-            //val fileName = (System.currentTimeMillis() / 1000).toString() + ".jpg"
-            uploadSignName = "$currentDateAndTime.jpg"
+            //val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+            //val currentDateAndTime: String = sdf.format(Date())
+            //uploadSignName = "$currentDateAndTime.jpg"
+            uploadSignName = "$sendOrder.jpg"
 
             val scaledWidth = 320.0 //stick height to 512
             //val scaledHeight = 512.0 //stick height to 512

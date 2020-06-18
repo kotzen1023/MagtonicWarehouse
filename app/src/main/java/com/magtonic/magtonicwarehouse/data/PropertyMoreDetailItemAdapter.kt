@@ -1,45 +1,28 @@
 package com.magtonic.magtonicwarehouse.data
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.text.InputType
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
-
-
-import android.util.Log
 import android.view.LayoutInflater
-
 import android.view.View
 import android.view.ViewGroup
-
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.magtonic.magtonicwarehouse.R
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment
-import com.magtonic.magtonicwarehouse.fragment.PropertyFragment.Companion.itemCanChange
-
-
 import java.util.ArrayList
 
-class PropertyDetailItemAdapter(context: Context?, resource: Int, objects: ArrayList<PropertyDetailItem>) :
-    ArrayAdapter<PropertyDetailItem>(context as Context, resource, objects) {
-
-    private val mTAG = OutsourcedProcessDetailItemAdapter::class.java.name
+class PropertyMoreDetailItemAdapter (context: Context?, resource: Int, objects: ArrayList<PropertyMoreDetailItem>) :
+    ArrayAdapter<PropertyMoreDetailItem>(context as Context, resource, objects) {
+    private val mTAG = OutsourcedProcessMoreDetailAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private val items: ArrayList<PropertyDetailItem> = objects
+    private val items: ArrayList<PropertyMoreDetailItem> = objects
     private val mContext = context
 
     override fun getCount(): Int {
         return items.size
     }
 
-    override fun getItem(position: Int): PropertyDetailItem? {
+    override fun getItem(position: Int): PropertyMoreDetailItem? {
         return items[position]
     }
 
@@ -69,25 +52,17 @@ class PropertyDetailItemAdapter(context: Context?, resource: Int, objects: Array
         //holder.checkbox = (CheckBox) view.findViewById(R.id.checkBoxInRow);
 
 
-        val propertyDetailItem = items[position]
-
-
-        holder.itemHeader.text = propertyDetailItem.faj02
-        holder.itemContent.text = propertyDetailItem.faj06
-
-
-
-
+        val propertyMoreDetailItem = items[position]
+        //if (receiptDetailItem != null) {
+        holder.itemHeader.text = propertyMoreDetailItem.getHeader()
+        holder.itemContent.text = propertyMoreDetailItem.getContent()
 
         return view
     }
 
-    private fun getColoredSpanned(text: String, color: String): String? {
-        return "<font color='$color'>$text</font>"
-    }
-
     class ViewHolder (view: View) {
-        var itemHeader: TextView = view.findViewById(R.id.propertyItemDetailHeader)
-        var itemContent: TextView = view.findViewById(R.id.propertyItemDetailContent)
+        var itemHeader: TextView = view.findViewById(R.id.propertyMoreDetailHeader)
+        var itemContent: TextView = view.findViewById(R.id.propertyMoreDetailContent)
+
     }
 }

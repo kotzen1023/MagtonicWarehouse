@@ -172,6 +172,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var materialList: ArrayList<RJMaterial> = ArrayList()
         @JvmStatic var seekBarCurrentPage: Int = 0
         @JvmStatic var propertyList: ArrayList<RJProperty> = ArrayList()
+        @JvmStatic var isPropertyInDetail: Int = 0
         //@JvmStatic var materialListInArrayList: ArrayList<ArrayList<MaterialDetailItem>> = ArrayList()
         @JvmStatic var isSecurityGuard: Boolean = false
         //guest
@@ -468,6 +469,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         val backIntent = Intent()
                         backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
+                        sendBroadcast(backIntent)
+                    }
+                }
+                CurrentFragment.PROPERTY_FRAGMENT -> {
+                    if (isPropertyInDetail == 1) {
+                        fabBack!!.visibility = View.GONE
+                        fabSign!!.visibility = View.GONE
+
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
                         sendBroadcast(backIntent)
                     }
                 }
@@ -1635,6 +1646,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         getOutSourcedProcessDetail(sendOrder as String)
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK")
+
+                        fabBack!!.visibility = View.VISIBLE
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK")
 
@@ -1883,8 +1898,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
             //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
 
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
-
 
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
@@ -1949,14 +1964,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
 
-        if (isOutSourcedInDetail == 1) { //if in outsourced detail
+        if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1) { //if in outsourced detail
 
             fabBack!!.visibility = View.GONE
             fabSign!!.visibility = View.GONE
 
-            val backIntent = Intent()
-            backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
-            sendBroadcast(backIntent)
+            if (isOutSourcedInDetail == 1) {
+                val backIntent = Intent()
+                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+                sendBroadcast(backIntent)
+            } else {
+                val backIntent = Intent()
+                backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
+                sendBroadcast(backIntent)
+            }
+
         } else if (isOutSourcedInDetail == 2) {
             val backIntent = Intent()
             backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST
@@ -4212,10 +4234,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.e(mTAG, "getProperty poBarcodeByScan = "+barcode.poBarcodeByScan)
             // to call api
             //acState = ReceiptACState.RECEIPT_GETTING_STATE
-            val para = HttpPropertyGetPara()
-            para.p_faj02 = barcode.poBarcodeByScan
 
-            ApiFunc().getProperty(para, getPropertyCallback)
+            //val para = HttpPropertyGetPara()
+            //para.p_faj02 = barcode.poBarcodeByScan
+
+            ApiFunc().getProperty(barcode.poBarcodeByScan, getPropertyCallback)
 
         }
 
@@ -4247,12 +4270,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     if (rjPropertyList.dataList.size > 0) {
                         if (rjPropertyList.dataList.size == 1) {
-                            if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
+                            if (rjPropertyList.dataList[0].result == "0") {
+                                Log.e(mTAG, "=== propertyList start ===")
+                                for (rjProperty in rjPropertyList.dataList) {
+                                    if (rjProperty.result == "0") { //0 success
+                                        propertyList.add(rjProperty)
+                                        //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
+                                    } else { //failed
+                                        Log.e(mTAG, "rjProperty.result = ${rjProperty.result}")
+                                    }
+                                }
+                                Log.e(mTAG, "=== propertyList end ===")
+
+                                val refreshIntent = Intent()
+                                refreshIntent.action = Constants.ACTION.ACTION_PROPERTY_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(refreshIntent)
+                            } else {
                                 val noExistIntent = Intent()
                                 noExistIntent.action = Constants.ACTION.ACTION_PROPERTY_NO_NOT_EXIST
                                 mContext!!.sendBroadcast(noExistIntent)
 
                                 toastLong(rjPropertyList.dataList[0].faj01)
+                            }
+
+                            if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
+
                             }
                         } else { //size > 1
                             Log.e(mTAG, "=== propertyList start ===")

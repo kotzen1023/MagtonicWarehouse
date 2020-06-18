@@ -1,34 +1,31 @@
 package com.magtonic.magtonicwarehouse.data
 
-import android.widget.*
 
-class PropertyDetailItem(header: String, content: String) {
-    private var header: String? = header
-    private var content: String? = content
-    private var textView: TextView? = null
-    private var linearLayout: LinearLayout? = null
-    private var editText: EditText? = null
-    private var spinner: Spinner? = null
-    private var btnOk: Button? = null
-    private var changed: Boolean = false
+class PropertyDetailItem(faj01: String, faj02: String, faj022: String, faj06: String, faj061: String, faj10: String, faj13: String,
+                         faj19: String, faj20: String, pmc03: String, gen02: String, gem02: String, faj43: String) {
+    var faj01: String? = faj01
+    var faj02: String? = faj02
+    var faj022: String? = faj022
+    var faj06: String? = faj06
+    var faj061: String? = faj061
+    var faj10: String? = faj10
+    var faj13: String? = faj13
+    var faj19: String? = faj19
+    var faj20: String? = faj20
+    var pmc03: String? = pmc03
+    var gen02: String? = gen02
+    var gem02: String? = gem02
+    var faj43: String? = faj43
+    //private var textView: TextView? = null
+    //private var linearLayout: LinearLayout? = null
+    //private var editText: EditText? = null
+    //private var spinner: Spinner? = null
+    //private var btnOk: Button? = null
+    //private var changed: Boolean = false
 
-    fun getHeader(): String? {
-        return header
-    }
 
-    fun setHeader(header: String) {
-        this.header = header
-    }
 
-    fun getContent(): String? {
-        return content
-    }
-
-    fun setContent(content: String) {
-        this.content = content
-    }
-
-    fun getTextView(): TextView? {
+    /*fun getTextView(): TextView? {
         return textView
     }
 
@@ -74,5 +71,5 @@ class PropertyDetailItem(header: String, content: String) {
 
     fun setChange(changed: Boolean) {
         this.changed = changed
-    }
+    }*/
 }
