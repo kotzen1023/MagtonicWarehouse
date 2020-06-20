@@ -47,7 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
             </ListView>
 
@@ -60,16 +60,16 @@
 
             </ListView>
 
-            <!--androidx.viewpager.widget.ViewPager
+            <androidx.viewpager.widget.ViewPager
                     android:id="@+id/viewPagerProperty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1">
 
 
-            </androidx.viewpager.widget.ViewPager-->
+            </androidx.viewpager.widget.ViewPager>
 
-            <LinearLayout
+            <!--LinearLayout
                     android:id="@+id/layoutBottomProperty"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
@@ -82,7 +82,7 @@
                         android:layout_weight="1"
                         android:textSize="@dimen/text_size_20"
                         android:text="@string/clear"/>
-            </LinearLayout>
+            </LinearLayout-->
 
         </LinearLayout>
 

@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 
 import com.magtonic.magtonicwarehouse.MainActivity
@@ -51,19 +52,19 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     private var propertyDetailItemAdapter: PropertyDetailItemAdapter? = null
     private var propertyMoreDetailAdapter: PropertyMoreDetailItemAdapter? = null
-    private var listViewProperty: ListView? = null
-    private var listViewPropertyDetail: ListView? = null
+    //private var listViewProperty: ListView? = null
+    //private var listViewPropertyDetail: ListView? = null
     var getPropertyList = ArrayList<PropertyDetailItem>()
     var getPropertyDetailList = ArrayList<PropertyMoreDetailItem>()
-    //var viewPager: ViewPager? = null
-    //var pagerAdapter : PropertyDetailAdapter? = null
+    var viewPager: ViewPager? = null
+    var pagerAdapter : PropertyDetailItemPagerAdapter? = null
 
     companion object {
         @JvmStatic var currentPropertyPage: Int = 0
         @JvmStatic val itemCanChange: Int = 12
     }
-    private var layoutBottom: LinearLayout? = null
-    private var btnClear: Button? = null
+    //private var layoutBottom: LinearLayout? = null
+    //private var btnClear: Button? = null
 
     private val colorCodePink = Color.parseColor("#D81B60")
 
@@ -97,14 +98,15 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
         }
         progressBar!!.visibility = View.GONE
 
-        layoutBottom = view.findViewById(R.id.layoutBottomProperty)
-        layoutBottom!!.visibility = View.GONE
+        //layoutBottom = view.findViewById(R.id.layoutBottomProperty)
+        //layoutBottom!!.visibility = View.GONE
 
-        //viewPager = view!!.findViewById(R.id.viewPagerProperty)
-        listViewProperty = view!!.findViewById(R.id.listViewProperty)
-        listViewPropertyDetail = view!!.findViewById(R.id.listViewPropertyDetail)
+        viewPager = view!!.findViewById(R.id.viewPagerProperty)
+        //listViewProperty = view!!.findViewById(R.id.listViewProperty)
+        //listViewPropertyDetail = view!!.findViewById(R.id.listViewPropertyDetail)
         if (propertyContext != null) {
 
+            getPropertyList.clear()
             //propertyList.clear()
 
             /*val item0 = RJProperty()
@@ -152,18 +154,18 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             item2.gem02 = "item2_gem02"
             item2.faj43 = "item2_faj43"
             propertyList.add(item2)
+            */
+            //layoutBottom!!.visibility = View.VISIBLE
 
-            layoutBottom!!.visibility = View.VISIBLE
+            //val pageString = "第 1/"+ propertyList.size +" 頁"
+            //toastPage(pageString)
 
-            val pageString = "第 1/"+ propertyList.size +" 頁"
-            toastPage(pageString)
+            pagerAdapter = PropertyDetailItemPagerAdapter(propertyContext, getPropertyList)
+            viewPager!!.adapter = pagerAdapter as PagerAdapter
 
-            pagerAdapter = PropertyDetailAdapter(propertyContext, propertyList)
-            viewPager!!.adapter = pagerAdapter
-
-            val showSeekBarIntent = Intent()
+            /*val showSeekBarIntent = Intent()
             showSeekBarIntent.action = Constants.ACTION.ACTION_SEEK_BAR_SHOW_ACTION
-            propertyContext!!.sendBroadcast(showSeekBarIntent)*/
+            propertyContext!!.sendBroadcast(showSeekBarIntent)
 
             //detail
             propertyDetailItemAdapter = PropertyDetailItemAdapter(propertyContext, R.layout.fragment_property_item, getPropertyList)
@@ -171,12 +173,12 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
 
             //more detail
             propertyMoreDetailAdapter = PropertyMoreDetailItemAdapter(propertyContext, R.layout.fragment_property_more_detail_item, getPropertyDetailList)
-            listViewPropertyDetail!!.adapter = propertyMoreDetailAdapter
+            listViewPropertyDetail!!.adapter = propertyMoreDetailAdapter*/
         }
 
-        //viewPager!!.addOnPageChangeListener(this)
+        viewPager!!.addOnPageChangeListener(this)
 
-        listViewProperty!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+        /*listViewProperty!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
             val moreDetailIntent = Intent()
@@ -184,7 +186,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             moreDetailIntent.putExtra("INDEX", position.toString())
             propertyContext?.sendBroadcast(moreDetailIntent)
 
-        }
+        }*/
 
         linearLayout = view.findViewById(R.id.linearLayoutProperty)
 
@@ -219,24 +221,27 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                     progressBar!!.visibility = View.VISIBLE
 
                     //clear
-                    getPropertyList.clear()
-                    if (propertyDetailItemAdapter != null) {
-                        propertyDetailItemAdapter?.notifyDataSetChanged()
+                    if (pagerAdapter != null) {
+                        //pagerAdapter!!.right_nav!!.visibility = View.GONE
+                        //pagerAdapter!!.left_nav!!.visibility = View.GONE
+
+                        for (i in 0 until pagerAdapter!!.propertyMoreDetailItemAdapterList.size) {
+                            pagerAdapter!!.propertyMoreDetailItemAdapterList[i].clear()
+                            pagerAdapter!!.propertyMoreDetailItemAdapterList[i].notifyDataSetChanged()
+                        }
+                        pagerAdapter!!.destroyAllItems()
+
+                        getPropertyList.clear()
+
+                        propertyList.clear()
+                        pagerAdapter!!.notifyDataSetChanged()
                     }
+                    pagerAdapter = null
 
-                    getPropertyDetailList.clear()
-                    if (propertyMoreDetailAdapter != null) {
-                        propertyMoreDetailAdapter?.notifyDataSetChanged()
-                    }
-
-                    listViewProperty!!.visibility = View.VISIBLE
-                    listViewPropertyDetail!!.visibility = View.GONE
+                    currentPropertyPage = 0
 
 
-                    //currentPropertyPage = 0
-
-
-                    layoutBottom!!.visibility = View.GONE
+                    //layoutBottom!!.visibility = View.GONE
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
@@ -264,23 +269,27 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                     progressBar!!.visibility = View.VISIBLE
 
                     //clear
-                    getPropertyList.clear()
-                    if (propertyDetailItemAdapter != null) {
-                        propertyDetailItemAdapter?.notifyDataSetChanged()
+                    if (pagerAdapter != null) {
+                        //pagerAdapter!!.right_nav!!.visibility = View.GONE
+                        //pagerAdapter!!.left_nav!!.visibility = View.GONE
+
+                        for (i in 0 until pagerAdapter!!.propertyMoreDetailItemAdapterList.size) {
+                            pagerAdapter!!.propertyMoreDetailItemAdapterList[i].clear()
+                            pagerAdapter!!.propertyMoreDetailItemAdapterList[i].notifyDataSetChanged()
+                        }
+                        pagerAdapter!!.destroyAllItems()
+
+                        getPropertyList.clear()
+
+                        propertyList.clear()
+                        pagerAdapter!!.notifyDataSetChanged()
                     }
+                    pagerAdapter = null
 
-                    getPropertyDetailList.clear()
-                    if (propertyMoreDetailAdapter != null) {
-                        propertyMoreDetailAdapter?.notifyDataSetChanged()
-                    }
-
-                    listViewProperty!!.visibility = View.VISIBLE
-                    listViewPropertyDetail!!.visibility = View.GONE
-
-                    //currentPropertyPage = 0
+                    currentPropertyPage = 0
 
 
-                    layoutBottom!!.visibility = View.GONE
+                    //layoutBottom!!.visibility = View.GONE
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
@@ -309,26 +318,31 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             }
         }*/
 
-        btnClear = view.findViewById(R.id.btnPropertyClear)
+        /*btnClear = view.findViewById(R.id.btnPropertyClear)
         btnClear!!.setOnClickListener {
             barcodeInput!!.setText("")
 
             Log.e(mTAG, "btnClear")
 
-            getPropertyList.clear()
-            if (propertyDetailItemAdapter != null) {
-                propertyDetailItemAdapter?.notifyDataSetChanged()
+            //clear
+            if (pagerAdapter != null) {
+                //pagerAdapter!!.right_nav!!.visibility = View.GONE
+                //pagerAdapter!!.left_nav!!.visibility = View.GONE
+
+                for (i in 0 until pagerAdapter!!.propertyMoreDetailItemAdapterList.size) {
+                    pagerAdapter!!.propertyMoreDetailItemAdapterList[i].clear()
+                    pagerAdapter!!.propertyMoreDetailItemAdapterList[i].notifyDataSetChanged()
+                }
+                pagerAdapter!!.destroyAllItems()
+
+                getPropertyList.clear()
+
+                propertyList.clear()
+                pagerAdapter!!.notifyDataSetChanged()
             }
+            pagerAdapter = null
 
-            getPropertyDetailList.clear()
-            if (propertyMoreDetailAdapter != null) {
-                propertyMoreDetailAdapter?.notifyDataSetChanged()
-            }
-
-            listViewProperty!!.visibility = View.VISIBLE
-            listViewPropertyDetail!!.visibility = View.GONE
-
-            //currentPropertyPage = 0
+            currentPropertyPage = 0
 
             layoutBottom!!.visibility = View.GONE
 
@@ -337,7 +351,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             //materialIssuingContext!!.sendBroadcast(hideSeekBarIntent)
 
             //MaterialIssuingFragment.itemClick = false
-        }
+        }*/
 
         val filter: IntentFilter
 
@@ -373,8 +387,27 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
 
                         barcodeInput!!.setText(barcode)
 
-                        getPropertyList.clear()
-                        if (propertyDetailItemAdapter != null) {
+                        if (pagerAdapter != null) {
+                            //pagerAdapter!!.right_nav!!.visibility = View.GONE
+                            //pagerAdapter!!.left_nav!!.visibility = View.GONE
+
+                            for (i in 0 until pagerAdapter!!.propertyMoreDetailItemAdapterList.size) {
+                                //pagerAdapter!!.propertyMoreDetailItemAdapterList[i].items.clear()
+                                pagerAdapter!!.propertyMoreDetailItemAdapterList[i].clear()
+                                pagerAdapter!!.propertyMoreDetailItemAdapterList[i].notifyDataSetChanged()
+                            }
+                            pagerAdapter!!.destroyAllItems()
+
+                            getPropertyList.clear()
+
+                            propertyList.clear()
+                            pagerAdapter!!.notifyDataSetChanged()
+                        }
+                        pagerAdapter = null
+
+                        currentPropertyPage = 0
+
+                        /*if (propertyDetailItemAdapter != null) {
                             propertyDetailItemAdapter?.notifyDataSetChanged()
                         }
 
@@ -384,12 +417,12 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                         }
 
                         listViewProperty!!.visibility = View.VISIBLE
-                        listViewPropertyDetail!!.visibility = View.GONE
+                        listViewPropertyDetail!!.visibility = View.GONE*/
 
                         //currentPropertyPage = 0
 
 
-                        layoutBottom!!.visibility = View.GONE
+                        //layoutBottom!!.visibility = View.GONE
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_PROPERTY_NO_NOT_EXIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_PROPERTY_NO_NOT_EXIST")
@@ -403,8 +436,8 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
 
                         progressBar!!.visibility = View.GONE
 
-                        //val pageString = "第 1/"+ propertyList.size +" 頁"
-                        //toastPage(pageString)
+                        val pageString = "第 1/"+ propertyList.size +" 頁"
+                        toastPage(pageString)
 
                         //for (i in 0 until MainActivity.propertyList.size) {
                         //    modifyList.add(false)
@@ -415,30 +448,31 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                             getPropertyList.add(item)
                         }
 
-                        if (propertyDetailItemAdapter != null) {
+                        /*if (propertyDetailItemAdapter != null) {
                             propertyDetailItemAdapter?.notifyDataSetChanged()
-                        }
+                        }*/
 
                         if (isKeyBoardShow) {
                             val hideIntent = Intent()
                             hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
                             propertyContext!!.sendBroadcast(hideIntent)
                         }
-                        //pagerAdapter = MaterialDetailAdapter(materialIssuingContext, materialList, modifyList)
-                        //viewPager!!.adapter = pagerAdapter
-                        /*if (pagerAdapter != null) {
+
+                        pagerAdapter = PropertyDetailItemPagerAdapter(propertyContext, getPropertyList)
+                        viewPager!!.adapter = pagerAdapter
+                        if (pagerAdapter != null) {
                             Log.e(mTAG, "pagerAdapter != null")
                             pagerAdapter!!.notifyDataSetChanged()
                         } else {
                             Log.e(mTAG, "pagerAdapter == null")
-                            pagerAdapter = PropertyDetailAdapter(propertyContext, propertyList)
+                            pagerAdapter = PropertyDetailItemPagerAdapter(propertyContext, getPropertyList)
                             viewPager!!.adapter = pagerAdapter
                             //viewPager!!.currentItem = 3
 
-                            //currentMaterialPage = 3
-                        }*/
+                            //currentPropertyPage = 3
+                        }
 
-                        layoutBottom!!.visibility = View.VISIBLE
+                        //layoutBottom!!.visibility = View.VISIBLE
 
                         //val showSeekBarIntent = Intent()
                         //showSeekBarIntent.action = Constants.ACTION.ACTION_MATERIAL_SEEK_BAR_SHOW_ACTION
@@ -507,8 +541,8 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                         }
 
 
-                        listViewProperty!!.visibility = View.GONE
-                        listViewPropertyDetail!!.visibility = View.VISIBLE
+                        //listViewProperty!!.visibility = View.GONE
+                        //listViewPropertyDetail!!.visibility = View.VISIBLE
 
                         isPropertyInDetail = 1
 
@@ -580,8 +614,8 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_PROPERTY_BACK_TO_LIST")
 
-                        listViewProperty!!.visibility = View.VISIBLE
-                        listViewPropertyDetail!!.visibility = View.GONE
+                        //listViewProperty!!.visibility = View.VISIBLE
+                        //listViewPropertyDetail!!.visibility = View.GONE
 
                         isPropertyInDetail = 0
                     }
@@ -595,6 +629,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             filter.addAction(Constants.ACTION.ACTION_BARCODE_NULL)
             filter.addAction(Constants.ACTION.ACTION_NETWORK_FAILED)
             filter.addAction(Constants.ACTION.ACTION_CONNECTION_TIMEOUT)
+            filter.addAction(Constants.ACTION.ACTION_PROPERTY_SCAN_BARCODE)
             filter.addAction(Constants.ACTION.ACTION_SERVER_ERROR)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_PROPERTY_MORE_DETAIL_REFRESH)
