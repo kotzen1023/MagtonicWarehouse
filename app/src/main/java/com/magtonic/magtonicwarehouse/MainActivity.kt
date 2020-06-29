@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var menuItemEraser: MenuItem? = null
     private var menuItemOutSourcedSupplier: MenuItem? = null
     private var menuItemShowReceiptConfirmFailed: MenuItem? = null
+    private var menuItemReconnectPrinter: MenuItem? = null
 
     companion object {
         @JvmStatic var screenWidth: Int = 0
@@ -654,7 +655,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(1).isVisible = false //receipt
                         navView!!.menu.getItem(2).isVisible = false //storage
                         navView!!.menu.getItem(3).isVisible = false //material
-                        navView!!.menu.getItem(4).isVisible = false //oustsourced
+                        navView!!.menu.getItem(4).isVisible = false //outsourced
                         navView!!.menu.getItem(5).isVisible = false //property
                         navView!!.menu.getItem(6).isVisible = true //login
                         navView!!.menu.getItem(7).isVisible = true //printer
@@ -1174,6 +1175,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = true
                         menuItemShowReceiptConfirmFailed!!.isVisible = true
+                        menuItemReconnectPrinter!!.isVisible = true
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1217,6 +1219,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1249,6 +1252,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1281,6 +1285,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1314,6 +1319,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1414,6 +1420,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1447,6 +1454,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1480,6 +1488,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = false
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = true
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -1513,6 +1522,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemKeyboard!!.isVisible = true
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -2002,6 +2012,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuItemEraser = menu.findItem(R.id.main_draw_pen_or_eraser)
         menuItemOutSourcedSupplier = menu.findItem(R.id.main_supplier_list)
         menuItemShowReceiptConfirmFailed = menu.findItem(R.id.main_receipt_show_confirm_failed)
+        menuItemReconnectPrinter = menu.findItem(R.id.main_reconnect_printer)
 
         return true
     }
@@ -2064,6 +2075,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val showIntent = Intent()
                 showIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG
                 sendBroadcast(showIntent)
+            }
+
+            R.id.main_reconnect_printer-> {
+                val connectIntent = Intent()
+                connectIntent.action = Constants.ACTION.ACTION_SETTING_BLUETOOTH_CONNECT_ACTION
+                sendBroadcast(connectIntent)
+
+                //fabPrint!!.visibility = View.GONE
+                fabPrint!!.hide()
             }
         }
 
@@ -2149,6 +2169,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = true
                 menuItemShowReceiptConfirmFailed!!.isVisible = true
+                menuItemReconnectPrinter!!.isVisible = true
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -2179,6 +2200,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 //title = getString(R.string.nav_storage) +" - "+ statusTitle
@@ -2200,6 +2222,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_material_issuing)
@@ -2220,6 +2243,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_property)
@@ -2240,6 +2264,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_home)
@@ -2260,6 +2285,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_login)
@@ -2308,6 +2334,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_printer)
@@ -2339,6 +2366,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_setting)
@@ -2360,6 +2388,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_guest)
@@ -2380,6 +2409,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemSeekBar!!.isVisible = false
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = true
                 title = getString(R.string.nav_outsourced)

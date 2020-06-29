@@ -54,7 +54,7 @@
     <string name="purchase_barcode_error">採購單條碼錯誤</string>
     <string name="set_printer_first">請先設定配對藍芽標籤機</string>
     <string name="setting_print_test">列印測試</string>
-    <string name="setting_bluetooth_reconnect">重新連線標籤列印機</string>
+    <string name="setting_bluetooth_reconnect">重新連線標籤機</string>
     <string name="setting_bluetooth_device_header">藍芽裝置</string>
     <string name="setting_bluetooth_mac">Mac位址</string>
     <string name="setting_bluetooth_status">狀態</string>

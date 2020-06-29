@@ -43,4 +43,9 @@
             android:visible="false"
             app:showAsAction="always"/>
 
+    <item android:id="@+id/main_reconnect_printer"
+            android:icon="@drawable/baseline_print_white_24"
+            android:title="@string/setting_bluetooth_reconnect"
+            android:visible="false"
+            app:showAsAction="collapseActionView"/>
 </menu>
