@@ -198,5 +198,8 @@
     <string name="outsourced_process_dialog_select_supplier">Select supplier</string>
     <string name="receipt_confirm_failed_history">Confirm failed history</string>
     <string name="log_enable">Log file enable</string>
+    <string name="receipt_print_again_data_null">Data was cleaned. Tag cannot be printed.</string>
+    <string name="receipt_print_again">Tag Print Again</string>
+    <string name="ftp_connect_error">Connect error. Please confirm your account and password.</string>
 
 </resources>

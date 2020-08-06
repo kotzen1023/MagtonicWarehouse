@@ -22,7 +22,6 @@ import com.magtonic.magtonicwarehouse.model.receive.RJMaterial
 class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMaterial>, modifyList: ArrayList<Boolean>) : PagerAdapter() {
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view === `object`
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private val mTAG = MaterialDetailAdapter::class.java.name
@@ -71,7 +70,7 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
 
         val view = LayoutInflater.from(mContext).inflate(R.layout.list_pager_item, container, false)
 
-        pagerListView = view.findViewById<ListView>(R.id.pagerListView)
+        pagerListView = view.findViewById(R.id.pagerListView)
         val leftNav: ImageView = view.findViewById(R.id.left_nav)
         val rightNav: ImageView = view.findViewById(R.id.right_nav)
 
@@ -205,8 +204,6 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
                     val hideIntent = Intent()
                     hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
                     mContext!!.sendBroadcast(hideIntent)
-                } else {
-
                 }
 
                 materialDetailList[item_position].getTextView()!!.visibility = View.GONE

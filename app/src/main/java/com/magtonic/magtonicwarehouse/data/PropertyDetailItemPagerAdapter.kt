@@ -1,7 +1,7 @@
 package com.magtonic.magtonicwarehouse.data
 
 import android.content.Context
-import android.content.Intent
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +10,13 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.ListView
 import androidx.viewpager.widget.PagerAdapter
-import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.R
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment
-import com.magtonic.magtonicwarehouse.model.receive.RJMaterial
+
 
 class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<PropertyDetailItem>) : PagerAdapter() {
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view === `object`
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     private val mTAG = PropertyDetailItemPagerAdapter::class.java.name
@@ -29,11 +27,11 @@ class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<
     var propertyMoreDetailItemAdapterList: ArrayList<PropertyMoreDetailItemAdapter> = ArrayList()
     //private var modifyList: ArrayList<Boolean> = ArrayList()
 
-    var pagerListView: ListView? = null
+    private var pagerListView: ListView? = null
 
     private var containerAll: ViewGroup? = null
 
-    var currentItemIndexList: ArrayList<Int>? = ArrayList()
+    private var currentItemIndexList: ArrayList<Int>? = ArrayList()
 
     init {
         Log.e(mTAG, "init")
@@ -67,7 +65,7 @@ class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<
 
         val view = LayoutInflater.from(mContext).inflate(R.layout.list_pager_item, container, false)
 
-        pagerListView = view.findViewById<ListView>(R.id.pagerListView)
+        pagerListView = view.findViewById(R.id.pagerListView)
         val leftNav: ImageView = view.findViewById(R.id.left_nav)
         val rightNav: ImageView = view.findViewById(R.id.right_nav)
 
@@ -270,7 +268,7 @@ class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<
         currentItemIndexList!!.clear()
     }
 
-    private fun updateString(state: Int): String {
+    /*private fun updateString(state: Int): String {
 
         return when (state) {
             1 -> {
@@ -283,5 +281,5 @@ class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<
                 mContext!!.getString(R.string.material_update_yet)
             }
         }
-    }
+    }*/
 }

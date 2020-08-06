@@ -20,12 +20,12 @@ import java.util.*
 
 class OutsourcedProcessDetailItemAdapter (context: Context?, resource: Int, objects: ArrayList<OutsourcedProcessDetailItem>) :
     ArrayAdapter<OutsourcedProcessDetailItem>(context as Context, resource, objects) {
-    private val mTAG = OutsourcedProcessDetailItemAdapter::class.java.name
+    //private val mTAG = OutsourcedProcessDetailItemAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<OutsourcedProcessDetailItem> = objects
-    private val mContext = context
+    //private val mContext = context
 
     override fun getCount(): Int {
         return items.size
@@ -64,7 +64,7 @@ class OutsourcedProcessDetailItemAdapter (context: Context?, resource: Int, obje
         val outsourcedProcessOrderDetailItem = items[position]
         //if (receiptDetailItem != null) {
         val workOrderSize = outsourcedProcessOrderDetailItem.getData2().length
-        val partNpSize = outsourcedProcessOrderDetailItem.getData3().length
+        //val partNpSize = outsourcedProcessOrderDetailItem.getData3().length
         val combine: String = outsourcedProcessOrderDetailItem.getData2()+"\n"+outsourcedProcessOrderDetailItem.getData3()
         val spannable = SpannableStringBuilder(combine)
         spannable.setSpan(
@@ -102,9 +102,9 @@ class OutsourcedProcessDetailItemAdapter (context: Context?, resource: Int, obje
         return view
     }
 
-    private fun getColoredSpanned(text: String, color: String): String? {
+    /*private fun getColoredSpanned(text: String, color: String): String? {
         return "<font color='$color'>$text</font>"
-    }
+    }*/
 
     class ViewHolder (view: View) {
         var itemHeader: TextView = view.findViewById(R.id.outSourcedProcessOrderDetailHeader)

@@ -12,12 +12,12 @@ import com.magtonic.magtonicwarehouse.R
 class HomeGridItemAdapter(context: Context?, resource: Int, objects: ArrayList<HomeGridItem>) :
     ArrayAdapter<HomeGridItem>(context as Context, resource, objects) {
 
-    private val mTAG = ReceiptDetailItemAdapter::class.java.name
+    //private val mTAG = ReceiptDetailItemAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<HomeGridItem> = objects
-    private val mContext = context
+    //private val mContext = context
 
     override fun getCount(): Int {
         return items.size

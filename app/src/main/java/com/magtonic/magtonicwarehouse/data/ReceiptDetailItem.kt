@@ -18,9 +18,9 @@ class ReceiptDetailItem (header: String, content: String){
         return header
     }
 
-    fun setHeader(header: String) {
+    /*fun setHeader(header: String) {
         this.header = header
-    }
+    }*/
 
     fun getContent(): String? {
         return content
@@ -54,9 +54,9 @@ class ReceiptDetailItem (header: String, content: String){
         this.editText = editText
     }
 
-    fun getBtnOk(): Button? {
+    /*fun getBtnOk(): Button? {
         return btnOk
-    }
+    }*/
 
     fun setBtnOk(btnOk: Button) {
         this.btnOk = btnOk

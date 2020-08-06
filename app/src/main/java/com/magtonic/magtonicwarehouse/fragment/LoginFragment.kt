@@ -17,6 +17,7 @@ import com.magtonic.magtonicwarehouse.R
 
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import androidx.core.text.HtmlCompat
 
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
@@ -229,11 +230,15 @@ class LoginFragment : Fragment() {
     }
 
     private fun toast(message: String) {
-        val toast = Toast.makeText(loginContext, message, Toast.LENGTH_SHORT)
+        //val toast = Toast.makeText(loginContext, message, Toast.LENGTH_SHORT)
+        //toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        val toast = Toast.makeText(loginContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
-        val group = toast.view as ViewGroup
+
+        /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
     }
 

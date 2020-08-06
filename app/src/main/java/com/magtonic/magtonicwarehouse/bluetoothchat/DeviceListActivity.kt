@@ -11,9 +11,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.R
 
@@ -332,11 +332,15 @@ class DeviceListActivity: Activity() {
     }
 
     fun toast(message: String) {
-        val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
+
+        val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        /*val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
         val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
     }
 

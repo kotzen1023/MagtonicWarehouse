@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.Gravity
@@ -17,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.currentPlant
@@ -100,7 +102,8 @@ class GuestFragment : Fragment() {
         }*/
 
         //private class MyHandler(context: Context) : Handler() {
-        private class MyHandler : Handler() {
+        //private class MyHandler : Handler() {
+        private class MyHandler : Handler(Looper.getMainLooper()) {
             //private var mFragment: WeakReference<Context> = WeakReference(context)
 
             override fun handleMessage(msg: Message) {
@@ -335,185 +338,196 @@ class GuestFragment : Fragment() {
         mReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action != null) {
-                    if (intent.action!!.equals(Constants.ACTION.ACTION_BARCODE_NULL, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_BARCODE_NULL")
+                    when {
+                        intent.action!!.equals(Constants.ACTION.ACTION_BARCODE_NULL, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_BARCODE_NULL")
 
 
 
-                        progressBar!!.visibility = View.GONE
+                            progressBar!!.visibility = View.GONE
 
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_NETWORK_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_NETWORK_FAILED")
-
-                        progressBar!!.visibility = View.GONE
-
-
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_TIMEOUT, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_CONNECTION_TIMEOUT")
-
-                        progressBar!!.visibility = View.GONE
-
-
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_SERVER_ERROR")
-
-                        progressBar!!.visibility = View.GONE
-
-
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_SCAN_BARCODE, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_SCAN_BARCODE")
-
-                        poBarcode = intent.getStringExtra("BARCODE") as String
-                        poLine = intent.getStringExtra("LINE") as String
-                        barcodeInput!!.setText(poBarcode)
-
-                        stopTimer()
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_FRAGMENT_REFRESH, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_FRAGMENT_REFRESH")
-
-                        guestDetailList.clear()
-
-                        progressBar!!.visibility = View.GONE
-                        //hide keyboard
-                        if (MainActivity.isKeyBoardShow) {
-                            val hideIntent = Intent()
-                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
-                            guestContext!!.sendBroadcast(hideIntent)
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_NETWORK_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_NETWORK_FAILED")
 
-                        when(currentPlant) {
-                            "A" -> {
-                                for (rjGuest in guestListA) {
-                                    //val date = rjGuest.data3.split(" ")
+                            progressBar!!.visibility = View.GONE
 
-                                    //val timeString = date[0]+"\n"+rjGuest.data4
-                                    val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
-                                    guestDetailList.add(guestDetailItem)
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_TIMEOUT, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_CONNECTION_TIMEOUT")
+
+                            progressBar!!.visibility = View.GONE
+
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_SERVER_ERROR")
+
+                            progressBar!!.visibility = View.GONE
+
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_SCAN_BARCODE, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_SCAN_BARCODE")
+
+                            poBarcode = intent.getStringExtra("BARCODE") as String
+                            poLine = intent.getStringExtra("LINE") as String
+                            barcodeInput!!.setText(poBarcode)
+
+                            stopTimer()
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_FRAGMENT_REFRESH, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_FRAGMENT_REFRESH")
+
+                            guestDetailList.clear()
+
+                            progressBar!!.visibility = View.GONE
+                            //hide keyboard
+                            if (MainActivity.isKeyBoardShow) {
+                                val hideIntent = Intent()
+                                hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                                guestContext!!.sendBroadcast(hideIntent)
+                            }
+
+                            when(currentPlant) {
+                                "A" -> {
+                                    for (rjGuest in guestListA) {
+                                        //val date = rjGuest.data3.split(" ")
+
+                                        //val timeString = date[0]+"\n"+rjGuest.data4
+                                        val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
+                                        guestDetailList.add(guestDetailItem)
+                                    }
+                                }
+                                "B" -> {
+                                    for (rjGuest in guestListB) {
+                                        //val date = rjGuest.data3.split(" ")
+
+                                        //val timeString = date[0]+"\n"+rjGuest.data4
+                                        val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
+                                        guestDetailList.add(guestDetailItem)
+                                    }
+                                }
+                                else -> {
+                                    for (rjGuest in guestListT) {
+                                        //val date = rjGuest.data3.split(" ")
+
+                                        //val timeString = date[0]+"\n"+rjGuest.data4
+                                        val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
+                                        guestDetailList.add(guestDetailItem)
+                                    }
                                 }
                             }
-                            "B" -> {
-                                for (rjGuest in guestListB) {
-                                    //val date = rjGuest.data3.split(" ")
 
-                                    //val timeString = date[0]+"\n"+rjGuest.data4
-                                    val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
-                                    guestDetailList.add(guestDetailItem)
-                                }
+
+
+                            if (guestDetailItemAdapter != null) {
+                                guestDetailItemAdapter?.notifyDataSetChanged()
                             }
-                            else -> {
-                                for (rjGuest in guestListT) {
-                                    //val date = rjGuest.data3.split(" ")
 
-                                    //val timeString = date[0]+"\n"+rjGuest.data4
-                                    val guestDetailItem = GuestDetailItem(rjGuest.data1, rjGuest.data2, rjGuest.data3, rjGuest.data4, rjGuest.data5)
-                                    guestDetailList.add(guestDetailItem)
-                                }
+                            startTimer()
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_LIST_CLEAR, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_LIST_CLEAR")
+
+                            guestDetailList.clear()
+
+                            progressBar!!.visibility = View.GONE
+                            //hide keyboard
+                            if (MainActivity.isKeyBoardShow) {
+                                val hideIntent = Intent()
+                                hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                                guestContext!!.sendBroadcast(hideIntent)
                             }
+
+                            if (guestDetailItemAdapter != null) {
+                                guestDetailItemAdapter?.notifyDataSetChanged()
+                            }
+
+                            startTimer()
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_IN_OR_LEAVE_FAILED")
 
+                            progressBar!!.visibility = View.GONE
 
-
-                        if (guestDetailItemAdapter != null) {
-                            guestDetailItemAdapter?.notifyDataSetChanged()
+                            startTimer()
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_SUCCESS, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_IN_OR_LEAVE_SUCCESS")
 
-                        startTimer()
+                            val getIntent = Intent()
+                            getIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_LIST_ACTION
+                            guestContext!!.sendBroadcast(getIntent)
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_LIST_CLEAR, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_LIST_CLEAR")
-
-                        guestDetailList.clear()
-
-                        progressBar!!.visibility = View.GONE
-                        //hide keyboard
-                        if (MainActivity.isKeyBoardShow) {
-                            val hideIntent = Intent()
-                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
-                            guestContext!!.sendBroadcast(hideIntent)
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_SHOW_LEAVE_ACTION, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_SHOW_LEAVE_ACTION")
 
-                        if (guestDetailItemAdapter != null) {
-                            guestDetailItemAdapter?.notifyDataSetChanged()
+                            val plant = intent.getStringExtra("PLANT")
+                            val guestNo = intent.getStringExtra("GUEST_NO")
+                            val inDate = intent.getStringExtra("IN_DATE")
+                            val inTime = intent.getStringExtra("IN_TIME")
+
+
+                            showGuestInDialog(plant as String, guestNo as String, inDate as String, inTime as String)
                         }
-
-                        startTimer()
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_IN_OR_LEAVE_FAILED")
-
-                        progressBar!!.visibility = View.GONE
-
-                        startTimer()
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_SUCCESS, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_IN_OR_LEAVE_SUCCESS")
-
-                        val getIntent = Intent()
-                        getIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_LIST_ACTION
-                        guestContext!!.sendBroadcast(getIntent)
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_SHOW_LEAVE_ACTION, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_SHOW_LEAVE_ACTION")
-
-                        val plant = intent.getStringExtra("PLANT")
-                        val guestNo = intent.getStringExtra("GUEST_NO")
-                        val inDate = intent.getStringExtra("IN_DATE")
-                        val inTime = intent.getStringExtra("IN_TIME")
+                        intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_RECEIPT_FRAGMENT_REFRESH")
 
 
-                        showGuestInDialog(plant as String, guestNo as String, inDate as String, inTime as String)
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_RECEIPT_FRAGMENT_REFRESH")
+                            //progressBar!!.visibility = View.GONE
+                            //hide keyboard
+                            if (MainActivity.isKeyBoardShow) {
+                                val hideIntent = Intent()
+                                hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                                guestContext!!.sendBroadcast(hideIntent)
+                            }
 
 
-                        //progressBar!!.visibility = View.GONE
-                        //hide keyboard
-                        if (MainActivity.isKeyBoardShow) {
-                            val hideIntent = Intent()
-                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
-                            guestContext!!.sendBroadcast(hideIntent)
+                            Log.e(mTAG, "pmm09 = " + MainActivity.itemReceipt!!.rjReceipt!!.pmm09 +"pmc03 = "+MainActivity.itemReceipt!!.rjReceipt!!.pmc03)
+
+                            toast(MainActivity.itemReceipt!!.rjReceipt!!.pmm09 +"-"+MainActivity.itemReceipt!!.rjReceipt!!.pmc03)
+
+                            //val barcode: String = intent.getStringExtra("BARCODE") as String
+                            //barcodeInput!!.setText(MainActivity.itemReceipt!!.rjReceipt!!.pmm09)
+
+                            //val guest = findGuestInAllList(MainActivity.itemReceipt!!.rjReceipt!!.pmm09)
+
+
+                            val guestInIntent = Intent()
+                            guestInIntent.action = Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_ACTION
+                            guestInIntent.putExtra("DATA1", "0") // In
+                            guestInIntent.putExtra("DATA2", currentPlant) //廠區
+                            guestInIntent.putExtra("DATA3", MainActivity.itemReceipt!!.rjReceipt!!.pmm09) //供應商編號
+                            guestInIntent.putExtra("DATA4", poBarcode) //採購單號
+                            guestInIntent.putExtra("DATA5", poLine) //項次
+                            guestInIntent.putExtra("DATA6", "") //刷進留空
+                            guestContext!!.sendBroadcast(guestInIntent)
+
+                            /*if (guest.data1.isNotEmpty() && guest.data2.isNotEmpty()) {
+                                            showGuestInDialog(false, MainActivity.itemReceipt!!.rjReceipt!!.pmm09, guest.data1)
+                                        } else {
+                                            showGuestInDialog(true, MainActivity.itemReceipt!!.rjReceipt!!.pmm09, "")
+                                        }*/
+
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_RECEIPT_NO_NOT_EXIST")
 
+                            progressBar!!.visibility = View.GONE
 
-                        Log.e(mTAG, "pmm09 = " + MainActivity.itemReceipt!!.rjReceipt!!.pmm09 +"pmc03 = "+MainActivity.itemReceipt!!.rjReceipt!!.pmc03)
+                            startTimer()
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED")
 
-                        toast(MainActivity.itemReceipt!!.rjReceipt!!.pmm09 +"-"+MainActivity.itemReceipt!!.rjReceipt!!.pmc03)
-
-                        //val barcode: String = intent.getStringExtra("BARCODE") as String
-                        //barcodeInput!!.setText(MainActivity.itemReceipt!!.rjReceipt!!.pmm09)
-
-                        //val guest = findGuestInAllList(MainActivity.itemReceipt!!.rjReceipt!!.pmm09)
-
-
-                        val guestInIntent = Intent()
-                        guestInIntent.action = Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_ACTION
-                        guestInIntent.putExtra("DATA1", "0") // In
-                        guestInIntent.putExtra("DATA2", currentPlant) //廠區
-                        guestInIntent.putExtra("DATA3", MainActivity.itemReceipt!!.rjReceipt!!.pmm09) //供應商編號
-                        guestInIntent.putExtra("DATA4", poBarcode) //採購單號
-                        guestInIntent.putExtra("DATA5", poLine) //項次
-                        guestInIntent.putExtra("DATA6", "") //刷進留空
-                        guestContext!!.sendBroadcast(guestInIntent)
-
-                        /*if (guest.data1.isNotEmpty() && guest.data2.isNotEmpty()) {
-                            showGuestInDialog(false, MainActivity.itemReceipt!!.rjReceipt!!.pmm09, guest.data1)
-                        } else {
-                            showGuestInDialog(true, MainActivity.itemReceipt!!.rjReceipt!!.pmm09, "")
-                        }*/
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_RECEIPT_NO_NOT_EXIST")
-
-                        progressBar!!.visibility = View.GONE
-
-                        startTimer()
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED")
-
-                        progressBar!!.visibility = View.GONE
+                            progressBar!!.visibility = View.GONE
+                        }
                     }
 
                 }
@@ -589,11 +603,11 @@ class GuestFragment : Fragment() {
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(guestContext, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(guestContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
-        val group = toast.view as ViewGroup
+        /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast

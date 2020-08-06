@@ -1,9 +1,6 @@
 package com.magtonic.magtonicwarehouse.model.receive
 
-import android.util.Log
-import org.json.JSONArray
-import org.json.JSONObject
-import org.json.XML
+
 
 
 class ReceiveTransform {
@@ -37,7 +34,7 @@ class ReceiveTransform {
     }
 
     companion object {
-        private val mTAG = ReceiveTransform::class.java.name
+        //private val mTAG = ReceiveTransform::class.java.name
         //const val arrField : String = "dataList"
         fun addToJsonArrayStr(str: String): String {
 
@@ -66,7 +63,7 @@ class ReceiveTransform {
 
         }
 
-        fun restoreXmlToJson(str: String): String {
+        /*fun restoreXmlToJson(str: String): String {
             Log.e(mTAG, "=== restoreXmlToJson start ===")
 
             val json: JSONObject = XML.toJSONObject(str)
@@ -79,7 +76,7 @@ class ReceiveTransform {
 
             Log.e(mTAG, "=== restoreXmlToJson end ===")
             return "{\"dataList\":${resArray.getString("content")}}"
-        }
+        }*/
     }
 
 

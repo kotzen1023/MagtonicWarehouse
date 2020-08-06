@@ -10,12 +10,12 @@ import java.util.ArrayList
 
 class OutsourcedProcessMoreDetailAdapter (context: Context?, resource: Int, objects: ArrayList<OutsourcedProcessMoreDetailItem>) :
     ArrayAdapter<OutsourcedProcessMoreDetailItem>(context as Context, resource, objects) {
-    private val mTAG = OutsourcedProcessMoreDetailAdapter::class.java.name
+    //private val mTAG = OutsourcedProcessMoreDetailAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<OutsourcedProcessMoreDetailItem> = objects
-    private val mContext = context
+    //private val mContext = context
 
     override fun getCount(): Int {
         return items.size

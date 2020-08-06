@@ -315,13 +315,13 @@ class BluetoothChatService(context: Context, handler: Handler) {
 
             // Create a new listening server socket
             try {
-                if (secure) {
-                    tmp = mAdapter!!.listenUsingRfcommWithServiceRecord(
+                tmp = if (secure) {
+                    mAdapter!!.listenUsingRfcommWithServiceRecord(
                         mNameSecure,
                         myUuidSecure
                     )
                 } else {
-                    tmp = mAdapter!!.listenUsingInsecureRfcommWithServiceRecord(
+                    mAdapter!!.listenUsingInsecureRfcommWithServiceRecord(
                         mNameInsecure, myUuidInSecure
                     )
                 }
@@ -428,12 +428,12 @@ class BluetoothChatService(context: Context, handler: Handler) {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-                if (secure) {
-                    tmp = mmDevice.createRfcommSocketToServiceRecord(
+                tmp = if (secure) {
+                    mmDevice.createRfcommSocketToServiceRecord(
                         myUuidSecure
                     )
                 } else {
-                    tmp = mmDevice.createInsecureRfcommSocketToServiceRecord(
+                    mmDevice.createInsecureRfcommSocketToServiceRecord(
                         myUuidInSecure
                     )
                 }

@@ -17,16 +17,8 @@ class OutsourcedProcessSupplierItem(data1: String, data2: String, data3: String)
         return data1
     }
 
-    fun setData1(data1: String) {
-        this.data1 = data1
-    }
-
     fun getData2(): String {
         return data2
-    }
-
-    fun setData2(data2: String) {
-        this.data2 = data2
     }
 
     fun getData3(): String {

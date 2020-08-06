@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 
@@ -675,11 +676,14 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(propertyContext, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(propertyContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+       /*val toast = Toast.makeText(propertyContext, message, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
         val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast
@@ -691,11 +695,14 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
             toastHandle!!.cancel()
         }
 
-        val toast = Toast.makeText(propertyContext, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(propertyContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        /*val toast = Toast.makeText(propertyContext, message, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 0)
         val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast

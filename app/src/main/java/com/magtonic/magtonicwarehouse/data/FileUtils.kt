@@ -113,12 +113,18 @@ class FileUtils {
 
                         // Get content uri by document type.
                         var mediaContentUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                        if ("image" == docType) {
-                            mediaContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                        } else if ("video" == docType) {
-                            mediaContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                        } else if ("audio" == docType) {
-                            mediaContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                        when (docType) {
+                            "image" -> {
+                                mediaContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                            }
+                            "video" -> {
+                                mediaContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                            }
+                            "audio" -> {
+                                mediaContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                            }
+
+                            // Get where clause with real document id.
                         }
 
                         // Get where clause with real document id.
@@ -241,12 +247,20 @@ class FileUtils {
 
                 // Get columns name by uri type.
                 var columnName = MediaStore.Images.Media.DATA
-                if (uri === MediaStore.Images.Media.EXTERNAL_CONTENT_URI) {
-                    columnName = MediaStore.Images.Media.DATA
-                } else if (uri === MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) {
-                    columnName = MediaStore.Audio.Media.DATA
-                } else if (uri === MediaStore.Video.Media.EXTERNAL_CONTENT_URI) {
-                    columnName = MediaStore.Video.Media.DATA
+                when {
+                    uri === MediaStore.Images.Media.EXTERNAL_CONTENT_URI -> {
+                        columnName = MediaStore.Images.Media.DATA
+                    }
+                    uri === MediaStore.Audio.Media.EXTERNAL_CONTENT_URI -> {
+                        columnName = MediaStore.Audio.Media.DATA
+                    }
+                    uri === MediaStore.Video.Media.EXTERNAL_CONTENT_URI -> {
+                        columnName = MediaStore.Video.Media.DATA
+                    }
+
+                    // Get column index.
+
+                    // Get column value which is the uri related file local path.
                 }
 
                 // Get column index.

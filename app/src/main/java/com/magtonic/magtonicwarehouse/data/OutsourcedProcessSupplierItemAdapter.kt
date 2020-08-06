@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ImageView
 import android.widget.TextView
 import com.magtonic.magtonicwarehouse.R
 import java.util.ArrayList
 
 class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, objects: ArrayList<OutsourcedProcessSupplierItem>) :
     ArrayAdapter<OutsourcedProcessSupplierItem>(context as Context, resource, objects) {
-    private val mTAG = OutsourcedProcessSupplierItemAdapter::class.java.name
+    //private val mTAG = OutsourcedProcessSupplierItemAdapter::class.java.name
     private val layoutResourceId: Int = resource
 
     private var inflater : LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val items: ArrayList<OutsourcedProcessSupplierItem> = objects
-    private val mContext = context
+    //private val mContext = context
 
     override fun getCount(): Int {
         return items.size

@@ -16,10 +16,6 @@ class MaterialDetailItem (header: String, content: String) {
         return header
     }
 
-    fun setHeader(header: String) {
-        this.header = header
-    }
-
     fun getContent(): String? {
         return content
     }
@@ -52,10 +48,6 @@ class MaterialDetailItem (header: String, content: String) {
         this.editText = editText
     }
 
-    fun getBtnOk(): Button? {
-        return btnOk
-    }
-
     fun setBtnOk(btnOk: Button) {
         this.btnOk = btnOk
     }
@@ -66,10 +58,6 @@ class MaterialDetailItem (header: String, content: String) {
 
     fun setChange(changed: Boolean) {
         this.changed = changed
-    }
-
-    fun getIcon(): ImageView? {
-        return icon
     }
 
     fun setIcon(icon: ImageView) {

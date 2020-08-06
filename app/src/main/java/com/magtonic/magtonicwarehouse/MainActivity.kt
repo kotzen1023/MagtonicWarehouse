@@ -4,50 +4,35 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
-
-
-import android.net.NetworkInfo
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.*
-//import android.support.design.widget.FloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-
-//import android.support.v4.view.GravityCompat
-import androidx.core.view.GravityCompat
-//import android.support.v7.app.ActionBarDrawerToggle
-import androidx.appcompat.app.ActionBarDrawerToggle
-//import android.support.v4.widget.DrawerLayout
-import androidx.drawerlayout.widget.DrawerLayout
-//import android.support.design.widget.NavigationView
-import com.google.android.material.navigation.NavigationView
-//import android.support.v4.app.ActivityCompat
-import androidx.core.app.ActivityCompat
-//import android.support.v4.app.Fragment
-import androidx.fragment.app.Fragment
-//import android.support.v4.content.ContextCompat
-import androidx.core.content.ContextCompat
-//import android.support.v7.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatActivity
-//import android.support.v7.widget.Toolbar
-import androidx.appcompat.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Xml
-
-
-import android.view.*
-
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
-
-
 import com.magtonic.magtonicwarehouse.api.ApiFunc
 import com.magtonic.magtonicwarehouse.bluetoothchat.BluetoothChatService
 import com.magtonic.magtonicwarehouse.bluetoothchat.DeviceListActivity
@@ -55,41 +40,29 @@ import com.magtonic.magtonicwarehouse.bluetoothchat.printer.BluetoothPrinterFunc
 import com.magtonic.magtonicwarehouse.data.Constants
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_DEVICE_NAME
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_READ
-
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_STATE_CHANGE
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_TOAST
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_WRITE
 import com.magtonic.magtonicwarehouse.data.ReceiptConfirmFailLog
-
 import com.magtonic.magtonicwarehouse.fragment.*
 import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.currentMaterialPage
 import com.magtonic.magtonicwarehouse.fragment.PropertyFragment.Companion.currentPropertyPage
 import com.magtonic.magtonicwarehouse.model.receive.*
-
-
 import com.magtonic.magtonicwarehouse.model.send.*
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
 import com.magtonic.magtonicwarehouse.model.sys.User
 import com.magtonic.magtonicwarehouse.model.ui.*
-
-
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
-
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
-
-
 import java.io.*
-import java.lang.NumberFormatException
-
 import java.lang.Process
 import java.lang.ref.WeakReference
-
 import java.text.SimpleDateFormat
 import java.util.*
-
+import java.util.concurrent.Executor
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -152,6 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var menuItemOutSourcedSupplier: MenuItem? = null
     private var menuItemShowReceiptConfirmFailed: MenuItem? = null
     private var menuItemReconnectPrinter: MenuItem? = null
+    private var menuItemPrintAgain: MenuItem? = null
 
     companion object {
         @JvmStatic var screenWidth: Int = 0
@@ -245,9 +219,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Log.d(mTAG, "onCreate")
+
+        mContext = applicationContext
 
         //disable Scan2Key Setting
         val disableServiceIntent = Intent()
@@ -255,10 +234,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         disableServiceIntent.putExtra("scan2key", false)
         sendBroadcast(disableServiceIntent)
 
-        Log.d(mTAG, "onCreate")
-
         val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        //
+        //mContext!!.display!!.getMetrics(displayMetrics)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M)
+        {
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+        } else {
+            //mContext!!.display!!.getMetrics(displayMetrics)
+            mContext!!.display!!.getRealMetrics(displayMetrics)
+        }
+
+        //Log.e(mTAG, "h = ${windowManager.currentWindowMetrics.bounds.height()} , w = ${windowManager.currentWindowMetrics.bounds.width()}")
         screenHeight = displayMetrics.heightPixels
         screenWidth = displayMetrics.widthPixels
 
@@ -285,7 +272,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         currentPlant = pref!!.getString("CURRENT_PLANT", "T") as String
 
 
-        mContext = applicationContext
+
         //user = User.getUser(applicationContext)
         user = User()
 
@@ -482,6 +469,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
                         sendBroadcast(backIntent)
                     }
+                }
+                else -> {
+                    Log.e(mTAG, "Unknown fragment")
                 }
             }
         }
@@ -1137,14 +1127,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 toast("mBluetoothAdapter = null")
                             }
 
-
                         }
 
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_PRINTTEST_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_PRINTTEST_ACTION")
 
-                        //ptintest
+                        //printTest
                         val ret = printLabel("AP22-1234567890", "AP32-0123456789", "料件編號", "數量" , "N", "儲位", "批號")
 
                         if (ret == 0) {
@@ -1154,6 +1143,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_RECEIPT_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_RECEIPT_ACTION")
+
+                        itemReceipt = null
 
                         var statusTitle = ""
                         when(printerStatus) {
@@ -1176,6 +1167,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = true
                         menuItemShowReceiptConfirmFailed!!.isVisible = true
                         menuItemReconnectPrinter!!.isVisible = true
+                        menuItemPrintAgain!!.isVisible = true
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1220,6 +1212,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1253,6 +1246,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1286,6 +1280,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1320,6 +1315,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1421,6 +1417,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1455,6 +1452,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -1489,6 +1487,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = true
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -1523,6 +1522,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         menuItemReceiptSetting!!.isVisible = false
                         menuItemShowReceiptConfirmFailed!!.isVisible = false
                         menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
                         menuItemEraser!!.isVisible = false
                         menuItemEraser!!.setIcon(R.drawable.eraser_white)
                         isEraser = false
@@ -1673,7 +1673,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         currentOutSourcedSendOrder = sendOrder as String
 
-                        confirmOutSourcedProcessSign(sendOrder as String , uploadSignFileName as  String, user!!.userAccount)
+                        confirmOutSourcedProcessSign(sendOrder , uploadSignFileName as  String, user!!.userAccount)
                     }
                 }
 
@@ -1681,7 +1681,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if ("android.net.wifi.STATE_CHANGE" == intent.action) {
                     Log.e(mTAG, "Wifi STATE_CHANGE")
 
-                    val info: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
+                    val wifiMgr = getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+                   if (wifiMgr.isWifiEnabled) { // Wi-Fi adapter is ON
+                        val wifiInfo: WifiInfo = wifiMgr.connectionInfo
+                        if (wifiInfo.networkId == -1) {
+                            Log.d(mTAG, "Not connected to an access point")// Not connected to an access point
+                            //fabWifi!!.visibility = View.VISIBLE
+
+                            isWifiConnected = false
+                            currentSSID = ""
+                            Log.e(mTAG, "info ===> not connected ")
+                            toast(getString(R.string.wifi_state_disconnected))
+                        } else {
+                            isWifiConnected = true
+
+                            currentSSID = wifiInfo.ssid
+
+                            Log.e(mTAG, "currentSSID = $currentSSID")
+                            toast(getString(R.string.wifi_state_connected, currentSSID))
+                            //Log.d(mTAG, "Connected to ${wifiInfo.ssid}")// Not connected to an access point
+                            //fabWifi!!.visibility = View.GONE
+                        }
+                        // Connected to an access point
+                    } else {
+                        Log.d(mTAG, "Wi-Fi adapter is OFF")
+                       //fabWifi!!.visibility = View.VISIBLE
+
+                       isWifiConnected = false
+                       currentSSID = ""
+                       Log.e(mTAG, "info ===> not connected ")
+                       toast(getString(R.string.wifi_state_disconnected))
+                    }
+
+                    /*val info: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
 
                     if (info!!.isConnected) {
                         isWifiConnected = true
@@ -1729,7 +1762,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentSSID = ""
                         Log.e(mTAG, "info ===> not connected ")
                         toast(getString(R.string.wifi_state_disconnected))
-                    }
+                    }*/
 
                     val changeIntent = Intent()
                     changeIntent.action = Constants.ACTION.ACTION_WIFI_STATE_CHANGED
@@ -1812,6 +1845,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                             scanIntent.putExtra("LINE", barcode!!.poLine)
                                             sendBroadcast(scanIntent)
                                             getReceipt(barcode)
+                                        }
+                                        CurrentFragment.OUTSOURCED_FRAGMENT -> {
+                                            scanIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SCAN_BARCODE
+                                            scanIntent.putExtra("BARCODE", text)
+                                            sendBroadcast(scanIntent)
+
+                                            getOutSourcedProcessBySupplierNo(text)
                                         }
                                         else -> {
                                             isBarcodeScanning = false
@@ -2013,6 +2053,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuItemOutSourcedSupplier = menu.findItem(R.id.main_supplier_list)
         menuItemShowReceiptConfirmFailed = menu.findItem(R.id.main_receipt_show_confirm_failed)
         menuItemReconnectPrinter = menu.findItem(R.id.main_reconnect_printer)
+        menuItemPrintAgain = menu.findItem(R.id.main_print_again)
 
         return true
     }
@@ -2084,6 +2125,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 //fabPrint!!.visibility = View.GONE
                 fabPrint!!.hide()
+            }
+
+            R.id.main_print_again-> {
+                Log.d(mTAG, "===> Print it again")
+
+                showPrintAgainConfirmDialog()
             }
         }
 
@@ -2170,6 +2217,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = true
                 menuItemShowReceiptConfirmFailed!!.isVisible = true
                 menuItemReconnectPrinter!!.isVisible = true
+                menuItemPrintAgain!!.isVisible = true
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
 
@@ -2201,6 +2249,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 //title = getString(R.string.nav_storage) +" - "+ statusTitle
@@ -2223,6 +2272,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_material_issuing)
@@ -2244,6 +2294,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_property)
@@ -2265,6 +2316,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_home)
@@ -2286,6 +2338,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_login)
@@ -2335,6 +2388,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_printer)
@@ -2367,6 +2421,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_setting)
@@ -2389,6 +2444,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
                 title = getString(R.string.nav_guest)
@@ -2410,6 +2466,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemReceiptSetting!!.isVisible = false
                 menuItemShowReceiptConfirmFailed!!.isVisible = false
                 menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = true
                 title = getString(R.string.nav_outsourced)
@@ -2675,11 +2732,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toastHandle!!.cancel()
         }
 
-        val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
-        val group = toast.view as ViewGroup
+        /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast
@@ -2690,11 +2747,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
-        val group = toast.view as ViewGroup
+        /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
         toastHandle = toast
     }
@@ -2867,7 +2924,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private class BluetoothHandler(activity: MainActivity) : Handler() {
+    //private class BluetoothHandler(activity: MainActivity) : Handler() {
+    private class BluetoothHandler(activity: MainActivity) : Handler(Looper.getMainLooper()) {
         private val mActivity: WeakReference<MainActivity> = WeakReference(activity)
         private val mTAG = MainActivity::class.java.name
 
@@ -3218,7 +3276,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {
                     //val  rjUser: RJUser? = null
                     //val  rjUser: RJUser = Gson().fromJson<Any>(res, RJUser::class.javaObjectType) as RJUser
-
+                    Log.e(mTAG, "res = $res")
                     val rjUser = Gson().fromJson<Any>(res, RJUser::class.java) as RJUser
 
                     //if (rjUser.result.equals("0")) {
@@ -3270,7 +3328,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }//response
     }
 
-    fun checkIfReceiptUploaded(barcode: ScanBarcode?) {
+    /*fun checkIfReceiptUploaded(barcode: ScanBarcode?) {
         if (barcode != null) {
             Log.e(mTAG, "checkIfReceiptUploaded poBarcode = "+barcode.poBarcode+ ", poLine = "+barcode.poLine)
             // to call api
@@ -3341,7 +3399,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.e(mTAG, "===>checkIfReceiptUploadedCallback onResponse end: ")
 
         }//onResponse
-    }
+    }*/
 
 
     fun getReceipt(barcode: ScanBarcode?) {
@@ -3625,14 +3683,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (itemReceipt != null) {
             val para = HttpParaConfirmReceiptUpload()
 
-            if (itemReceipt!!.receiveNum.isNotEmpty()) {
-                para.rva01 = itemReceipt!!.receiveNum
-                ApiFunc().confirmUploadReceiptSend(para, confirmUploadReceiptCallback)
-            } else if (receiveNumUploadSuccess.isNotEmpty()) {
-                para.rva01 = receiveNumUploadSuccess
-                ApiFunc().confirmUploadReceiptSend(para, confirmUploadReceiptCallback)
-            } else {
-                toastLong(getString(R.string.receipt_uploaded_confirm_rva01_lost))
+            when {
+                itemReceipt!!.receiveNum.isNotEmpty() -> {
+                    para.rva01 = itemReceipt!!.receiveNum
+                    ApiFunc().confirmUploadReceiptSend(para, confirmUploadReceiptCallback)
+                }
+                receiveNumUploadSuccess.isNotEmpty() -> {
+                    para.rva01 = receiveNumUploadSuccess
+                    ApiFunc().confirmUploadReceiptSend(para, confirmUploadReceiptCallback)
+                }
+                else -> {
+                    toastLong(getString(R.string.receipt_uploaded_confirm_rva01_lost))
+                }
             }
 
 
@@ -4323,9 +4385,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 toastLong(rjPropertyList.dataList[0].faj01)
                             }
 
-                            if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
+                            //if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
 
-                            }
+                            //}
                         } else { //size > 1
                             Log.e(mTAG, "=== propertyList start ===")
                             for (rjProperty in rjPropertyList.dataList) {
@@ -4721,6 +4783,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
 
 
+
+
                 } catch (e: Exception) {
                     Log.e(mTAG, "ex = $e")
                     //system error
@@ -4729,6 +4793,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
                     //sendBroadcast(failIntent)
                 }
+
+
             }
 
 
@@ -4737,9 +4803,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun getOutSourcedProcessBySupplierNo(sfpp02: String) {
         Log.e(mTAG, "=== getOutSourcedProcessBySupplierNo start ===")
-        Log.e(mTAG, "sfpp02 = $sfpp02 ===")
+        val newString = sfpp02.replace("\n", "")
+        Log.e(mTAG, "sfpp02 = $newString ===")
         val para = HttpOutsourcedProcessGetPara()
-        para.data1 = sfpp02
+        para.data1 = newString
         ApiFunc().getOutSourcedProcessBySupplierNo(para, getOutSourcedProcessBySupplierNoCallback)
     }
 
@@ -4752,6 +4819,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         @Throws(IOException::class)
         override fun onResponse(call: Call, response: Response) {
+            isBarcodeScanning = false
             Log.e(mTAG, "onResponse : "+response.body.toString())
             val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
             Log.e(mTAG, "jsonStr = $jsonStr")
@@ -4958,12 +5026,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }*/
 
-    private class SeekHandle(activity: MainActivity) : Handler() {
-
+    //private class SeekHandle(activity: MainActivity) : Handler() {
+    private class SeekHandle(activity: MainActivity) : Executor {
         private val mActivity: WeakReference<MainActivity> = WeakReference(activity)
         private val mTAG = MainActivity::class.java.name
 
-        override fun handleMessage(msg: Message) {
+        /*override fun handleMessage(msg: Message) {
 
             if (mActivity.get() == null) {
                 return
@@ -4980,7 +5048,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             pageSelectIntent.putExtra("PAGE", seekBarCurrentPage)
             activity.sendBroadcast(pageSelectIntent)
+        }*/
+
+        override fun execute(p0: Runnable?) {
+
+            //val mActivity: WeakReference<MainActivity> = WeakReference(this)
+
+            val activity = mActivity.get()
+
+
+            Log.e(mTAG, "receive close")
+            activity!!.dialog!!.dismiss()
+
+            val pageSelectIntent = Intent()
+
+            pageSelectIntent.action = Constants.ACTION.ACTION_SEEK_BAR_SELECT_PAGE_ACTION
+
+            pageSelectIntent.putExtra("PAGE", seekBarCurrentPage)
+            activity.sendBroadcast(pageSelectIntent)
         }
+    }
+
+    internal var seekRunnable: Runnable = Runnable {
+
+        /*val mActivity: WeakReference<MainActivity> = WeakReference(this)
+
+        val activity = mActivity.get()
+
+
+        Log.e(mTAG, "receive close")
+        activity!!.dialog!!.dismiss()
+
+        val pageSelectIntent = Intent()
+
+        pageSelectIntent.action = Constants.ACTION.ACTION_SEEK_BAR_SELECT_PAGE_ACTION
+
+        pageSelectIntent.putExtra("PAGE", seekBarCurrentPage)
+        activity.sendBroadcast(pageSelectIntent)*/
+
+
+
     }
 
     private fun showMaterialSeekDialog() {
@@ -5000,14 +5107,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (materialList.size > 0) {
             seekBarPage.max = materialList.size - 1
             seekBarPage.progress = currentMaterialPage
+        } else {
+            seekBarPage.max = 0
+            seekBarPage.progress = 0
         }
+
+        var temp = 0
 
         if (materialList.size > 0) {
             textPartNo.text = materialList[currentMaterialPage].sfs04
             textPartName.text = materialList[currentMaterialPage].ima02
+            temp = currentMaterialPage+1
         }
 
-        val pageString = getString(R.string.material_viewpage_page, currentMaterialPage+1, materialList.size)
+        val pageString = getString(R.string.material_viewpage_page, temp, materialList.size)
         textPage.text = pageString
 
         seekBarPage.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -5036,7 +5149,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //val msg = Message()
                 //mSeekHandler.sendMessage(msg)
                 val msg = SeekHandle(this@MainActivity)
-                msg.sendEmptyMessage(0)
+                //msg.sendEmptyMessage(0)
+                msg.execute(seekRunnable)
+
             }
         })
 
@@ -5099,7 +5214,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //val msg = Message()
                 //mSeekHandler.sendMessage(msg)
                 val msg = SeekHandle(this@MainActivity)
-                msg.sendEmptyMessage(0)
+                //msg.sendEmptyMessage(0)
+                msg.execute(seekRunnable)
             }
         })
 
@@ -5279,6 +5395,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             } else {
                 Log.e(mTAG, "itemReceipt = null")
+                toastLong(getString(R.string.receipt_print_again_data_null))
             }
 
             alertDialogBuilder.dismiss()
@@ -5315,6 +5432,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var msg = "1. 修改數量時，小數點無法使用的問題\n"
         msg += "2. 新增上傳確認失敗的提示對話方塊\n"
         msg += "3. 將輸入欄位預設都為大寫輸入\n"
+        msg += "4. 收料畫面加入\"重新連線標籤機\"於右上功能列表。\n用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。"
 
         textViewFixMsg.text = msg
 
@@ -5334,7 +5452,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         alertDialogBuilder.show()
 
     }
-
+    @SuppressLint("CommitPrefEdits")
     private fun showSettingReceiptDialog() {
         val promptView = View.inflate(this@MainActivity, R.layout.receipt_setting_dialog, null)
 

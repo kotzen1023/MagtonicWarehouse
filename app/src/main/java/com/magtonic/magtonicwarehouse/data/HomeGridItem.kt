@@ -15,23 +15,12 @@ class HomeGridItem(appId: String, imgId: Int, stringId: Int) {
         return appId
     }
 
-    fun setAppId(appId: String) {
-        this.appId = appId
-    }
-
     fun getImgId(): Int {
         return imgId
-    }
-
-    fun setImgId(imgId: Int) {
-        this.imgId = imgId
     }
 
     fun getStringId(): Int {
         return stringId
     }
 
-    fun setStringId(stringId: Int) {
-        this.stringId = stringId
-    }
 }

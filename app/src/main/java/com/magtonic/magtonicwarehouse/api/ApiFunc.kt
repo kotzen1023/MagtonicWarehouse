@@ -22,7 +22,7 @@ class ApiFunc {
     //private val testIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2_toptest"
     private val realIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2"
     private val iepIP = "http://192.1.1.121/webs.asmx/"
-    private val apiTestSign = "http://192.1.16.152:8080/JerseyExample/rest/data/getdata"
+    //private val apiTestSign = "http://192.1.16.152:8080/JerseyExample/rest/data/getdata"
     private val outsideIP = "http://61.216.114.217/asmx/WebService.asmx/"
     //api http address string define
 
@@ -40,7 +40,7 @@ class ApiFunc {
     private val apiStrConfirmUploadReceiptArr = realIP
 
     //4.Get Receipt History
-    private val apiStrGetReceiptHis = baseIP + "Sel_rvb01"
+    //private val apiStrGetReceiptHis = baseIP + "Sel_rvb01"
 
     //storage
     //5.
@@ -83,7 +83,7 @@ class ApiFunc {
         Log.e("ApiFunc", "login")
         val paraMap = HashMap<String, String>()
         paraMap["p_json"] = Gson().toJson(para)
-        postWithMultiKey(apiStrLogin, paraMap, callback)
+        postWithMultiKey(paraMap, callback)
 
     }//login
 
@@ -93,10 +93,10 @@ class ApiFunc {
 
     }
 
-    fun getHistory(para: HttpReceiptGetPara, callback: Callback) {
+    /*fun getHistory(para: HttpReceiptGetPara, callback: Callback) {
         postWithParaPJsonStr(apiStrGetReceiptHis, Gson().toJson(para), callback)
 
-    }
+    }*/
 
     fun getStorage(para: HttpStorageGetPara, callback: Callback) {
         postWithParaPJsonStr(apiStrGetRecDataFun, Gson().toJson(para), callback)
@@ -110,7 +110,7 @@ class ApiFunc {
     //fun getProperty(para: HttpPropertyGetPara, callback: Callback) {
     fun getProperty(para: String, callback: Callback) {
         //postWithParaPFAJ02Str(apiStrGetPropertyFun, Gson().toJson(para), callback)
-        postWithParaPFAJ02Str(apiStrGetPropertyFun, para, callback)
+        postWithParaPFAJ02Str(para, callback)
     }
 
     //guest
@@ -177,9 +177,11 @@ class ApiFunc {
 
     }
 
-    private fun postWithParaPFAJ02Str(url: String, jsonStr: String, callback: Callback) {
+    private fun postWithParaPFAJ02Str(jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")
         //Log.e(mTAG, "=======> $jsonStr" )
+
+        val url = apiStrGetPropertyFun
 
         val body = FormBody.Builder()
             .add("p_faj02", jsonStr)
@@ -254,9 +256,11 @@ class ApiFunc {
 
     }
 
-    private fun postWithMultiKey(url: String, paraMap: HashMap<String, String>?, callback: Callback) {
+    private fun postWithMultiKey(paraMap: HashMap<String, String>?, callback: Callback) {
         Log.e(mTAG, "postWithMultiKey")
         val builder = FormBody.Builder()
+
+        val url = apiStrLogin
 
         for (key in paraMap!!.keys) {
 
@@ -268,13 +272,13 @@ class ApiFunc {
         }
 
         val body = builder.build()
-        val rBulider = Request.Builder()
+        val rBuilder = Request.Builder()
         Log.e(mTAG, "url = $url")
-        rBulider.url(url)
-        rBulider.post(body)
+        rBuilder.url(url)
+        rBuilder.post(body)
 
-        rBulider.addHeader(ContentType.title, ContentType.xxxForm)
-        val req = rBulider.build()
+        rBuilder.addHeader(ContentType.title, ContentType.xxxForm)
+        val req = rBuilder.build()
 
         val client = OkHttpClient().newBuilder()
             .retryOnConnectionFailure(false)
@@ -293,7 +297,7 @@ class ApiFunc {
         }
 
 
-    }//postWithMultiKey
+    }
 
 
     /*fun uploadReceiptList(uploadReceiptList: List<HttpParaUploadReceipt>, callback: Callback) {
@@ -410,7 +414,7 @@ class ApiFunc {
     }
 
     //for test
-    fun uploadOutSourcedWithSign(httpOutsourcedProcessGetPara: HttpOutsourcedProcessGetPara, callback: Callback) {
+    /*fun uploadOutSourcedWithSign(httpOutsourcedProcessGetPara: HttpOutsourcedProcessGetPara, callback: Callback) {
         val gson = Gson()
         val builder = StringBuilder()
 
@@ -421,10 +425,10 @@ class ApiFunc {
         //postWithParaPJsonStr(apiStrUploadReceiptArr, builder.toString(), callback)
 
         Log.e(mTAG, "builder.length = ${builder.length}")
-        Log.e(mTAG, "builder.toString() = ${builder.toString()}")
+        Log.e(mTAG, "builder.toString() = $builder")
 
         //postWithParaPJsonStrandTimeOut(apiTestSign, builder.toString(), callback)
-    }
+    }*/
 
     fun confirmUploadReceiptSend(httpParaConfirmReceiptUpload: HttpParaConfirmReceiptUpload, callback: Callback) {
         Log.e(mTAG, "->confirmUploadReceiptSend")

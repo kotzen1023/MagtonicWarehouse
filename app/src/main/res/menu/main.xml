@@ -48,4 +48,10 @@
             android:title="@string/setting_bluetooth_reconnect"
             android:visible="false"
             app:showAsAction="collapseActionView"/>
+
+    <item android:id="@+id/main_print_again"
+            android:icon="@drawable/baseline_print_white_24"
+            android:title="@string/receipt_print_again"
+            android:visible="false"
+            app:showAsAction="collapseActionView"/>
 </menu>

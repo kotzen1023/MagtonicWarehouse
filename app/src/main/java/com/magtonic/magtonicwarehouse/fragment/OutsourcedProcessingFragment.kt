@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.widget.AdapterView
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
@@ -118,6 +119,16 @@ class OutsourcedProcessingFragment : Fragment() {
         outsourcedSupplierHashMap["錦一"] = "53152589"
         outsourcedSupplierHashMap["盛豐"] = "89342228"
         outsourcedSupplierHashMap["鴻通海"] = "16660219"
+        outsourcedSupplierHashMap["頡宥"] = "42914225"
+        outsourcedSupplierHashMap["頡亮"] = "53610142"
+        outsourcedSupplierHashMap["政泰"] = "29128266"
+        outsourcedSupplierHashMap["允潔"] = "27887071"
+        outsourcedSupplierHashMap["聖岱1"] = "06515434"
+        outsourcedSupplierHashMap["聖岱2"] = "85031855"
+        outsourcedSupplierHashMap["南隆"] = "22814493"
+        outsourcedSupplierHashMap["昶太"] = "24276225"
+        outsourcedSupplierHashMap["鋐偉1"] = "85008897"
+        outsourcedSupplierHashMap["鋐偉2"] = "00294906"
 
         outsourcedSupplierNameList.clear()
         outsourcedSupplierNameList.add("萬興")
@@ -135,6 +146,16 @@ class OutsourcedProcessingFragment : Fragment() {
         outsourcedSupplierNameList.add("錦一")
         outsourcedSupplierNameList.add("盛豐")
         outsourcedSupplierNameList.add("鴻通海")
+        outsourcedSupplierNameList.add("頡宥")
+        outsourcedSupplierNameList.add("頡亮")
+        outsourcedSupplierNameList.add("政泰")
+        outsourcedSupplierNameList.add("允潔")
+        outsourcedSupplierNameList.add("聖岱1")
+        outsourcedSupplierNameList.add("聖岱2")
+        outsourcedSupplierNameList.add("南隆")
+        outsourcedSupplierNameList.add("昶太")
+        outsourcedSupplierNameList.add("鋐偉1")
+        outsourcedSupplierNameList.add("鋐偉2")
 
         val view = inflater.inflate(R.layout.fragment_outsourced_process, container, false)
 
@@ -483,6 +504,45 @@ class OutsourcedProcessingFragment : Fragment() {
 
                         //showButtonStatusByState()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SCAN_BARCODE, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SCAN_BARCODE")
+
+                        val barcode: String = intent.getStringExtra("BARCODE") as String
+                        Log.e(mTAG, "barcode = $barcode")
+                        barcodeInput!!.setText(barcode)
+
+
+                        textViewSupplier!!.visibility = View.GONE
+                        textViewSupplier!!.text = ""
+
+                        linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
+                        linearLayoutDetailHeader!!.visibility = View.GONE
+                        viewLine!!.visibility = View.GONE
+
+                        progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
+                        progressBar!!.visibility = View.VISIBLE
+
+                        outsourcedProcessListBySupplier.clear()
+                        if (outsourcedProcessSupplierItemAdapter != null) {
+                            outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
+                        }
+
+                        outsourcedProcessDetailList.clear()
+                        if (outsourcedProcessDetailItemAdapter != null) {
+                            outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
+                        }
+
+                        outsourcedProcessMoreDetailList.clear()
+                        if (outsourcedProcessMoreDetailAdapter != null) {
+                            outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+                        }
+
+                        listViewBySupplier!!.visibility = View.VISIBLE
+                        listViewDetail!!.visibility = View.GONE
+                        listViewMoreDetail!!.visibility = View.GONE
+
+                        isOutSourcedInDetail = 0
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SERVER_ERROR")
 
@@ -691,6 +751,7 @@ class OutsourcedProcessingFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_BARCODE_NULL)
             filter.addAction(Constants.ACTION.ACTION_NETWORK_FAILED)
             filter.addAction(Constants.ACTION.ACTION_CONNECTION_TIMEOUT)
+            filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SCAN_BARCODE)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH)
@@ -742,11 +803,14 @@ class OutsourcedProcessingFragment : Fragment() {
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(outsourcedProcessContext, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(outsourcedProcessContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+       /*val toast = Toast.makeText(outsourcedProcessContext, message, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
         val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast
@@ -862,7 +926,7 @@ class OutsourcedProcessingFragment : Fragment() {
         //val textViewOutsourcedProcessWorkOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderContent)
         val btnCancel = promptView.findViewById<Button>(R.id.btnOutSourcedDialogCancel)
         val btnConfirm = promptView.findViewById<Button>(R.id.btnOutSourcedDialogConfirm)
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameList)
+        val adapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameList)
         spinnerSupplier.adapter = adapter
 
         spinnerSupplier.setSelection(currentSelectedSupplier)

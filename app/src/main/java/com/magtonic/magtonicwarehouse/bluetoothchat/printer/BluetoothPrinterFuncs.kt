@@ -6,10 +6,10 @@ import java.io.UnsupportedEncodingException
 class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
     //internal var LK_CPCL_BCS_39 = "39"
     //internal var LK_CPCL_BCS_93 = "93"
-    private var LK_CPCL_BCS_128 = "128"
+    //private var LK_CPCL_BCS_128 = "128"
 
     //internal var LK_CPCL_BCS_0RATIO = 0
-    private var LK_CPCL_BCS_1RATIO = 1
+    //private var LK_CPCL_BCS_1RATIO = 1
     //internal var LK_CPCL_BCS_2RATIO = 2
     //internal var LK_CPCL_BCS_3RATIO = 3
     //internal var LK_CPCL_BCS_4RATIO = 4
@@ -24,7 +24,7 @@ class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
     //internal var LK_CPCL_BCS_28RATIO = 13
     //internal var LK_CPCL_BCS_29RATIO = 14
     //internal var LK_CPCL_BCS_30RATIO = 15
-    private var stringBuffer: StringBuffer? = null
+    //private var stringBuffer: StringBuffer? = null
     private var mChatService: BluetoothChatService? = null
 
     init {
@@ -41,7 +41,7 @@ class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
         mChatService!!.write(initPrinter)
     }
 
-    @Throws(UnsupportedEncodingException::class)
+    /*@Throws(UnsupportedEncodingException::class)
     fun print_qr_code(qrdata: String) {
         val storeLen = qrdata.toByteArray(charset("Big5")).size + 3
         val storePl = (storeLen % 256).toByte()
@@ -63,7 +63,7 @@ class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
         mChatService!!.write(qrdata.toByteArray(charset("Big5")))
         mChatService!!.write(printQR)
         feedAndCut("10")
-    }
+    }*/
 
     fun printBarCode(content: String) {
         val bytes = content.toByteArray()
@@ -135,7 +135,7 @@ class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
 
     /////*******ESC/POS列印語言
     /////*******CLPL列印語言
-    @Throws(UnsupportedEncodingException::class)
+   /*@Throws(UnsupportedEncodingException::class)
     fun CLPLbarcodePrinter(content1: String, content2: String) {
         this.stringBuffer = StringBuffer()
         this.setForm(0, 200, 200, 406, 1)
@@ -228,5 +228,5 @@ class BluetoothPrinterFuncs(mCS: BluetoothChatService) {
 
     private fun getBuffer(): StringBuffer? {
         return this.stringBuffer
-    }
+    }*/
 }

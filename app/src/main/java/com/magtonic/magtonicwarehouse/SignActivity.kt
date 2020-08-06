@@ -2,20 +2,20 @@ package com.magtonic.magtonicwarehouse
 
 import android.app.AlertDialog
 import android.content.*
-import android.database.Cursor
+
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Base64
+
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isEraser
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penColor
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penWidth
@@ -23,13 +23,15 @@ import com.magtonic.magtonicwarehouse.data.Constants
 import com.magtonic.magtonicwarehouse.data.FTPUtils
 import com.magtonic.magtonicwarehouse.data.FileUtils
 import com.magtonic.magtonicwarehouse.data.PaintBoard
-import java.io.ByteArrayOutputStream
+import kotlinx.coroutines.*
+
 
 import java.io.IOException
 import java.io.OutputStream
 
-import java.text.SimpleDateFormat
-import java.util.*
+
+
+import kotlin.coroutines.CoroutineContext
 
 
 class SignActivity : AppCompatActivity() {
@@ -144,92 +146,104 @@ class SignActivity : AppCompatActivity() {
         mReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action != null) {
-                    if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_TIMEOUT, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_TIMEOUT")
-                        progressBar!!.visibility = View.GONE
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_UNKNOWN_HOST, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_UNKNOWN_HOST")
-                        progressBar!!.visibility = View.GONE
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_FAILED")
-                        progressBar!!.visibility = View.GONE
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED")
-                        progressBar!!.visibility = View.GONE
-
-                        toast(getString(R.string.outsourced_process_sign_upload_failed))
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS")
-
-                        uploadSuccess = true
-                        //progressBar!!.visibility = View.GONE
-                        toast(getString(R.string.outsourced_process_sign_upload_success))
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE")
-
-                        //delete image
-
-                        deleteImage()
-                        /*if (!ret) {
-                            Log.e(mTAG, "Delete $signImageAbsolutePath success!")
-                        } else {
-                            Log.e(mTAG, "delete $signImageAbsolutePath failed")
-                        }*/
-
-                        progressBar!!.visibility = View.GONE
-
-                        linearLayoutSign!!.visibility = View.GONE
-                        linearLayoutUpload!!.visibility = View.VISIBLE
-
-                        val promptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
-
-                        val sendOrderHeader = promptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
-                        val sendOrderContent = promptView.findViewById<TextView>(R.id.receiptItemDetailContent)
-                        sendOrderHeader.text = getString(R.string.outsource_send_no)
-                        sendOrderContent.text = sendOrder
-                        linearLayoutSignDetailList!!.addView(promptView)
-
-                        val headerPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item_header, null)
-                        val barHeader = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailHeader)
-                        val barContent = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentStatic)
-                        val barQuantity = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentDynamic)
-
-                        barHeader.text = getString(R.string.outsource_part_no)
-                        barContent.text = getString(R.string.outsource_part_name)
-                        barQuantity.text = getString(R.string.outsource_quantity)
-                        linearLayoutSignDetailList!!.addView(headerPromptView)
-
-                        for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
-
-                            //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
-                            //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
-                            //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
-                            val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
-
-                            val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
-                            val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
-                            val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
-
-                            itemHeader.text = rjOutSourceProcessed.data3
-                            itemContent.text = rjOutSourceProcessed.data6
-                            itemQuantity.text = rjOutSourceProcessed.data4
-
-                            linearLayoutSignDetailList!!.addView(insidePromptView)
+                    when {
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_TIMEOUT, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_TIMEOUT")
+                            progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.connect_timeout))
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_UNKNOWN_HOST, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_UNKNOWN_HOST")
+                            progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.toast_server_error))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_CONNECT_FAILED")
+                            progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.ftp_connect_error))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_FAILED")
+                            progressBar!!.visibility = View.GONE
 
-                        imageViewShowSignature!!.setImageBitmap(paintBoard!!.bitmap)
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED")
+                            toast(getString(R.string.outsourced_process_sign_upload_failed))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS")
 
-                        progressBar!!.visibility = View.GONE
+                            uploadSuccess = true
+                            //progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.outsourced_process_sign_upload_success))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE")
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS")
+                            //delete image
+
+                            deleteImage()
+                            /*if (!ret) {
+                                            Log.e(mTAG, "Delete $signImageAbsolutePath success!")
+                                        } else {
+                                            Log.e(mTAG, "delete $signImageAbsolutePath failed")
+                                        }*/
+
+                            progressBar!!.visibility = View.GONE
+
+                            linearLayoutSign!!.visibility = View.GONE
+                            linearLayoutUpload!!.visibility = View.VISIBLE
+
+                            val promptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+
+                            val sendOrderHeader = promptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                            val sendOrderContent = promptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+                            sendOrderHeader.text = getString(R.string.outsource_send_no)
+                            sendOrderContent.text = sendOrder
+                            linearLayoutSignDetailList!!.addView(promptView)
+
+                            val headerPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item_header, null)
+                            val barHeader = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailHeader)
+                            val barContent = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentStatic)
+                            val barQuantity = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentDynamic)
+
+                            barHeader.text = getString(R.string.outsource_part_no)
+                            barContent.text = getString(R.string.outsource_part_name)
+                            barQuantity.text = getString(R.string.outsource_quantity)
+                            linearLayoutSignDetailList!!.addView(headerPromptView)
+
+                            for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
+
+                                //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
+                                //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
+                                //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
+                                val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
+
+                                val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
+                                val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
+                                val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
+
+                                itemHeader.text = rjOutSourceProcessed.data3
+                                itemContent.text = rjOutSourceProcessed.data6
+                                itemQuantity.text = rjOutSourceProcessed.data4
+
+                                linearLayoutSignDetailList!!.addView(insidePromptView)
+                            }
+
+                            imageViewShowSignature!!.setImageBitmap(paintBoard!!.bitmap)
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED")
+
+                            progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.outsourced_process_sign_upload_confirm_failed))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS")
 
 
 
-                        progressBar!!.visibility = View.GONE
-                        finish()
+                            progressBar!!.visibility = View.GONE
+                            finish()
+                        }
                     }
 
                 }
@@ -338,10 +352,12 @@ class SignActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun saveBitmap(
         context: Context, bitmap: Bitmap,
-        format: Bitmap.CompressFormat, mimeType: String,
+        //format: Bitmap.CompressFormat, mimeType: String,
         displayName: String
     ): String {
-        var path = ""
+        val path: String
+        val format = Bitmap.CompressFormat.JPEG
+        val mimeType = "image/jpeg"
 
         val relativeLocation = Environment.DIRECTORY_PICTURES
         val contentValues = ContentValues()
@@ -352,7 +368,7 @@ class SignActivity : AppCompatActivity() {
         }
         val resolver = context.contentResolver
         var stream: OutputStream? = null
-        val byteArrayOutputStream = ByteArrayOutputStream()
+        //val byteArrayOutputStream = ByteArrayOutputStream()
 
         var uri: Uri? = null
         try {
@@ -410,7 +426,7 @@ class SignActivity : AppCompatActivity() {
     private fun deleteImage() {
 
         val resolver = signContext!!.contentResolver
-        val ret = resolver.delete (signImageUriPath as Uri,null ,null );
+        val ret = resolver.delete (signImageUriPath as Uri,null ,null )
 
         Log.e(mTAG, "ret = $ret")
     }
@@ -439,7 +455,7 @@ class SignActivity : AppCompatActivity() {
         return ret
     }
 
-    private fun getRealPathFromURI2(context: Context, contentUri: Uri?): String? {
+    /*private fun getRealPathFromURI2(context: Context, contentUri: Uri?): String? {
         val cursor: Cursor?
         val columnIndexID: Int
         val listOfAllImages: MutableList<Uri> = mutableListOf()
@@ -451,16 +467,12 @@ class SignActivity : AppCompatActivity() {
             columnIndexID = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             ret = cursor.getString(columnIndexID)
             Log.e(mTAG, "getRealPathFromURI2 = $ret")
-            /*while (cursor.moveToNext()) {
-                imageId = cursor.getLong(columnIndexID)
-                val uriImage = Uri.withAppendedPath(contentUri , "" + imageId)
-                listOfAllImages.add(uriImage)
-            }*/
+
             cursor.close()
         }
 
         return ret
-    }
+    }*/
 
     private fun showLogoutConfirmDialog() {
 
@@ -491,9 +503,9 @@ class SignActivity : AppCompatActivity() {
         }
         btnConfirm!!.setOnClickListener {
 
-            //val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-            //val currentDateAndTime: String = sdf.format(Date())
-            //uploadSignName = "$currentDateAndTime.jpg"
+            /*val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+            val currentDateAndTime: String = sdf.format(Date())
+            uploadSignName = "$currentDateAndTime.jpg"*/
             uploadSignName = "$sendOrder.jpg"
 
             val scaledWidth = 320.0 //stick height to 512
@@ -507,14 +519,16 @@ class SignActivity : AppCompatActivity() {
             val scaledImage = Bitmap.createScaledBitmap(paintBoard!!.bitmap, scaledWidth.toInt(), scaledHeight.toInt(), false)
 
             //saveBitmap(drawContext as Context, paintBoard!!.bitmap, CompressFormat.JPEG,"image/jpeg", fileName)
-            val path = saveBitmap(this@SignActivity as Context, scaledImage, Bitmap.CompressFormat.JPEG,"image/jpeg", uploadSignName)
+            val path = saveBitmap(this@SignActivity as Context, scaledImage,  uploadSignName)
 
             if (path != "")
             {
                 progressBar!!.visibility = View.VISIBLE
                 val ftpUtils = FTPUtils(signContext as Context,"192.1.1.121", 21, "iepftp", "T69924056Ftp", uploadSignName, path)
-                val ftpTask = FtpTask()
-                ftpTask.execute(ftpUtils)
+                val coroutineFtp = Presenter(ftpUtils)
+                coroutineFtp.execute()
+                //val ftpTask = FtpTask()
+                //ftpTask.execute(ftpUtils)
             } else {
                 Log.e(mTAG, "Path = null")
             }
@@ -535,18 +549,21 @@ class SignActivity : AppCompatActivity() {
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(signContext, message, Toast.LENGTH_SHORT)
+        val toast = Toast.makeText(signContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        /*val toast = Toast.makeText(signContext, message, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
         val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
-        textView.textSize = 30.0f
+        textView.textSize = 30.0f*/
         toast.show()
 
         toastHandle = toast
     }
 
     //private class FtpTask : AsyncTask<FTPUtils, Void?, FTPClient>() {
-    private class FtpTask : AsyncTask<FTPUtils, Void?, Context>() {
+    /*private class FtpTask : AsyncTask<FTPUtils, Void?, Context>() {
 
         override fun onPreExecute() {
 
@@ -571,6 +588,62 @@ class SignActivity : AppCompatActivity() {
             }
 
             return params[0]!!.mContext as Context
+        }
+    }*/
+
+    private class Presenter(ftpUtils: FTPUtils) : CoroutineScope {
+        private var job: Job = Job()
+
+        override val coroutineContext: CoroutineContext
+            get() = Dispatchers.Main + job // to run code in Main(UI) Thread
+
+        private var ftpUtils: FTPUtils ?= null
+        private var isUploadSuccess = false
+        init {
+            this.ftpUtils =  ftpUtils
+        }
+
+
+        // call this method to cancel a coroutine when you don't need it anymore,
+        // e.g. when user closes the screen
+
+        /*fun cancel() {
+            job.cancel()
+        }*/
+
+        fun execute() = launch {
+            onPreExecute()
+            //val result = doInBackground() // runs in background thread without blocking the Main Thread
+            doInBackground() // runs in background thread without blocking the Main Thread
+            onPostExecute()
+        }
+
+        private suspend fun doInBackground(): String = withContext(Dispatchers.IO) { // to run code in Background Thread
+            // do async work
+
+            isUploadSuccess = ftpUtils!!.uploadFile()
+            delay(1000) // simulate async work
+            return@withContext "SomeResult"
+        }
+
+        // Runs on the Main(UI) Thread
+        private fun onPreExecute() {
+            Log.e("FTPTask", "task start")
+            // show progress
+        }
+
+        // Runs on the Main(UI) Thread
+        //private fun onPostExecute(result: String) {
+        private fun onPostExecute() {
+            // hide progress
+            Log.e("FTPTask", "task complete, isUploadSuccess = $isUploadSuccess")
+
+            if (isUploadSuccess) {
+                val completeIntent = Intent()
+                completeIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE
+                ftpUtils!!.mContext!!.sendBroadcast(completeIntent)
+            }
+
         }
     }
 }

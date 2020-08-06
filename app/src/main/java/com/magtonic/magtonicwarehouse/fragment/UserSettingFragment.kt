@@ -40,7 +40,7 @@ class UserSettingFragment : Fragment() {
         receiptAutoConfirmUploaded.isChecked = isReceiptUploadAutoConfirm
         logEnable.isChecked = isLogEnable
 
-        receiptAutoConfirmUploaded.setOnCheckedChangeListener { buttonView, isChecked ->
+        receiptAutoConfirmUploaded.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 val successIntent = Intent()
                 successIntent.action = Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON
@@ -53,7 +53,7 @@ class UserSettingFragment : Fragment() {
 
         }
 
-        logEnable.setOnCheckedChangeListener { buttonView, isChecked ->
+        logEnable.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 val successIntent = Intent()
                 successIntent.action = Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON

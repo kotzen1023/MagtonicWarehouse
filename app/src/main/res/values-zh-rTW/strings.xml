@@ -22,7 +22,7 @@
     <string name="confirm">確定</string>
     <string name="cancel">取消</string>
     <string name="dialog_title">訊息</string>
-    <string name="toast_network_error">網路連線失敗,請檢查</string>
+    <string name="toast_network_error">網路連線失敗,請檢查網路設定</string>
     <string name="toast_server_error">伺服器錯誤,請通知資訊人員</string>
     <string name="nav_receipt">收料</string>
     <string name="nav_login">登入</string>
@@ -193,5 +193,8 @@
     <string name="outsourced_process_dialog_select_supplier">請選擇供應商</string>
     <string name="receipt_confirm_failed_history">確認失敗紀錄</string>
     <string name="log_enable">啟用Log</string>
+    <string name="receipt_print_again_data_null">資料為空，無法列印。</string>
+    <string name="receipt_print_again">標籤再印</string>
+    <string name="ftp_connect_error">連線錯誤。請檢查FTP帳號密碼</string>
 
 </resources>

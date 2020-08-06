@@ -4,7 +4,7 @@ package com.magtonic.magtonicwarehouse.data
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.ProgressBar
+
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPConnectionClosedException
@@ -17,7 +17,7 @@ import java.net.UnknownHostException
 
 class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String, userPassword: String, filename: String, path: String) {
     private val mTAG = FTPUtils::class.java.name
-    var ftpClient: FTPClient? = null
+    private var ftpClient: FTPClient? = null
     private var ftpUrl: String? = null
     private var ftpPort: Int = 0
     private var userName: String? = null
@@ -45,12 +45,12 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
 
 
 
-    fun uploadFile(): Long {
-        var size: Long = 0
+    fun uploadFile(): Boolean {
+        //var size: Long = 0
         /*if (!initFtp()) {
             return 0
         }*/
-
+        var ret = false
 
 
         if (!ftpClient!!.isConnected) {
@@ -76,7 +76,7 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
                 //if (files.size == 1) ftpClient!!.deleteFile(File(filename).getPath())
                 ftpClient!!.storeFile(File(filename as String).path, bis)
                 bis.close()
-                size = ftpClient!!.listFiles(File(filename as String).path)[0].size
+                val size = ftpClient!!.listFiles(File(filename as String).path)[0].size
 
                 Log.d(mTAG, "Upload file size = $size")
 
@@ -89,6 +89,7 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
                 successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_SUCCESS
                 mContext!!.sendBroadcast(successIntent)
 
+                ret = true
             } catch (ex1: SocketException) {
                 ex1.printStackTrace()
                 val timeoutIntent = Intent()
@@ -141,10 +142,10 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
 
         }*/
 
-        return size
+        return ret
     }
 
-    fun downLoadFile(remoteFile: File, localFile: File?): Boolean {
+    /*fun downLoadFile(remoteFile: File, localFile: File?): Boolean {
         if (!ftpClient!!.isConnected) {
             return false
         } else {
@@ -160,7 +161,7 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
         }
 
         return true
-    }
+    }*/
 
 
 }

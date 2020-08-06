@@ -105,7 +105,7 @@
                             android:layout_height="match_parent"
                             android:textStyle="bold"
                             android:textColor="@color/md_black_1000"
-                            android:textSize="@dimen/text_size_25"
+                            android:textSize="@dimen/text_size_20"
                             android:gravity="center"
                             android:paddingLeft="5dp"
                             android:layout_weight="1">
@@ -115,7 +115,7 @@
                             android:id="@+id/outSourcedProcessDetailContent"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="@dimen/text_size_25"
+                            android:textSize="@dimen/text_size_20"
                             android:gravity="center"
                             android:layout_weight="1">
                     </TextView>
@@ -125,7 +125,7 @@
                         android:id="@+id/outSourcedProcessDetailQuantity"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textSize="@dimen/text_size_25"
+                        android:textSize="@dimen/text_size_20"
                         android:gravity="center"
 
                         android:layout_weight="2">
