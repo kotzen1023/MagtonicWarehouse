@@ -196,5 +196,11 @@
     <string name="receipt_print_again_data_null">資料為空，無法列印。</string>
     <string name="receipt_print_again">標籤再印</string>
     <string name="ftp_connect_error">連線錯誤。請檢查FTP帳號密碼</string>
+    <string name="nav_issuance_lookup">發料查詢</string>
+    <string name="issuance_lookup_input_hint">掃描或輸入發料單號碼</string>
+    <string name="issuance_no">發料單號</string>
+    <string name="issuance_work_order">工單單號</string>
+    <string name="issuance_part_no">料件編號</string>
+    <string name="issuance_part_name">品名</string>
 
 </resources>

@@ -39,7 +39,7 @@
                         android:hint="@string/outsource_supplier_input_hint"
                         android:textSize="@dimen/text_size_25"
                         android:textAlignment="center"
-                        android:inputType="numberDecimal"
+                        android:inputType="textCapCharacters"
                         android:maxLines="1"
                         android:minLines="1"
                         android:lines="1"

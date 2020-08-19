@@ -33,6 +33,10 @@ class ReceiveTransform {
         var dataList = ArrayList<RJSupplier>()
     }
 
+    inner class RJIssuanceLookupList {
+        var dataList = ArrayList<RJIssuanceLookup>()
+    }
+
     companion object {
         //private val mTAG = ReceiveTransform::class.java.name
         //const val arrField : String = "dataList"

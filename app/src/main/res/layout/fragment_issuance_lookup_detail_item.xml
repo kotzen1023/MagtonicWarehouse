@@ -9,7 +9,7 @@
             android:layout_weight="1">
 
         <TextView android:text="header"
-                android:id="@+id/outSourcedProcessMoreDetailHeader"
+                android:id="@+id/issuanceLookupDetailHeader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textStyle="bold"
@@ -17,19 +17,17 @@
                 android:textSize="@dimen/text_size_30"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
-                android:layout_weight="1"
-                android:minHeight="60dp">
+                android:layout_weight="1">
         </TextView>
 
         <TextView android:text="content"
-                android:id="@+id/outSourcedProcessMoreDetailContent"
+                android:id="@+id/issuanceLookupDetailContent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textSize="@dimen/text_size_25"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"
-                android:layout_weight="1"
-                android:minHeight="60dp">
+                android:layout_weight="1">
         </TextView>
     </LinearLayout>
 

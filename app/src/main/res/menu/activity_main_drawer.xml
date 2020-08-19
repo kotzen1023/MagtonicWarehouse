@@ -19,11 +19,18 @@
                 android:icon="@drawable/factory_stock_house"
                 android:title="@string/nav_storage"
                 android:visible="false"/>
+
         <item
+                android:id="@+id/nav_issuance_lookup"
+                android:icon="@drawable/baseline_find_in_page_black_48"
+                android:title="@string/nav_issuance_lookup"
+                android:visible="false"/>
+
+        <!--item
                 android:id="@+id/nav_material_issuing"
                 android:icon="@drawable/baseline_unarchive_black_48"
                 android:title="@string/nav_material_issuing"
-                android:visible="false"/>
+                android:visible="false"/-->
         <item
                 android:id="@+id/nav_outsourced"
                 android:icon="@drawable/baseline_edit_black_48"

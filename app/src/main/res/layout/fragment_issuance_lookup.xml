@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="?attr/actionBarSize"
+        android:id="@+id/issuance_lookup_container">
+
+    <LinearLayout
+            android:id="@+id/linearLayoutIssuanceLookupMain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:focusableInTouchMode="true">
+
+        <EditText
+                android:id="@+id/editTextIssuanceLookup"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/issuance_lookup_input_hint"
+                android:textSize="@dimen/text_size_25"
+                android:textAlignment="center"
+                android:inputType="textCapCharacters"
+                android:maxLines="1"
+                android:minLines="1"
+                android:lines="1"
+                />
+
+        <View
+                android:id="@+id/viewLineIssuanceLookup"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_weight="0"
+                android:background="#b7b7b7"
+                android:visibility="gone"/>
+
+        <LinearLayout
+                android:id="@+id/linearLayoutIssuanceLookup"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+            <LinearLayout
+                    android:id="@+id/linearLayoutIssuanceLookupHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:visibility="gone">
+
+                <TextView android:text="@string/issuance_work_order"
+                        android:id="@+id/issuanceLookupHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textStyle="bold"
+                        android:textColor="@color/md_black_1000"
+                        android:textSize="@dimen/text_size_20"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:layout_weight="1">
+                </TextView>
+
+                <TextView android:text="@string/issuance_part_name"
+                        android:id="@+id/issuanceLookupContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/text_size_20"
+                        android:gravity="center"
+                        android:layout_weight="1">
+                </TextView>
+
+            </LinearLayout>
+
+            <ListView
+                    android:id="@+id/listViewIssuanceLookup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/linearLayoutIssuanceLookupDetail"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:visibility="gone">
+
+            <ListView
+                    android:id="@+id/listViewIssuanceLookupDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     enum class CurrentFragment {
         RECEIPT_FRAGMENT, STORAGE_FRAGMENT, MATERIAL_ISSUING_FRAGMENT, HOME_FRAGMENT, PRINTER_FRAGMENT,
-        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT
+        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT
     }
 
     //for printer
@@ -167,6 +167,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var outsourcedProcessOrderListBySupplier = ArrayList<RJSupplier>()
         @JvmStatic var isOutSourcedInDetail: Int = 0
         @JvmStatic var currentOutSourcedSendOrder: String = ""
+        //IssuanceLookup
+        @JvmStatic var issuanceLookupList = ArrayList<RJIssuanceLookup>()
+        @JvmStatic var isIssuanceLookupDetail: Int = 0
         //log
         @JvmStatic var isLogEnable: Boolean = true
     }
@@ -470,6 +473,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         sendBroadcast(backIntent)
                     }
                 }
+                CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT -> {
+                    if (isIssuanceLookupDetail == 1) {
+                        fabBack!!.visibility = View.GONE
+                        fabSign!!.visibility = View.GONE
+
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST
+                        sendBroadcast(backIntent)
+                    }
+                }
                 else -> {
                     Log.e(mTAG, "Unknown fragment")
                 }
@@ -729,6 +742,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         }
                                         CurrentFragment.OUTSOURCED_FRAGMENT -> {
                                             getOutSourcedProcessBySupplierNo(inputNo)
+                                        }
+                                        CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT -> {
+                                            getIssuanceLookup(inputNo)
                                         }
 
                                         else -> {
@@ -1270,6 +1286,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //hide print again button
                         fabPrintAgain!!.hide()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_ISSUANCE_LOOKUP_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_HOME_GO_TO_ISSUANCE_LOOKUP_ACTION")
+
+                        title = getString(R.string.nav_issuance_lookup)
+
+                        menuItemBluetooth!!.isVisible = false
+                        menuItemKeyboard!!.isVisible = true
+                        menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
+                        menuItemEraser!!.isVisible = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
+
+                        //start with receipt fragment
+                        var fragment: Fragment? = null
+                        val fragmentClass = IssuanceLookupFragment::class.java
+
+                        try {
+                            fragment = fragmentClass.newInstance()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                        val fragmentManager = supportFragmentManager
+                        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
+
+                        currentFrag = CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT
+                        isBarcodeScanning = false
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_PROPERTY_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_PROPERTY_ACTION")
 
@@ -1665,6 +1715,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         fabBack!!.visibility = View.GONE
                         fabSign!!.visibility = View.GONE
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK")
+
+                        fabBack!!.visibility = View.VISIBLE
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION")
 
@@ -1853,6 +1907,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                             getOutSourcedProcessBySupplierNo(text)
                                         }
+                                        CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT -> {
+                                            scanIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_SCAN_BARCODE
+                                            scanIntent.putExtra("BARCODE", text)
+                                            sendBroadcast(scanIntent)
+
+                                            getIssuanceLookup(text)
+                                        }
                                         else -> {
                                             isBarcodeScanning = false
                                         }
@@ -1921,6 +1982,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_RECEIPT_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_STORAGE_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_MATERIAL_ACTION)
+            filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_ISSUANCE_LOOKUP_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_TAG_PRINTER_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_LOGOUT_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_ABOUT_ACTION)
@@ -1951,6 +2013,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
 
+            filter.addAction(Constants.ACTION.ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK)
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
             filter.addAction("unitech.scanservice.data")
@@ -2014,18 +2077,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
 
-        if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1) { //if in outsourced detail
+        if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1 || isIssuanceLookupDetail == 1) { //if in outsourced detail
 
             fabBack!!.visibility = View.GONE
             fabSign!!.visibility = View.GONE
 
+            val backIntent = Intent()
             if (isOutSourcedInDetail == 1) {
-                val backIntent = Intent()
                 backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
                 sendBroadcast(backIntent)
-            } else {
-                val backIntent = Intent()
+            } else if (isPropertyInDetail == 1) {
                 backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
+                sendBroadcast(backIntent)
+            } else if (isIssuanceLookupDetail == 1) {
+                backIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST
                 sendBroadcast(backIntent)
             }
 
@@ -2265,7 +2330,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //hide print again button
                 fabPrintAgain!!.hide()
             }
-            R.id.nav_material_issuing -> {
+            /*R.id.nav_material_issuing -> {
                 menuItemKeyboard!!.isVisible = true
                 menuItemBluetooth!!.isVisible = false
                 menuItemSeekBar!!.isVisible = false
@@ -2279,6 +2344,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentClass = MaterialIssuingFragment::class.java
                 menuItem.isChecked = true
                 currentFrag = CurrentFragment.MATERIAL_ISSUING_FRAGMENT
+
+                //must hide fab print
+                //fabPrint!!.visibility = View.GONE
+                fabPrint!!.hide()
+                isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
+            }*/
+            R.id.nav_issuance_lookup -> {
+                menuItemKeyboard!!.isVisible = true
+                menuItemBluetooth!!.isVisible = false
+                menuItemSeekBar!!.isVisible = false
+                menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
+                menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
+                title = getString(R.string.nav_issuance_lookup)
+                fragmentClass = IssuanceLookupFragment::class.java
+                menuItem.isChecked = true
+                currentFrag = CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT
 
                 //must hide fab print
                 //fabPrint!!.visibility = View.GONE
@@ -4939,6 +5026,97 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
                     //sendBroadcast(failIntent)
                 }
+            }
+
+
+        }//onResponse
+    }
+
+    fun getIssuanceLookup(sfpp01: String) {
+        Log.e(mTAG, "=== getOutSourcedProcessDetail start ===")
+        Log.e(mTAG, "sfpp01 = $sfpp01 ===")
+        val sfpp01RemoveSpace = sfpp01.replace("\n", "");
+        val para = HttpIssuanceLookupGetPara()
+        para.data1 = sfpp01RemoveSpace
+        ApiFunc().getIssuanceLookup(para, getIssuanceLookupCallback)
+    }
+
+    private var getIssuanceLookupCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+
+            runOnUiThread(netErrRunnable)
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            isBarcodeScanning = false
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
+            //Log.e(mTAG, "jsonStr = $jsonStr")
+            //val res = ReceiveTransform.restoreToJsonStr(response.body()!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    val rjIssuanceLookupList = Gson().fromJson(jsonStr, ReceiveTransform.RJIssuanceLookupList::class.java)
+                    Log.e(mTAG, "rjIssuanceLookupList.dataList.size = " + rjIssuanceLookupList.dataList.size)
+
+                    issuanceLookupList.clear()
+
+                    if (rjIssuanceLookupList.dataList.size > 0) {
+                        if (rjIssuanceLookupList.dataList.size == 1) {
+                            if (rjIssuanceLookupList.dataList[0].result == "0" && rjIssuanceLookupList.dataList[0].result2 == "") { //success
+
+
+                                issuanceLookupList.add(rjIssuanceLookupList.dataList[0])
+                                //fabBack!!.visibility = View.VISIBLE
+                                //fabSign!!.visibility = View.VISIBLE
+                            } else {
+
+                                Log.e(mTAG, "rjIssuanceLookupList.dataList[0].result2 = ${rjIssuanceLookupList.dataList[0].result2}")
+                                toast(rjIssuanceLookupList.dataList[0].result2)
+                            }
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        } else { //rjOutSourceProcessedList.dataList.size > 1
+                            var error = 0
+
+                            for (rjIssuanceLookup in rjIssuanceLookupList.dataList) {
+                                if (rjIssuanceLookup.result == "0") { //0 success
+
+                                    issuanceLookupList.add(rjIssuanceLookup)
+
+                                } else { //failed
+                                    error++
+                                    Log.e(mTAG, "rjIssuanceLookup.result = ${rjIssuanceLookup.result2}")
+                                }
+                            }
+
+                            //fabBack!!.visibility = View.VISIBLE
+                            //fabSign!!.visibility = View.VISIBLE
+
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        }
+
+                    }
+
+
+
+
+                } catch (e: Exception) {
+                    Log.e(mTAG, "ex = $e")
+                    //system error
+                    //toast(getString(R.string.toast_server_error))
+                    //val failIntent = Intent()
+                    //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    //sendBroadcast(failIntent)
+                }
+
+
             }
 
 

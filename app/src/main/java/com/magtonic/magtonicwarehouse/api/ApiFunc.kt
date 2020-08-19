@@ -72,6 +72,8 @@ class ApiFunc {
 
     private val apiStrOutsourcedProcessSignConfirm = iepIP + "webs_app_sfpp03"
 
+    private val apiStrIssuanceLookup = iepIP + "webs_app_sfpp04"
+
     private object ContentType {
 
         const val title = "Content-Type"
@@ -142,6 +144,9 @@ class ApiFunc {
         postWithParaPJsonStr(apiStrOutsourcedProcessSignConfirm, Gson().toJson(getPara), callback)
     }
 
+    fun getIssuanceLookup(getPara: HttpIssuanceLookupGetPara, callback: Callback) {
+        postWithParaPJsonStr(apiStrIssuanceLookup, Gson().toJson(getPara), callback)
+    }
     // post with only one para  "p_json"
     private fun postWithParaPJsonStr(url: String, jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")

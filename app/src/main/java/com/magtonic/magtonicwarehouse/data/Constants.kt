@@ -98,6 +98,7 @@ class Constants {
             const val ACTION_HOME_GO_TO_RECEIPT_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToReceiptAction"
             const val ACTION_HOME_GO_TO_STORAGE_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToStorageAction"
             const val ACTION_HOME_GO_TO_MATERIAL_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToMaterialAction"
+            const val ACTION_HOME_GO_TO_ISSUANCE_LOOKUP_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToIssuanceLookupAction"
             const val ACTION_HOME_GO_TO_TAG_PRINTER_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToTagPrinterAction"
             const val ACTION_HOME_GO_TO_LOGOUT_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToLogoutAction"
             const val ACTION_HOME_GO_TO_ABOUT_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToAboutAction"
@@ -144,7 +145,7 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToSupplierList"
             const val ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessBackToDetailList"
 
-            const val ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessShoeFabBack"
+            const val ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowFabBack"
             const val ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessHideFabBack"
 
             const val ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSignDialogAction"
@@ -167,6 +168,14 @@ class Constants {
             const val ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
 
             const val ACTION_OUTSOURCED_PROCESS_SHOW_SUPPLIER_DIALOG : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessShowSupplierDialog"
+
+            //Issuance Lookup
+            const val ACTION_ISSUANCE_LOOKUP_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.IssuanceLookupScanBarcode"
+            const val ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH : String = "com.magtonic.MagtonicWarehoouse.IssuanceLookupFragmentRefresh"
+            const val ACTION_ISSUANCE_LOOKUP_FRAGMENT_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.IssuanceLookupFragmentDetailRefresh"
+            const val ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST : String = "com.magtonic.MagtonicWarehoouse.IssuanceLookupBackToList"
+            const val ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.IssuanceLookupShowFabBack"
+            const val ACTION_ISSUANCE_LOOKUP_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.IssuanceLookupHideFabBack"
         }
 
     }

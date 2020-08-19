@@ -44,7 +44,10 @@ class HomeGridFragment : Fragment() {
         val item1 = HomeGridItem("Storage", R.drawable.factory_stock_house, R.string.nav_storage)
         appList.add(item1)
 
-        val item2 = HomeGridItem("Material", R.drawable.baseline_unarchive_black_48, R.string.nav_material_issuing)
+        /*val item2 = HomeGridItem("Material", R.drawable.baseline_unarchive_black_48, R.string.nav_material_issuing)
+        appList.add(item2)*/
+
+        val item2 = HomeGridItem("IssuanceLookup", R.drawable.baseline_find_in_page_black_48, R.string.nav_issuance_lookup)
         appList.add(item2)
 
         val item10 = HomeGridItem("OutSourced", R.drawable.baseline_edit_black_48, R.string.nav_outsourced)
@@ -99,9 +102,14 @@ class HomeGridFragment : Fragment() {
                     showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_STORAGE_ACTION
                     homeGridContext!!.sendBroadcast(showIntent)
                 }
-                "Material" -> {
+                /*"Material" -> {
                     val showIntent = Intent()
                     showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_MATERIAL_ACTION
+                    homeGridContext!!.sendBroadcast(showIntent)
+                }*/
+                "IssuanceLookup" -> {
+                    val showIntent = Intent()
+                    showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_ISSUANCE_LOOKUP_ACTION
                     homeGridContext!!.sendBroadcast(showIntent)
                 }
                 "Property" -> {

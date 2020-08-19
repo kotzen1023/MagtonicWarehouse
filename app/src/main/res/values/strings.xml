@@ -201,5 +201,11 @@
     <string name="receipt_print_again_data_null">Data was cleaned. Tag cannot be printed.</string>
     <string name="receipt_print_again">Tag Print Again</string>
     <string name="ftp_connect_error">Connect error. Please confirm your account and password.</string>
+    <string name="nav_issuance_lookup">Issuance Lookup</string>
+    <string name="issuance_lookup_input_hint">Scan or input Issuance order</string>
+    <string name="issuance_no">Issuance No.</string>
+    <string name="issuance_work_order">Work Order</string>
+    <string name="issuance_part_no">Part No.</string>
+    <string name="issuance_part_name">Part Name</string>
 
 </resources>
