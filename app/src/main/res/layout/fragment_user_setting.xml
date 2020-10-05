@@ -6,7 +6,7 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="180dp"
             android:orientation="vertical">
 
         <CheckBox
@@ -26,6 +26,28 @@
                 android:paddingLeft="10dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:layout_weight="1"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:gravity="center"
+                    android:text="@string/setting_connect_timeout"/>
+
+            <Spinner
+                    android:id="@+id/timeoutSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

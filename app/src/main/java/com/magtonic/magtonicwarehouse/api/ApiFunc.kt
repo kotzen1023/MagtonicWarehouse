@@ -2,6 +2,7 @@ package com.magtonic.magtonicwarehouse.api
 
 import android.util.Log
 import com.google.gson.Gson
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.timeOutSeconds
 
 import com.magtonic.magtonicwarehouse.model.send.*
 import okhttp3.*
@@ -91,7 +92,7 @@ class ApiFunc {
 
     fun getReceipt(para: HttpReceiptGetPara, callback: Callback) {
         Log.e(mTAG, "ApiFunc->getReceipt")
-        postWithParaPJsonStr(apiStrGetReceipt, Gson().toJson(para), callback)
+        postWithParaPJsonStrandTimeOut(apiStrGetReceipt, Gson().toJson(para), callback)
 
     }
 
@@ -236,9 +237,12 @@ class ApiFunc {
 
 
         val client = OkHttpClient().newBuilder()
-            .connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            .connectTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .readTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .writeTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
             .retryOnConnectionFailure(false)
             .build()
 
@@ -399,9 +403,12 @@ class ApiFunc {
             .build()
 
         val client = OkHttpClient().newBuilder()
-            .connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            .connectTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .readTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .writeTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
             .retryOnConnectionFailure(false)
             .build()
 
@@ -496,9 +503,12 @@ class ApiFunc {
             .build()*/
 
         val client = OkHttpClient().newBuilder()
-            .connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
-            .writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            .connectTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .readTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
+            .writeTimeout(timeOutSeconds, TimeUnit.SECONDS) //5 secs
             .retryOnConnectionFailure(false)
             .build()
 

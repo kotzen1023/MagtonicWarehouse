@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.user
 
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.data.Constants
@@ -53,8 +54,12 @@ class HomeGridFragment : Fragment() {
         val item10 = HomeGridItem("OutSourced", R.drawable.baseline_edit_black_48, R.string.nav_outsourced)
         appList.add(item10)
 
-        val item3 = HomeGridItem("Property", R.drawable.baseline_monetization_on_black_48, R.string.nav_property)
-        appList.add(item3)
+        Log.e(mTAG, "account = ${user!!.userAccount}")
+
+        if (user!!.userAccount == "0031" || user!!.userAccount == "0133") {
+            val item3 = HomeGridItem("Property", R.drawable.baseline_monetization_on_black_48, R.string.nav_property)
+            appList.add(item3)
+        }
 
         val item4 = HomeGridItem("PrintTest", R.drawable.baseline_print_black_48, R.string.nav_printer)
         appList.add(item4)

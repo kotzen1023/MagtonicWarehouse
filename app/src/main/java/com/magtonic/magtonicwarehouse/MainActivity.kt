@@ -172,6 +172,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var isIssuanceLookupDetail: Int = 0
         //log
         @JvmStatic var isLogEnable: Boolean = true
+        //timeout
+        @JvmStatic var timeOutSeconds: Long = 5
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -263,6 +265,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         username = pref!!.getString(User.USER_NAME, "") as String
         isReceiptUploadAutoConfirm = pref!!.getBoolean("IS_RECEIPT_UPLOAD_AUTO_CONFIRM", true)
         isLogEnable = pref!!.getBoolean("IS_LOG_ENABLE", true)
+        timeOutSeconds = pref!!.getLong("CONNECT_TIMEOUT", 60)
 
         isSecurityGuard = pref!!.getBoolean("IS_SECURITY_GUARD", false)
 
@@ -581,7 +584,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(2).isVisible = true //storage
                         navView!!.menu.getItem(3).isVisible = true //material
                         navView!!.menu.getItem(4).isVisible = true //outsourced
-                        navView!!.menu.getItem(5).isVisible = true //property
+                        navView!!.menu.getItem(5).isVisible = user!!.userAccount == "0031" || user!!.userAccount == "0133"
+
                         navView!!.menu.getItem(6).isVisible = false //login
                         navView!!.menu.getItem(7).isVisible = true //printer
                         navView!!.menu.getItem(8).isVisible = true //setting
@@ -1636,6 +1640,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         process!!.destroy()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_TIMEOUT_CHANGE, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SETTING_TIMEOUT_CHANGE")
+
+                        val seconds = intent.getStringExtra("TIMEOUT_SECOND")
+
+                        timeOutSeconds = seconds!!.toLong()
+                        Log.e(mTAG, "timeOutSeconds = $timeOutSeconds")
+                        //save
+                        editor = pref!!.edit()
+                        editor!!.putLong("CONNECT_TIMEOUT", timeOutSeconds)
+                        editor!!.apply()
+
+                        process!!.destroy()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST")
 
@@ -1735,9 +1753,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if ("android.net.wifi.STATE_CHANGE" == intent.action) {
                     Log.e(mTAG, "Wifi STATE_CHANGE")
 
-                    val wifiMgr = getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-                   if (wifiMgr.isWifiEnabled) { // Wi-Fi adapter is ON
+                    //val wifiMgr = getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiMgr = mContext!!.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    if (wifiMgr.isWifiEnabled) { // Wi-Fi adapter is ON
                         val wifiInfo: WifiInfo = wifiMgr.connectionInfo
                         if (wifiInfo.networkId == -1) {
                             Log.d(mTAG, "Not connected to an access point")// Not connected to an access point
@@ -1996,6 +2014,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF)
             filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON)
             filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_OFF)
+            filter.addAction(Constants.ACTION.ACTION_SETTING_TIMEOUT_CHANGE)
             //guest
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST)
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_SUCCESS)
@@ -2903,7 +2922,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(2).isVisible = true //storage
             navView!!.menu.getItem(3).isVisible = true //material
             navView!!.menu.getItem(4).isVisible = true //outsourced
-            navView!!.menu.getItem(5).isVisible = true //property
+            navView!!.menu.getItem(5).isVisible = account == "0031" || account == "0133"
+
             navView!!.menu.getItem(6).isVisible = false //login
             navView!!.menu.getItem(7).isVisible = true //printer
             navView!!.menu.getItem(8).isVisible = true //setting
@@ -3518,7 +3538,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         override fun onFailure(call: Call, e: IOException) {
             Log.e(mTAG, "getReceiptCallback err msg = $e")
-            runOnUiThread(netErrRunnable)
+            isBarcodeScanning = false
+            val errorArray = e.toString().split(": ")
+            Log.e(mTAG, "[1] = ${errorArray[1]}")
+            val failIntent = Intent()
+
+            if (errorArray[1] == "No route to host") {
+                failIntent.action = Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST
+            } else {
+                failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+            }
+
+            runOnUiThread {
+                sendBroadcast(failIntent)
+            }
+
         }
 
         @Throws(IOException::class)
@@ -5607,10 +5641,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-        var msg = "1. 修改數量時，小數點無法使用的問題\n"
-        msg += "2. 新增上傳確認失敗的提示對話方塊\n"
-        msg += "3. 將輸入欄位預設都為大寫輸入\n"
-        msg += "4. 收料畫面加入\"重新連線標籤機\"於右上功能列表。\n用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。"
+        var msg = "1. 將輸入欄位預設都為大寫輸入\n"
+        msg += "2. 收料畫面加入\"重新連線標籤機\"於右上功能列表。用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。\n"
+        msg += "3. 新增可調整連線timeout時間，最長60秒。\n"
+        msg += "4. 固資查詢使用鎖定，只允許特定使用者。"
+
 
         textViewFixMsg.text = msg
 

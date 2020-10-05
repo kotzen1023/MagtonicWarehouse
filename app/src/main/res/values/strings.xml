@@ -207,5 +207,7 @@
     <string name="issuance_work_order">Work Order</string>
     <string name="issuance_part_no">Part No.</string>
     <string name="issuance_part_name">Part Name</string>
+    <string name="setting_connect_timeout">timeout seconds</string>
+    <string name="no_route_to_host">No route to host</string>
 
 </resources>

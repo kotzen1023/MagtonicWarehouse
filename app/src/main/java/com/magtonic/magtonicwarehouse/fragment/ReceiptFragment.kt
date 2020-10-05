@@ -409,6 +409,15 @@ class ReceiptFragment : Fragment() {
 
                         showButtonStatusByState()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_CONNECTION_NO_ROUTE_TO_HOST")
+
+                        progressBar!!.visibility = View.GONE
+
+                        toast(getString(R.string.no_route_to_host))
+
+                        showButtonStatusByState()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SERVER_ERROR")
 
@@ -822,6 +831,7 @@ class ReceiptFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_BARCODE_NULL)
             filter.addAction(Constants.ACTION.ACTION_NETWORK_FAILED)
             filter.addAction(Constants.ACTION.ACTION_CONNECTION_TIMEOUT)
+            filter.addAction(Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST)
             filter.addAction(Constants.ACTION.ACTION_SERVER_ERROR)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST)

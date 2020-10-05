@@ -24,6 +24,7 @@ class Constants {
             const val ACTION_LOGOUT_ACTION : String = "com.magtonic.MagtonicWarehoouse.LogoutAction"
             const val ACTION_HIDE_KEYBOARD : String = "com.magtonic.MagtonicWarehoouse.HideKeyboardAction"
             const val ACTION_CONNECTION_TIMEOUT : String = "com.magtonic.MagtonicWarehoouse.ConnectionTimeOut"
+            const val ACTION_CONNECTION_NO_ROUTE_TO_HOST : String = "com.magtonic.MagtonicWarehoouse.ConnectionNoRouteToHost"
             const val ACTION_SERVER_ERROR : String = "com.magtonic.MagtonicWarehoouse.ServerError"
             //const val ACTION_SHOW_KEYBOARD : String = "com.magtonic.MagtonicWarehoouse.ShowKeyboardAction"
             const val ACTION_LOGIN_FRAGMENT_LOGIN_FAILED : String = "com.magtonic.MagtonicWarehoouse.LoginFragmentLoginFailedAction"
@@ -123,6 +124,7 @@ class Constants {
             const val ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingReceiptAutoConfirmUploadedOff"
             const val ACTION_SETTING_LOG_ENABLE_ON : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOn"
             const val ACTION_SETTING_LOG_ENABLE_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOff"
+            const val ACTION_SETTING_TIMEOUT_CHANGE : String ="com.magtonic.MagtonicWarehoouse.SettingTimeoutChange"
             //guest
             const val ACTION_GUEST_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.GuestScanBarcode"
             const val ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST : String = "com.magtonic.MagtonicWarehoouse.GuestGetCurrentPlantGuestList"
