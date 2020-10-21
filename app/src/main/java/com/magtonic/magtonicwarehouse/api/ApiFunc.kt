@@ -34,6 +34,8 @@ class ApiFunc {
     //2.Get Receipt Content
     private val apiStrGetReceipt = baseIP + "Sel_pmn01"
 
+    private val apiStrGetReceiptPoint = baseIP + "Sel_pmn03"
+
     //3.Upload Receipt Array
     private val apiStrUploadReceiptArr = baseIP + "Ins_rva01"
 
@@ -93,6 +95,12 @@ class ApiFunc {
     fun getReceipt(para: HttpReceiptGetPara, callback: Callback) {
         Log.e(mTAG, "ApiFunc->getReceipt")
         postWithParaPJsonStrandTimeOut(apiStrGetReceipt, Gson().toJson(para), callback)
+
+    }
+
+    fun getReceiptPoint(para: HttpReceiptPointGetPara, callback: Callback) {
+        Log.e(mTAG, "ApiFunc->getReceiptPoint")
+        postWithParaPJsonStrandTimeOut(apiStrGetReceiptPoint, Gson().toJson(para), callback)
 
     }
 

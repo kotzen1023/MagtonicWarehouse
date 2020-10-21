@@ -41,6 +41,7 @@ class Constants {
 
             const val ACTION_RECEIPT_NO_NOT_EXIST : String = "com.magtonic.MagtonicWarehoouse.ReceiptNoNotExist"
             const val ACTION_RECEIPT_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.ReceiptScanBarcode"
+            const val ACTION_RECEIPT_SCAN_STORAGE : String = "com.magtonic.MagtonicWarehoouse.ReceiptScanStorage"
             const val ACTION_RECEIPT_MODIFY_CHANGED : String = "com.magtonic.MagtonicWarehoouse.ReceiptModifyChanged"
             const val ACTION_RECEIPT_MODIFY_NO_CHANGED : String = "com.magtonic.MagtonicWarehoouse.ReceiptModifyNoChanged"
             const val ACTION_RECEIPT_UPLOAD_ACTION: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadAction"

@@ -204,5 +204,8 @@
     <string name="issuance_part_name">品名</string>
     <string name="setting_connect_timeout">連線逾時設定(秒)</string>
     <string name="no_route_to_host">400 - 無法連線到伺服器(No Route to host)</string>
-
+    <string name="material_slide_to_left_nextpage">左滑進入下一頁</string>
+    <string name="material_prev">上一頁</string>
+    <string name="material_next">下一頁</string>
+    <string name="receipt_storage_change">儲位變更為 %s</string>
 </resources>

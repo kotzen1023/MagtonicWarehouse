@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.viewpager.widget.PagerAdapter
 import com.magtonic.magtonicwarehouse.MainActivity
@@ -71,8 +72,8 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
         val view = LayoutInflater.from(mContext).inflate(R.layout.list_pager_item, container, false)
 
         pagerListView = view.findViewById(R.id.pagerListView)
-        val leftNav: ImageView = view.findViewById(R.id.left_nav)
-        val rightNav: ImageView = view.findViewById(R.id.right_nav)
+        val leftNav: LinearLayout = view.findViewById(R.id.left_nav)
+        val rightNav: LinearLayout = view.findViewById(R.id.right_nav)
 
         if (position == 0) {
             if (materialList.size > 1) {
@@ -114,6 +115,8 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
         //materialDetailList.add(item0)
         val item11 = MaterialDetailItem(mContext!!.getString(R.string.material_wrok_order), MainActivity.materialList[position].sfs03)
         materialDetailList.add(item11)
+        val item12 = MaterialDetailItem(mContext!!.getString(R.string.material_send_num), MainActivity.materialList[position].sfs02)
+        materialDetailList.add(item12)
         val item0 = MaterialDetailItem(mContext!!.getString(R.string.material_send_part_no), MainActivity.materialList[position].sfs04)
         materialDetailList.add(item0)
         val item1 = MaterialDetailItem(mContext!!.getString(R.string.material_send_name), MainActivity.materialList[position].ima02)
@@ -155,7 +158,8 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
         pagerListView!!.adapter = materialDetailItemAdapter
 
         //add index and adapter
-        currentItemIndexList!!.add(position)
+        //currentItemIndexList!!.add(position)
+        currentItemIndexList!!.add(MainActivity.materialList[position].sfs02.toInt())
         materialDetailItemAdapterList.add(materialDetailItemAdapter)
 
         Log.e(mTAG, "=== currentItemIndexList start (instantiateItem) ===")
@@ -197,7 +201,7 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
             Log.d(mTAG, "click $item_position")
             //currentClickItem = position
 
-            if (item_position == itemCanEdit) { //sfs05
+            /*if (item_position == itemCanEdit) { //sfs05
                 Log.d(mTAG, "MaterialDetailAdapter->isKeyBoardShow = $isKeyBoardShow")
                 if (!isKeyBoardShow) { // show keyboard
 
@@ -212,7 +216,7 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
                 //materialListInArrayList[position][item_position].getTextView()!!.visibility = View.GONE
                 //materialListInArrayList[position][item_position].getLinearLayout()!!.visibility = View.VISIBLE
                 itemClick = true
-            }
+            }*/
         }
 
 
@@ -227,32 +231,37 @@ class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMateria
         Log.e(mTAG, "destroyItem $position")
 
         //find index
-        for (i in 0 until currentItemIndexList!!.size) {
-            if (currentItemIndexList!![i] == position) {
-                //found position index
-                materialDetailItemAdapterList.removeAt(i)
+        if (currentItemIndexList!!.size > 0) {
+            var idx = -1
+            for (i in 0 until currentItemIndexList!!.size) {
+                if (currentItemIndexList!![i] == (position+1)) {
+                    //found position index
+                    materialDetailItemAdapterList.removeAt(i)
+                    idx = i
+                }
             }
-        }
 
-        currentItemIndexList!!.removeAt(position)
-        //currentItemIndexList.remove(position)
+            currentItemIndexList!!.removeAt(idx)
+            //currentItemIndexList.remove(position)
 
-        Log.e(mTAG, "=== currentItemIndexList start (destroyItem) ===")
-        for (i in 0 until currentItemIndexList!!.size) {
-            Log.d(mTAG, "currentItemIndexList["+i+"] = "+currentItemIndexList!![i])
-        }
-        Log.e(mTAG, "=== currentItemIndexList end (destroyItem) ===")
-
-        Log.e(mTAG, "=== materialDetailItemAdapterList start (destroyItem) ===")
-        for (i in 0 until materialDetailItemAdapterList.size) {
-            if (materialDetailItemAdapterList[i].count > 0) {
-                Log.d(
-                    mTAG,
-                    "materialDetailItemAdapterList[" + i + "] = " + materialDetailItemAdapterList[i].getItem(2)!!.getContent()
-                )
+            Log.e(mTAG, "=== currentItemIndexList start (destroyItem) ===")
+            for (i in 0 until currentItemIndexList!!.size) {
+                Log.d(mTAG, "currentItemIndexList["+i+"] = "+currentItemIndexList!![i])
             }
+            Log.e(mTAG, "=== currentItemIndexList end (destroyItem) ===")
+
+            Log.e(mTAG, "=== materialDetailItemAdapterList start (destroyItem) ===")
+            for (i in 0 until materialDetailItemAdapterList.size) {
+                if (materialDetailItemAdapterList[i].count > 0) {
+                    Log.d(
+                        mTAG,
+                        "materialDetailItemAdapterList[" + i + "] = " + materialDetailItemAdapterList[i].getItem(2)!!.getContent()
+                    )
+                }
+            }
+            Log.e(mTAG, "=== materialDetailItemAdapterList end (destroyItem) ===")
         }
-        Log.e(mTAG, "=== materialDetailItemAdapterList end (destroyItem) ===")
+
 
         container.removeView(view as View)
 

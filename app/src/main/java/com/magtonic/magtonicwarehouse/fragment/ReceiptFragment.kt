@@ -68,6 +68,7 @@ class ReceiptFragment : Fragment() {
     private val colorCodePink = Color.parseColor("#D81B60")
     private val colorCodeBlue = Color.parseColor("#1976D2")
 
+    private val storageSpaceHashMap = HashMap<String, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +85,13 @@ class ReceiptFragment : Fragment() {
     ): View? {
 
         Log.d(mTAG, "onCreateView")
+
+        //create list
+        storageSpaceHashMap.clear()
+        storageSpaceHashMap["T80731324"] = "萬興"
+        storageSpaceHashMap["T11HUB"] = "雙龍興"
+        storageSpaceHashMap["T28861417"] = "廈興"
+        storageSpaceHashMap["T80355469"] = "杉億"
 
         //val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
         //val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
@@ -136,7 +144,7 @@ class ReceiptFragment : Fragment() {
                         i++
                     }
 
-                    if (position < 3) {
+                    if (position in 0..2) {
                         if (receiptDetailItemAdapter != null) {
 
                             if (!isKeyBoardShow) { // show keyboard
@@ -462,12 +470,23 @@ class ReceiptFragment : Fragment() {
                         Log.e(mTAG, "itemReceipt status = " + itemReceipt!!.state)
 
 
+
+
                         val item0 = ReceiptDetailItem("倉庫", itemReceipt!!.rjReceipt!!.ima35)
                         receiptDetailList.add(item0)
                         val item1 = ReceiptDetailItem("儲位", itemReceipt!!.rjReceipt!!.ima36)
                         receiptDetailList.add(item1)
                         val item2 = ReceiptDetailItem("數量", itemReceipt!!.rjReceipt!!.pmn20)
                         receiptDetailList.add(item2)
+
+                        if (itemReceipt!!.rjReceipt!!.pmn01 != "") {
+                            val item12 = ReceiptDetailItem("採購單號", itemReceipt!!.rjReceipt!!.pmn01)
+                            receiptDetailList.add(item12)
+                        } else {
+                            val item12 = ReceiptDetailItem("採購單號", barcodeInput!!.text.toString())
+                            receiptDetailList.add(item12)
+                        }
+
                         val item3 = ReceiptDetailItem("供應商編號", itemReceipt!!.rjReceipt!!.pmm09)
                         receiptDetailList.add(item3)
                         val item4 = ReceiptDetailItem("供應商名稱", itemReceipt!!.rjReceipt!!.pmc03)
@@ -820,6 +839,37 @@ class ReceiptFragment : Fragment() {
                         progressBar!!.visibility = View.GONE
 
                         showButtonStatusByState()
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_SCAN_STORAGE, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_RECEIPT_SCAN_STORAGE")
+
+                        val storage = intent.getStringExtra("BARCODE")
+
+                        if (itemReceipt != null) {
+                            if (storage != null) {
+                                itemReceipt!!.rjReceipt!!.ima36 = storage
+                                receiptDetailList[1].setContent(storage)
+                                //val storageWithTag = storage+"\n"+storageSpaceHashMap[storage]
+
+                                //Log.e(mTAG, "storageWithTag = $storageWithTag")
+
+                                if (storageSpaceHashMap[storage] != null) {
+                                    //val toastString = getString(R.string.receipt_storage_change, storage)+" ("+storageSpaceHashMap[storage]+")"
+                                    toastLong(storageSpaceHashMap[storage] as String)
+                                }
+                                receiptDetailList[1].getTextView()!!.text = storage
+                                receiptDetailList[1].getEditText()!!.setText(storage)
+                                receiptDetailList[1].getTextView()!!.visibility = View.VISIBLE
+                                receiptDetailList[1].getLinearLayout()!!.visibility = View.GONE
+                                receiptDetailList[1].setChange(true)
+
+                                listView!!.invalidateViews()
+                                Log.d(mTAG, "[new item start]")
+                                Log.d(mTAG, "儲位 = "+itemReceipt!!.rjReceipt!!.ima36)
+                                Log.d(mTAG, "[new item end]")
+                            }
+                        } else {
+                            Log.e(mTAG, "itemReceipt = null")
+                        }
                     }
 
                 }
@@ -845,6 +895,7 @@ class ReceiptFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED)
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS)
 
+            filter.addAction(Constants.ACTION.ACTION_RECEIPT_SCAN_STORAGE)
             //filter.addAction(Constants.ACTION.ACTION_RECEIPT_ALREADY_UPLOADED_SEND_TO_FRAGMENT)
             receiptContext?.registerReceiver(mReceiver, filter)
             isRegister = true
@@ -886,6 +937,24 @@ class ReceiptFragment : Fragment() {
             toastHandle!!.cancel()
 
         val toast = Toast.makeText(receiptContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        /*val toast = Toast.makeText(receiptContext, message, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+        val group = toast.view as ViewGroup
+        val textView = group.getChildAt(0) as TextView
+        textView.textSize = 30.0f*/
+        toast.show()
+
+        toastHandle = toast
+    }
+
+    private fun toastLong(message: String) {
+
+        if (toastHandle != null)
+            toastHandle!!.cancel()
+
+        val toast = Toast.makeText(receiptContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
 
         /*val toast = Toast.makeText(receiptContext, message, Toast.LENGTH_SHORT)

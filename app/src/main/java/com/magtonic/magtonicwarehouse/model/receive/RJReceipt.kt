@@ -23,6 +23,7 @@ class RJReceipt : RJBase() {
     var rva06 = "收貨日期"//收貨日期
     var rvb01 = "收貨單單號或失敗原因說明"//收貨單單號或失敗原因說明
     var rvb02 = "收貨單項次"//收貨單項次
+    var pmn01 = "採購單號"
     //eleven field
 
     //eleven field

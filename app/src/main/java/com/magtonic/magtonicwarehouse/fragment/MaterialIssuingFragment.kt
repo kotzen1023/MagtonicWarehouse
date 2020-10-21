@@ -549,11 +549,16 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
                             //currentMaterialPage = 3
                         }
 
-                        layoutBottom!!.visibility = View.VISIBLE
+                        //layoutBottom!!.visibility = View.VISIBLE
 
                         val showSeekBarIntent = Intent()
                         showSeekBarIntent.action = Constants.ACTION.ACTION_SEEK_BAR_SHOW_ACTION
                         materialIssuingContext!!.sendBroadcast(showSeekBarIntent)
+
+                        if (modifyList.size > 1) {
+                            toast(getString(R.string.material_slide_to_left_nextpage))
+                        }
+
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_MATERIAL_MODIFY_NO_CHANGED, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_MATERIAL_MODIFY_NO_CHANGED")

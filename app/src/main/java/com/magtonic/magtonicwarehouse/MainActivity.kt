@@ -728,6 +728,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         CurrentFragment.RECEIPT_FRAGMENT -> {
                                             //checkIfReceiptUploaded(barcode)
                                             getReceipt(barcode)
+                                            /*if (inputNo.length == 16) {
+                                                getReceipt(barcode)
+                                            } else if (inputNo.length == 13) {
+                                                getReceiptPoint(barcode)
+                                            }*/
                                         }
                                         CurrentFragment.STORAGE_FRAGMENT -> {
                                             getStorage(barcode)
@@ -1858,7 +1863,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 isBarcodeScanning = true
 
                                 val text = bundle.getString("text")
-                                Log.d(mTAG, "text = " + text!!)
+                                Log.d(mTAG, "text = $text, size = ${text!!.length}" )
                                 //showMyToast(text, ReceiptActivity.this);
 
 
@@ -1869,22 +1874,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 //clear
                                 //ReceiptList.removeAllItem()
                                 //rva06 = ""
-                                itemReceipt = null
+                                //itemReceipt = null
 
                                 //et_Barcode.setText(text)
 
                                 barcode = ScanBarcode.setPoBarcodeByScanTransform(text.toString().trim())
+
+                                val barcodeTrim = text.toString().trim()
+                                Log.d(mTAG, "barcodeTrim = $barcodeTrim, size = ${barcodeTrim.length}" )
 
                                 if (isWifiConnected) {
                                     val scanIntent = Intent()
                                     when (currentFrag) {
                                         CurrentFragment.RECEIPT_FRAGMENT -> {
 
-                                            scanIntent.action = Constants.ACTION.ACTION_RECEIPT_SCAN_BARCODE
-                                            scanIntent.putExtra("BARCODE", text)
-                                            sendBroadcast(scanIntent)
-                                            //checkIfReceiptUploaded(barcode)
-                                            getReceipt(barcode)
+                                            if (barcodeTrim.length < 13) { //掃描儲位
+                                                isBarcodeScanning = false
+                                                val first = barcodeTrim.substring(0, 1)
+                                                if (first == "T") {
+                                                    scanIntent.action = Constants.ACTION.ACTION_RECEIPT_SCAN_STORAGE
+                                                    scanIntent.putExtra("BARCODE", barcodeTrim)
+                                                    sendBroadcast(scanIntent)
+                                                }
+
+                                            } else {
+                                                itemReceipt = null
+
+                                                scanIntent.action = Constants.ACTION.ACTION_RECEIPT_SCAN_BARCODE
+                                                scanIntent.putExtra("BARCODE", text)
+                                                sendBroadcast(scanIntent)
+                                                //checkIfReceiptUploaded(barcode)
+                                                /*if (barcodeTrim.length == 16) {
+                                                    getReceipt(barcode)
+                                                } else if (barcodeTrim.length == 13) {
+                                                    getReceiptPoint(barcode)
+                                                }*/
+                                                getReceipt(barcode)
+                                            }
+
                                         }
                                         CurrentFragment.STORAGE_FRAGMENT -> {
 
@@ -2102,15 +2129,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             fabSign!!.visibility = View.GONE
 
             val backIntent = Intent()
-            if (isOutSourcedInDetail == 1) {
-                backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
-                sendBroadcast(backIntent)
-            } else if (isPropertyInDetail == 1) {
-                backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
-                sendBroadcast(backIntent)
-            } else if (isIssuanceLookupDetail == 1) {
-                backIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST
-                sendBroadcast(backIntent)
+            when {
+                isOutSourcedInDetail == 1 -> {
+                    backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
+                    sendBroadcast(backIntent)
+                }
+                isPropertyInDetail == 1 -> {
+                    backIntent.action = Constants.ACTION.ACTION_PROPERTY_BACK_TO_LIST
+                    sendBroadcast(backIntent)
+                }
+                isIssuanceLookupDetail == 1 -> {
+                    backIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST
+                    sendBroadcast(backIntent)
+                }
             }
 
         } else if (isOutSourcedInDetail == 2) {
@@ -2798,15 +2829,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 Manifest.permission.CHANGE_WIFI_STATE
                             )
                         ) {
-                            showDialogOK(
-                                DialogInterface.OnClickListener { _, which ->
-                                    when (which) {
-                                        DialogInterface.BUTTON_POSITIVE -> checkAndRequestPermissions()
-                                        DialogInterface.BUTTON_NEGATIVE ->
-                                            // proceed with logic by disabling the related features or quit the app.
-                                            finish()
-                                    }
-                                })
+                            showDialogOK { _, which ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> checkAndRequestPermissions()
+                                    DialogInterface.BUTTON_NEGATIVE ->
+                                        // proceed with logic by disabling the related features or quit the app.
+                                        finish()
+                                }
+                            }
                         } else {
                             Toast.makeText(this, "Go to settings and enable permissions", Toast.LENGTH_LONG)
                                 .show()
@@ -3510,23 +3540,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     fun getReceipt(barcode: ScanBarcode?) {
-        // go for : 1.get barcode  2.call get Receipt Api ,3.update list ,4. restore input mode
-        //1.
-
-        /*runOnUiThread(Runnable {
-            // hideKeyboard();
-            mLoadingView.setStatus(LoadingView.LOADING)
-        })*/
 
         if (barcode != null) {
             Log.e(mTAG, "getReceipt poBarcode = "+barcode.poBarcode+ ", poLine = "+barcode.poLine)
             // to call api
             //acState = ReceiptACState.RECEIPT_GETTING_STATE
-            val para = HttpReceiptGetPara()
-            para.pmn01 = barcode.poBarcode
-            para.pmn02 = barcode.poLine
+            if (barcode.poBarcodeByScan.length == 16) {
+                val para = HttpReceiptGetPara()
+                para.pmn01 = barcode.poBarcode
+                para.pmn02 = barcode.poLine
 
-            ApiFunc().getReceipt(para, getReceiptCallback)
+                ApiFunc().getReceipt(para, getReceiptCallback)
+            } else if (barcode.poBarcodeByScan.length == 13) {
+                val para = HttpReceiptPointGetPara()
+                para.pmn01 = barcode.poBarcodeByScan
+                para.pmn02 = "0"
+
+                ApiFunc().getReceiptPoint(para, getReceiptPointCallback)
+            }
+
+
+
+
 
         }
 
@@ -3564,6 +3599,110 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {
 
                     val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceipt(res, barcode!!.poBarcode)
+
+
+                    if (retItemReceipt != null) {
+                        if (!retItemReceipt.rjReceipt?.result.equals(ItemReceipt.RESULT_CORRECT)) {
+                            Log.e(
+                                mTAG,
+                                "result = " + retItemReceipt.rjReceipt?.result + " result2 = " + retItemReceipt.rjReceipt?.result2
+                            )
+                            //can't receive the item
+                            //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                            val mess = retItemReceipt.rjReceipt?.result2 as String
+                            toastLong(mess)
+
+
+                            val receiptNoIntent = Intent()
+                            receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                            sendBroadcast(receiptNoIntent)
+                        }// result  = 0
+                        else {
+                            // success receive ,update list ,update fragment
+                            //if(Fristpmc3.equals("") || Fristpmm02.equals("") || Fristpmc3.equals(itemReceipt.rjReceipt.pmc03) || Fristpmm02.equals(itemReceipt.rjReceipt.pmm02)) {
+
+                            //multi
+                            /*if (ReceiptList.size() > 0 ) {
+                                ReceiptList.removeAllItem()
+                            }
+
+                            addResult = ReceiptList.add(retItemReceipt)
+                            itemReceipt = ReceiptList.getReceiptItem(0)*/
+
+                            //single
+                            itemReceipt = retItemReceipt
+
+                            Log.e(mTAG, "2")
+                            val refreshIntent = Intent()
+                            refreshIntent.action = Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH
+                            //refreshIntent.putExtra("RVA06", rva06)
+                            mContext!!.sendBroadcast(refreshIntent)
+
+                        }//result = 1
+                    } else {
+                        Log.e(mTAG, "retItemReceipt = null")
+
+                        toast(getString(R.string.receipt_this_receipt_not_exist))
+
+                        val receiptNoIntent = Intent()
+                        receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                        sendBroadcast(receiptNoIntent)
+                    }
+
+
+                } catch (ex: Exception) {
+
+                    Log.e(mTAG, "Server error")
+
+                    val serverErrorIntent = Intent()
+                    serverErrorIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    sendBroadcast(serverErrorIntent)
+                    //system error
+                    runOnUiThread {
+
+                        toast(getString(R.string.toast_server_error))
+                    }
+                }
+                isBarcodeScanning = false
+            }
+
+
+        }//onResponse
+    }
+
+
+
+    private var getReceiptPointCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+            Log.e(mTAG, "getReceiptPointCallback err msg = $e")
+            isBarcodeScanning = false
+            val errorArray = e.toString().split(": ")
+            Log.e(mTAG, "[1] = ${errorArray[1]}")
+            val failIntent = Intent()
+
+            if (errorArray[1] == "No route to host") {
+                failIntent.action = Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST
+            } else {
+                failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+            }
+
+            runOnUiThread {
+                sendBroadcast(failIntent)
+            }
+
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            val res = ReceiveTransform.restoreToJsonStr(response.body!!.string())
+            //Log.e(mTAG, "res = $res")
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceiptPoint(res, barcode!!.poBarcodeByScan)
 
 
                     if (retItemReceipt != null) {
@@ -5069,7 +5208,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     fun getIssuanceLookup(sfpp01: String) {
         Log.e(mTAG, "=== getOutSourcedProcessDetail start ===")
         Log.e(mTAG, "sfpp01 = $sfpp01 ===")
-        val sfpp01RemoveSpace = sfpp01.replace("\n", "");
+        val sfpp01RemoveSpace = sfpp01.replace("\n", "")
         val para = HttpIssuanceLookupGetPara()
         para.data1 = sfpp01RemoveSpace
         ApiFunc().getIssuanceLookup(para, getIssuanceLookupCallback)
@@ -5156,6 +5295,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }//onResponse
     }
+
+
 
     internal var netErrRunnable: Runnable = Runnable {
 
@@ -5640,11 +5781,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-
-        var msg = "1. 將輸入欄位預設都為大寫輸入\n"
-        msg += "2. 收料畫面加入\"重新連線標籤機\"於右上功能列表。用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。\n"
-        msg += "3. 新增可調整連線timeout時間，最長60秒。\n"
-        msg += "4. 固資查詢使用鎖定，只允許特定使用者。"
+        var msg = "1. 收料畫面加入\"重新連線標籤機\"於右上功能列表。用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。\n"
+        msg += "2. 新增可調整連線timeout時間，最長60秒。\n"
+        msg += "3. 固資查詢使用鎖定，只允許特定使用者。\n"
+        msg += "4. 新增可掃交貨指示單條碼。"
 
 
         textViewFixMsg.text = msg

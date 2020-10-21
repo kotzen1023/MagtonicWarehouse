@@ -58,7 +58,28 @@ class ItemReceipt {
             }
 
             return itemReceipt
-        }//trans_RJReceiptStr_To_ItemReceipt
+        }
+
+        fun transRJReceiptStrToItemReceiptPoint(RJReceiptStr: String, poNumScanTotal: String): ItemReceipt? {
+            val gson = Gson()
+            val itemReceipt = ItemReceipt()
+            val rjReceipt: RJReceipt // = new RJReceipt();
+            try {
+                rjReceipt = gson.fromJson<Any>(RJReceiptStr, RJReceipt::class.java) as RJReceipt
+                itemReceipt.rjReceipt = rjReceipt
+                itemReceipt.poNumSplit = poNumScanTotal
+                itemReceipt.poNumScanTotal = poNumScanTotal
+                itemReceipt.poLineInt = 0
+
+
+
+            } catch (ex: Exception) {
+                return null
+            }
+
+            return itemReceipt
+        }
+        //trans_RJReceiptStr_To_ItemReceipt
 
         /*fun trans_RJHistoryStr_To_ItemReceipt(RJReceiptStr: String, poNumSplit: String, poLineInt: String): ItemReceipt? {
             val gson = Gson()

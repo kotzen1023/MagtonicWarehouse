@@ -14,20 +14,51 @@
 
     </ListView>
 
-    <ImageView
+    <LinearLayout
             android:id="@+id/left_nav"
-            android:layout_width="48dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical|start"
-            android:src="@drawable/baseline_chevron_left_grey_48"
-            android:visibility="gone"/>
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|start"
+            android:visibility="gone">
 
-    <ImageView
+        <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/baseline_chevron_left_grey_48" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_25"
+
+                android:text="@string/material_prev"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
             android:id="@+id/right_nav"
-            android:layout_width="48dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical|end"
-            android:src="@drawable/baseline_chevron_right_grey_48"
-            android:visibility="gone"/>
+            android:orientation="horizontal"
+            android:layout_gravity="bottom|end"
+            android:visibility="gone">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_25"
+
+                android:text="@string/material_next"/>
+
+        <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/baseline_chevron_right_grey_48" />
+    </LinearLayout>
+
+
 
 </FrameLayout>

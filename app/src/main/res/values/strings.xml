@@ -209,5 +209,8 @@
     <string name="issuance_part_name">Part Name</string>
     <string name="setting_connect_timeout">timeout seconds</string>
     <string name="no_route_to_host">No route to host</string>
-
+    <string name="material_slide_to_left_nextpage">Next page by slide to left.</string>
+    <string name="material_prev">Prev</string>
+    <string name="material_next">Next</string>
+    <string name="receipt_storage_change">Storage change to %s</string>
 </resources>

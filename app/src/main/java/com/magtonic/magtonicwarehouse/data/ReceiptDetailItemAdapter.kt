@@ -87,7 +87,7 @@ class ReceiptDetailItemAdapter(context: Context?, resource: Int, objects: ArrayL
                 holder.itemContent.setTextColor(Color.BLACK)
             }*/
 
-            if (position == 12) { //rva06
+            if (position == 13) { //rva06 收貨日期
                 holder.itemHeader.setBackgroundColor(Color.YELLOW)
                 holder.itemContent.setBackgroundColor(Color.YELLOW)
             }
