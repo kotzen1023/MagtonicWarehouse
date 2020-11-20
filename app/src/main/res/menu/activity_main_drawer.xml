@@ -37,6 +37,12 @@
                 android:title="@string/nav_outsourced"
                 android:visible="false"/>
         <item
+                android:id="@+id/nav_return_of_goods"
+                android:icon="@drawable/baseline_undo_black_48"
+                android:title="@string/nav_return_of_goods"
+                android:visible="false"/>
+
+        <item
                 android:id="@+id/nav_property"
                 android:icon="@drawable/baseline_monetization_on_black_48"
                 android:title="@string/nav_property"

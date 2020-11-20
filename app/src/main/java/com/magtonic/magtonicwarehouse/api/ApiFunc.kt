@@ -77,6 +77,12 @@ class ApiFunc {
 
     private val apiStrIssuanceLookup = iepIP + "webs_app_sfpp04"
 
+    private val apiStrReturnOfGoods = iepIP + "webs_app_rvu01"
+
+    private val apiStrReturnOfGoodsDetail = iepIP + "webs_app_rvu02"
+
+    private val apiStrReturnOfGoodsConfirm = iepIP + "webs_app_rvup01"
+
     private object ContentType {
 
         const val title = "Content-Type"
@@ -156,6 +162,19 @@ class ApiFunc {
     fun getIssuanceLookup(getPara: HttpIssuanceLookupGetPara, callback: Callback) {
         postWithParaPJsonStr(apiStrIssuanceLookup, Gson().toJson(getPara), callback)
     }
+
+    fun getReturnOfGoodsOrder(getPara: HttpReturnOfGoodsGetPara, callback: Callback) {
+        postWithParaPJsonStr(apiStrReturnOfGoods, Gson().toJson(getPara), callback)
+    }
+
+    fun getReturnOfGoodsDetail(getPara: HttpReturnOfGoodsGetPara, callback: Callback) {
+        postWithParaPJsonStr(apiStrReturnOfGoodsDetail, Gson().toJson(getPara), callback)
+    }
+
+    fun confirmReturnOfGoodsSign(getPara: HttpReturnOfGoodsConfirmGetPara, callback: Callback) {
+        postWithParaPJsonStr(apiStrReturnOfGoodsConfirm, Gson().toJson(getPara), callback)
+    }
+
     // post with only one para  "p_json"
     private fun postWithParaPJsonStr(url: String, jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")
@@ -337,6 +356,7 @@ class ApiFunc {
         val builder = StringBuilder()
         builder.append("[")
         builder.append(gson.toJson(httpParaUploadReceipt))
+        //Log.e(mTAG, "uploadReceiptSingle json = ${gson.toJson(httpParaUploadReceipt)}")
         builder.append("]")
         //postWithParaPJsonStr(apiStrUploadReceiptArr, builder.toString(), callback)
 

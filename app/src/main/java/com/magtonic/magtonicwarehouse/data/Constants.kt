@@ -56,6 +56,8 @@ class Constants {
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_ACTION: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmAction"
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmSuccess"
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmFailed"
+
+            const val ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH: String = "com.magtonic.MagtonicWarehoouse.ReceiptUnknownBarcodeLenght"
             //20200601
             const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_HISTORY : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedHistory"
             const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_MORE_DETAIL : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedMoreDetail"
@@ -109,6 +111,7 @@ class Constants {
             const val ACTION_HOME_GO_TO_GUEST_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToGuestAction"
             const val ACTION_HOME_GO_TO_PAINT_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToPaintAction"
             const val ACTION_HOME_GO_TO_OUTSOURCED_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToOutsourcedAction"
+            const val ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToReturnOfGoodsAction"
             //property
             const val ACTION_PROPERTY_FRAGMENT_REFRESH : String ="com.magtonic.MagtonicWarehoouse.PropertyFragmentRefresh"
             const val ACTION_PROPERTY_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.PropertyMoreDetailRefresh"
@@ -179,6 +182,21 @@ class Constants {
             const val ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST : String = "com.magtonic.MagtonicWarehoouse.IssuanceLookupBackToList"
             const val ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.IssuanceLookupShowFabBack"
             const val ACTION_ISSUANCE_LOOKUP_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.IssuanceLookupHideFabBack"
+
+            //Return of goods
+            const val ACTION_RETURN_OF_GOODS_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsScanBarcode"
+            const val ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsFragmentRefresh"
+            const val ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsFragmentDetailRefresh"
+            const val ACTION_RETURN_OF_GOODS_BACK_TO_LIST : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsBackToList"
+            const val ACTION_RETURN_OF_GOODS_SHOW_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessShowFabBack"
+            const val ACTION_RETURN_OF_GOODS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessHideFabBack"
+            const val ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsGetDetailBySendOrder"
+
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadAction"
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadFailed"
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
+
+            const val ACTION_RETURN_OF_GOODS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsShowSignDialogAction"
         }
 
     }

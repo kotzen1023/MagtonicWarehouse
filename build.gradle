@@ -17,7 +17,7 @@ buildscript {
         androidx_preference_version = '1.0.0'
         androidx_test_runner_version = '1.1.1'
         arch_lifecycle_version = '2.2.0'
-        constraint_layout_version = '2.0.2'
+        constraint_layout_version = '2.0.4'
         espresso_core_version = '3.3.0'
         exoplayer_version = '2.10.0'
         glide_version = '4.9.0'
@@ -46,7 +46,7 @@ buildscript {
         
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

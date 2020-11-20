@@ -46,7 +46,7 @@ class ReceiptFragment : Fragment() {
     private var relativeLayout: RelativeLayout? = null
     private var receiptDetailItemAdapter: ReceiptDetailItemAdapter? = null
     private var btnUpload: Button? = null
-    private var btnConfim: Button? = null
+    private var btnConfirm: Button? = null
     private var barcodeInput: EditText? = null
     private var linearLayout: LinearLayout? = null
     //private var isKeyBoardShow: Boolean = false
@@ -117,7 +117,7 @@ class ReceiptFragment : Fragment() {
 
         btnUpload = view.findViewById(R.id.btnUpload)
         buttonTextColor = btnUpload!!.textColors
-        btnConfim = view.findViewById(R.id.btnReceiptUploadConfirm)
+        btnConfirm = view.findViewById(R.id.btnReceiptUploadConfirm)
         listView = view!!.findViewById(R.id.listViewReceipt)
         listView!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
@@ -383,7 +383,7 @@ class ReceiptFragment : Fragment() {
         }
 
 
-        btnConfim!!.setOnClickListener {
+        btnConfirm!!.setOnClickListener {
             showUploadedConfirmDialog()
 
         }
@@ -522,7 +522,7 @@ class ReceiptFragment : Fragment() {
                         btnUpload!!.setBackgroundResource(android.R.drawable.btn_default)
                         btnUpload!!.visibility = View.VISIBLE
                         //hide upload confirm button
-                        btnConfim!!.visibility = View.GONE
+                        btnConfirm!!.visibility = View.GONE
 
                         when (printerStatus) {
                             BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
@@ -554,7 +554,7 @@ class ReceiptFragment : Fragment() {
                         barcodeInput!!.setText(barcode)
 
                         btnUpload!!.visibility = View.GONE
-                        btnConfim!!.visibility = View.GONE
+                        btnConfirm!!.visibility = View.GONE
                         progressBar!!.visibility = View.VISIBLE
 
                         receiptDetailList.clear()
@@ -663,26 +663,26 @@ class ReceiptFragment : Fragment() {
                                 btnUpload!!.visibility = View.VISIBLE
 
                                 //show upload confirm button
-                                btnConfim!!.isEnabled = isWifiConnected
-                                btnConfim!!.text = getString(R.string.receipt_upload_confirm)
-                                btnConfim!!.setTextColor(buttonTextColor)
-                                btnConfim!!.setBackgroundResource(android.R.drawable.btn_default)
-                                btnConfim!!.visibility = View.VISIBLE
+                                btnConfirm!!.isEnabled = isWifiConnected
+                                btnConfirm!!.text = getString(R.string.receipt_upload_confirm)
+                                btnConfirm!!.setTextColor(buttonTextColor)
+                                btnConfirm!!.setBackgroundResource(android.R.drawable.btn_default)
+                                btnConfirm!!.visibility = View.VISIBLE
                             }  else if (itemReceipt!!.state == ItemReceipt.ItemState.CONFIRMED) {
                                 btnUpload!!.visibility = View.GONE
                                 //show upload confirm button
-                                btnConfim!!.isEnabled = false
-                                btnConfim!!.text = getString(R.string.receipt_confirm_success)
-                                btnConfim!!.setTextColor(Color.BLACK)
-                                btnConfim!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
-                                btnConfim!!.visibility = View.VISIBLE
+                                btnConfirm!!.isEnabled = false
+                                btnConfirm!!.text = getString(R.string.receipt_confirm_success)
+                                btnConfirm!!.setTextColor(Color.BLACK)
+                                btnConfirm!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
+                                btnConfirm!!.visibility = View.VISIBLE
                             } else {
                                 btnUpload!!.text = getString(R.string.receipt_upload)
                                 btnUpload!!.setTextColor(buttonTextColor)
                                 btnUpload!!.setBackgroundResource(android.R.drawable.btn_default)
                                 btnUpload!!.visibility = View.VISIBLE
                                 //hide upload confirm button
-                                btnConfim!!.visibility = View.GONE
+                                btnConfirm!!.visibility = View.GONE
 
                                 when (printerStatus) {
                                     BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
@@ -710,7 +710,7 @@ class ReceiptFragment : Fragment() {
 
                         } else {
                             btnUpload!!.visibility = View.GONE
-                            btnConfim!!.visibility = View.GONE
+                            btnConfirm!!.visibility = View.GONE
                         }
 
 
@@ -725,11 +725,11 @@ class ReceiptFragment : Fragment() {
                             btnUpload!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
                             btnUpload!!.visibility = View.GONE
 
-                            btnConfim!!.isEnabled = false
-                            btnConfim!!.text = getString(R.string.receipt_confirm_doing)
-                            btnConfim!!.setTextColor(buttonTextColor)
-                            btnConfim!!.setBackgroundResource(android.R.drawable.btn_default)
-                            btnConfim!!.visibility = View.VISIBLE
+                            btnConfirm!!.isEnabled = false
+                            btnConfirm!!.text = getString(R.string.receipt_confirm_doing)
+                            btnConfirm!!.setTextColor(buttonTextColor)
+                            btnConfirm!!.setBackgroundResource(android.R.drawable.btn_default)
+                            btnConfirm!!.visibility = View.VISIBLE
 
                             val uploadIntent = Intent()
                             uploadIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_ACTION
@@ -763,7 +763,7 @@ class ReceiptFragment : Fragment() {
                         btnUpload!!.setBackgroundResource(android.R.drawable.btn_default)
                         btnUpload!!.visibility = View.VISIBLE
                         //hide upload confirm button
-                        btnConfim!!.visibility = View.GONE*/
+                        btnConfirm!!.visibility = View.GONE*/
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_WIFI_STATE_CHANGED, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_WIFI_STATE_CHANGED")
@@ -779,11 +779,11 @@ class ReceiptFragment : Fragment() {
                                 btnUpload!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
                                 btnUpload!!.visibility = View.VISIBLE
 
-                                btnConfim!!.isEnabled = isWifiConnected
-                                btnConfim!!.text = getString(R.string.receipt_upload_confirm)
-                                btnConfim!!.setTextColor(buttonTextColor)
-                                btnConfim!!.setBackgroundResource(android.R.drawable.btn_default)
-                                btnConfim!!.visibility = View.VISIBLE
+                                btnConfirm!!.isEnabled = isWifiConnected
+                                btnConfirm!!.text = getString(R.string.receipt_upload_confirm)
+                                btnConfirm!!.setTextColor(buttonTextColor)
+                                btnConfirm!!.setBackgroundResource(android.R.drawable.btn_default)
+                                btnConfirm!!.visibility = View.VISIBLE
 
 
                             } else { // not upload or upload failed
@@ -792,7 +792,7 @@ class ReceiptFragment : Fragment() {
                                 btnUpload!!.setBackgroundResource(android.R.drawable.btn_default)
                                 btnUpload!!.visibility = View.VISIBLE
                                 //hide upload confirm button
-                                btnConfim!!.visibility = View.GONE
+                                btnConfirm!!.visibility = View.GONE
 
                                 when (printerStatus) {
                                     BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
@@ -807,7 +807,7 @@ class ReceiptFragment : Fragment() {
                         } else {
                             Log.e(mTAG, "itemReceipt = null")
                             btnUpload!!.visibility = View.GONE
-                            btnConfim!!.visibility = View.GONE
+                            btnConfirm!!.visibility = View.GONE
                         }*/
 
 
@@ -827,11 +827,11 @@ class ReceiptFragment : Fragment() {
                         btnUpload!!.visibility = View.VISIBLE
 
                         //show upload confirm button
-                        btnConfim!!.isEnabled = isWifiConnected
-                        btnConfim!!.text = getString(R.string.receipt_upload_confirm)
-                        btnConfim!!.setTextColor(buttonTextColor)
-                        btnConfim!!.setBackgroundResource(android.R.drawable.btn_default)
-                        btnConfim!!.visibility = View.VISIBLE*/
+                        btnConfirm!!.isEnabled = isWifiConnected
+                        btnConfirm!!.text = getString(R.string.receipt_upload_confirm)
+                        btnConfirm!!.setTextColor(buttonTextColor)
+                        btnConfirm!!.setBackgroundResource(android.R.drawable.btn_default)
+                        btnConfirm!!.visibility = View.VISIBLE*/
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS")
@@ -870,6 +870,12 @@ class ReceiptFragment : Fragment() {
                         } else {
                             Log.e(mTAG, "itemReceipt = null")
                         }
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH")
+
+                        progressBar!!.visibility = View.GONE
+
+                        toast("barcode長度未定義")
                     }
 
                 }
@@ -896,7 +902,7 @@ class ReceiptFragment : Fragment() {
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS)
 
             filter.addAction(Constants.ACTION.ACTION_RECEIPT_SCAN_STORAGE)
-            //filter.addAction(Constants.ACTION.ACTION_RECEIPT_ALREADY_UPLOADED_SEND_TO_FRAGMENT)
+            filter.addAction(Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH)
             receiptContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")
@@ -1041,7 +1047,7 @@ class ReceiptFragment : Fragment() {
             progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
             progressBar!!.visibility = View.VISIBLE
 
-            btnConfim!!.isEnabled = false
+            btnConfirm.isEnabled = false
 
             val uploadIntent = Intent()
             uploadIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_ACTION
@@ -1081,7 +1087,7 @@ class ReceiptFragment : Fragment() {
             /*progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
             progressBar!!.visibility = View.VISIBLE
 
-            btnConfim!!.isEnabled = false
+            btnConfirm!!.isEnabled = false
 
             val uploadIntent = Intent()
             uploadIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_ACTION
@@ -1107,20 +1113,20 @@ class ReceiptFragment : Fragment() {
                 btnUpload!!.visibility = View.VISIBLE
 
                 //show upload confirm button
-                btnConfim!!.isEnabled = isWifiConnected
-                btnConfim!!.text = getString(R.string.receipt_upload_confirm)
-                btnConfim!!.setTextColor(buttonTextColor)
-                btnConfim!!.setBackgroundResource(android.R.drawable.btn_default)
-                btnConfim!!.visibility = View.VISIBLE
+                btnConfirm!!.isEnabled = isWifiConnected
+                btnConfirm!!.text = getString(R.string.receipt_upload_confirm)
+                btnConfirm!!.setTextColor(buttonTextColor)
+                btnConfirm!!.setBackgroundResource(android.R.drawable.btn_default)
+                btnConfirm!!.visibility = View.VISIBLE
 
             } else if (itemReceipt!!.state == ItemReceipt.ItemState.CONFIRMED) {
                 btnUpload!!.visibility = View.GONE
                 //show upload confirm button
-                btnConfim!!.isEnabled = false
-                btnConfim!!.text = getString(R.string.receipt_confirm_success)
-                btnConfim!!.setTextColor(Color.BLACK)
-                btnConfim!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
-                btnConfim!!.visibility = View.VISIBLE
+                btnConfirm!!.isEnabled = false
+                btnConfirm!!.text = getString(R.string.receipt_confirm_success)
+                btnConfirm!!.setTextColor(Color.BLACK)
+                btnConfirm!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
+                btnConfirm!!.visibility = View.VISIBLE
             } else { //initial, upload_failed
                 when (printerStatus) {
                     BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
@@ -1137,12 +1143,12 @@ class ReceiptFragment : Fragment() {
                 btnUpload!!.setBackgroundResource(android.R.drawable.btn_default)
                 btnUpload!!.visibility = View.VISIBLE
                 //hide upload confirm button
-                btnConfim!!.visibility = View.GONE
+                btnConfirm!!.visibility = View.GONE
             }
         } else {
             Log.e(mTAG, "itemReceipt = null")
             btnUpload!!.visibility = View.GONE
-            btnConfim!!.visibility = View.GONE
+            btnConfirm!!.visibility = View.GONE
         }
 
         Log.d(mTAG, "=== receipt showButtonStatusByState end === ")

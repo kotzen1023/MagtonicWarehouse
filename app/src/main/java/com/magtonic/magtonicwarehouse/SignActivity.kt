@@ -68,6 +68,10 @@ class SignActivity : AppCompatActivity() {
     private var imageViewShowSignature: ImageView?=null
     private var uploadSignName: String = ""
     private var sendOrder: String = ""
+    private var title: String = ""
+    private var sendFragment: String = ""
+    private var type: String = ""
+    private var date: String = ""
 
     private var signImageUriPath: Uri ?= null
 
@@ -77,7 +81,22 @@ class SignActivity : AppCompatActivity() {
 
         val intent = this.intent
         sendOrder = intent.getStringExtra("SEND_ORDER") as String
+        title = intent.getStringExtra("TITLE") as String
+        sendFragment = intent.getStringExtra("SEND_FRAGMENT") as String
+
+        if (intent.getStringExtra("TYPE") != null) {
+            type = intent.getStringExtra("TYPE") as String
+        }
+
+        if (intent.getStringExtra("DATE") != null) {
+            date = intent.getStringExtra("DATE") as String
+        }
+
+
+
         Log.e(mTAG, "sendOrder = $sendOrder")
+        Log.e(mTAG, "title = $title")
+        Log.e(mTAG, "sendFragment = $sendFragment")
 
         signContext = applicationContext
 
@@ -122,7 +141,17 @@ class SignActivity : AppCompatActivity() {
             progressBar!!.visibility = View.VISIBLE
 
             val confirmIntent = Intent()
-            confirmIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION
+
+            when (sendFragment) {
+                "OUTSOURCED_PROCESS" -> {
+                    confirmIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION
+                }
+                "RETURN_OF_GOODS" -> {
+                    confirmIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION
+                }
+            }
+
+
             confirmIntent.putExtra("SEND_ORDER", sendOrder)
             confirmIntent.putExtra("SIGN_FILE_NAME", uploadSignName)
             signContext!!.sendBroadcast(confirmIntent)
@@ -136,8 +165,8 @@ class SignActivity : AppCompatActivity() {
             actionBar.setDisplayUseLogoEnabled(true)
             actionBar.setDisplayShowHomeEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.title = getString(R.string.nav_outsourced)
-
+            //actionBar.title = getString(R.string.nav_outsourced)
+            actionBar.title = title
         }
 
 
@@ -173,7 +202,19 @@ class SignActivity : AppCompatActivity() {
 
                             uploadSuccess = true
                             //progressBar!!.visibility = View.GONE
-                            toast(getString(R.string.outsourced_process_sign_upload_success))
+
+                            when (sendFragment) {
+                                "OUTSOURCED_PROCESS" -> {
+                                    toast(getString(R.string.outsourced_process_sign_upload_success))
+                                    btnSignConfirm!!.text = getString(R.string.outsourced_process_send_order_sign_confirm)
+                                }
+                                "RETURN_OF_GOODS" -> {
+                                    toast(getString(R.string.return_of_goods_sign_upload_success))
+                                    btnSignConfirm!!.text = getString(R.string.return_of_goods_order_sign_confirm)
+                                }
+                            }
+
+
                         }
                         intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE, ignoreCase = true) -> {
                             Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE")
@@ -196,37 +237,144 @@ class SignActivity : AppCompatActivity() {
 
                             val sendOrderHeader = promptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
                             val sendOrderContent = promptView.findViewById<TextView>(R.id.receiptItemDetailContent)
-                            sendOrderHeader.text = getString(R.string.outsource_send_no)
+
+                            when (sendFragment) {
+                                "OUTSOURCED_PROCESS" -> {
+                                    sendOrderHeader.text = getString(R.string.outsource_send_no)
+                                }
+                                "RETURN_OF_GOODS" -> {
+                                    sendOrderHeader.text = getString(R.string.return_of_goods_dialog_order_header)
+                                }
+                            }
+
+
                             sendOrderContent.text = sendOrder
                             linearLayoutSignDetailList!!.addView(promptView)
 
-                            val headerPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item_header, null)
-                            val barHeader = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailHeader)
-                            val barContent = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentStatic)
-                            val barQuantity = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentDynamic)
+                            when (sendFragment) {
+                                "OUTSOURCED_PROCESS" -> {
+                                    val headerPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item_header, null)
+                                    val barHeader = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailHeader)
+                                    val barContent = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentStatic)
+                                    val barQuantity = headerPromptView.findViewById<TextView>(R.id.outSourcedProcessLowerItemDetailContentDynamic)
 
-                            barHeader.text = getString(R.string.outsource_part_no)
-                            barContent.text = getString(R.string.outsource_part_name)
-                            barQuantity.text = getString(R.string.outsource_quantity)
-                            linearLayoutSignDetailList!!.addView(headerPromptView)
+                                    barHeader.text = getString(R.string.outsource_part_no)
+                                    barContent.text = getString(R.string.outsource_part_name)
+                                    barQuantity.text = getString(R.string.outsource_quantity)
+                                    linearLayoutSignDetailList!!.addView(headerPromptView)
+                                }
+                                "RETURN_OF_GOODS" -> {
 
-                            for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
+                                    val typePromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val datePromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
 
-                                //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
-                                //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
-                                //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
-                                val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
+                                    val typeHeader = typePromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val typeContent = typePromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
 
-                                val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
-                                val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
-                                val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
+                                    val dateHeader = datePromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val dateContent = datePromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
 
-                                itemHeader.text = rjOutSourceProcessed.data3
-                                itemContent.text = rjOutSourceProcessed.data6
-                                itemQuantity.text = rjOutSourceProcessed.data4
+                                    typeHeader.text = getString(R.string.return_of_goods_dialog_type_header)
+                                    typeContent.text = type
 
-                                linearLayoutSignDetailList!!.addView(insidePromptView)
+                                    dateHeader.text = getString(R.string.return_of_goods_dialog_date_header)
+                                    dateContent.text = date
+
+                                    linearLayoutSignDetailList!!.addView(typePromptView)
+                                    linearLayoutSignDetailList!!.addView(datePromptView)
+                                }
                             }
+
+                            when (sendFragment) {
+                                "OUTSOURCED_PROCESS" -> {
+                                    for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
+
+                                        //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
+                                        //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
+                                        //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
+                                        val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
+
+                                        val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
+                                        val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
+                                        val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
+
+                                        itemHeader.text = rjOutSourceProcessed.data3
+                                        itemContent.text = rjOutSourceProcessed.data6
+                                        itemQuantity.text = rjOutSourceProcessed.data4
+
+                                        linearLayoutSignDetailList!!.addView(insidePromptView)
+                                    }
+                                }
+                                "RETURN_OF_GOODS" -> {
+                                    val numPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val buyOrderPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val buyNumPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val partNoPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val quantityPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val unitPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val namePromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+                                    val specPromptView = View.inflate(this@SignActivity, R.layout.fragment_receipt_item, null)
+
+                                    val numHeader = numPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val numContent = numPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val buyOrderHeader = buyOrderPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val buyOrderContent = buyOrderPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val buyNumHeader = buyNumPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val buyNumContent = buyNumPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val partNoHeader = partNoPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val partNoContent = partNoPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val quantityHeader = quantityPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val quantityContent = quantityPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val unitHeader = unitPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val unitContent = unitPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val nameHeader = namePromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val nameContent = namePromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    val specHeader = specPromptView.findViewById<TextView>(R.id.receiptItemDetailHeader)
+                                    val specContent = specPromptView.findViewById<TextView>(R.id.receiptItemDetailContent)
+
+                                    numHeader.text = "退貨項次"
+                                    numContent.text = MainActivity.returnOfGoodsDetailList[0].data1
+
+                                    buyOrderHeader.text = "採購單號"
+                                    buyOrderContent.text = MainActivity.returnOfGoodsDetailList[0].data2
+
+                                    buyNumHeader.text = "採購單項次"
+                                    buyNumContent.text = MainActivity.returnOfGoodsDetailList[0].data3
+
+                                    partNoHeader.text = "料件編號"
+                                    partNoContent.text = MainActivity.returnOfGoodsDetailList[0].data4
+
+                                    quantityHeader.text = "數量"
+                                    quantityContent.text = MainActivity.returnOfGoodsDetailList[0].data5
+
+                                    unitHeader.text = "單位"
+                                    unitContent.text = MainActivity.returnOfGoodsDetailList[0].data6
+
+                                    nameHeader.text = "品名"
+                                    nameContent.text = MainActivity.returnOfGoodsDetailList[0].data7
+
+                                    specHeader.text = "規格"
+                                    specContent.text = MainActivity.returnOfGoodsDetailList[0].data8
+
+                                    linearLayoutSignDetailList!!.addView(numPromptView)
+                                    linearLayoutSignDetailList!!.addView(buyOrderPromptView)
+                                    linearLayoutSignDetailList!!.addView(buyNumPromptView)
+                                    linearLayoutSignDetailList!!.addView(partNoPromptView)
+                                    linearLayoutSignDetailList!!.addView(quantityPromptView)
+                                    linearLayoutSignDetailList!!.addView(unitPromptView)
+                                    linearLayoutSignDetailList!!.addView(namePromptView)
+                                    linearLayoutSignDetailList!!.addView(specPromptView)
+                                }
+                            }
+
+
 
                             imageViewShowSignature!!.setImageBitmap(paintBoard!!.bitmap)
                         }
@@ -639,9 +787,10 @@ class SignActivity : AppCompatActivity() {
             Log.e("FTPTask", "task complete, isUploadSuccess = $isUploadSuccess")
 
             if (isUploadSuccess) {
-                val completeIntent = Intent()
-                completeIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE
-                ftpUtils!!.mContext!!.sendBroadcast(completeIntent)
+
+                val outsourcedCompleteIntent = Intent()
+                outsourcedCompleteIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_FTP_UPLOAD_COMPLETE
+                ftpUtils!!.mContext!!.sendBroadcast(outsourcedCompleteIntent)
             }
 
         }

@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     enum class CurrentFragment {
         RECEIPT_FRAGMENT, STORAGE_FRAGMENT, MATERIAL_ISSUING_FRAGMENT, HOME_FRAGMENT, PRINTER_FRAGMENT,
-        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT
+        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT
     }
 
     //for printer
@@ -174,6 +174,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var isLogEnable: Boolean = true
         //timeout
         @JvmStatic var timeOutSeconds: Long = 5
+        //ReturnOfGoods
+        @JvmStatic var returnOfGoodsListBySupplier = ArrayList<RJReturnOfGoods>()
+        @JvmStatic var returnOfGoodsDetailList = ArrayList<RJReturnOfGoodsDetail>()
+        @JvmStatic var isReturnOfGoodsInDetail: Int = 0
+        //supplier
+        @JvmStatic var outsourcedSupplierHashMap = HashMap<String, String>()
+        @JvmStatic var outsourcedSupplierNameList = ArrayList<String>()
+        @JvmStatic var currentReturnOfGoodsOrder: String = ""
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -232,6 +240,61 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d(mTAG, "onCreate")
 
         mContext = applicationContext
+
+        //create list
+        outsourcedSupplierHashMap.clear()
+        outsourcedSupplierHashMap["萬興"] = "24924616"
+        outsourcedSupplierHashMap["信旭"] = "22549100"
+        outsourcedSupplierHashMap["順升昌"] = "84431670"
+        outsourcedSupplierHashMap["廈興"] = "28861417"
+        outsourcedSupplierHashMap["迦賢"] = "23082263"
+        outsourcedSupplierHashMap["鋐偉"] = "20294906"
+        outsourcedSupplierHashMap["宏通"] = "10475032"
+        outsourcedSupplierHashMap["弘福興"] = "42929389"
+        outsourcedSupplierHashMap["原茂"] = "37577167"
+        outsourcedSupplierHashMap["佳滿利"] = "27800461"
+        outsourcedSupplierHashMap["日鋒"] = "97199386"
+        outsourcedSupplierHashMap["鈺晃"] = "25081394"
+        outsourcedSupplierHashMap["錦一"] = "53152589"
+        outsourcedSupplierHashMap["盛豐"] = "89342228"
+        outsourcedSupplierHashMap["鴻通海"] = "16660219"
+        outsourcedSupplierHashMap["頡宥"] = "42914225"
+        outsourcedSupplierHashMap["頡亮"] = "53610142"
+        outsourcedSupplierHashMap["政泰"] = "29128266"
+        outsourcedSupplierHashMap["允潔"] = "27887071"
+        outsourcedSupplierHashMap["聖岱1"] = "06515434"
+        outsourcedSupplierHashMap["聖岱2"] = "85031855"
+        outsourcedSupplierHashMap["南隆"] = "22814493"
+        outsourcedSupplierHashMap["昶太"] = "24276225"
+        outsourcedSupplierHashMap["鋐偉1"] = "85008897"
+        outsourcedSupplierHashMap["鋐偉2"] = "00294906"
+
+        outsourcedSupplierNameList.clear()
+        outsourcedSupplierNameList.add("萬興")
+        outsourcedSupplierNameList.add("信旭")
+        outsourcedSupplierNameList.add("順升昌")
+        outsourcedSupplierNameList.add("廈興")
+        outsourcedSupplierNameList.add("迦賢")
+        outsourcedSupplierNameList.add("鋐偉")
+        outsourcedSupplierNameList.add("宏通")
+        outsourcedSupplierNameList.add("弘福興")
+        outsourcedSupplierNameList.add("原茂")
+        outsourcedSupplierNameList.add("佳滿利")
+        outsourcedSupplierNameList.add("日鋒")
+        outsourcedSupplierNameList.add("鈺晃")
+        outsourcedSupplierNameList.add("錦一")
+        outsourcedSupplierNameList.add("盛豐")
+        outsourcedSupplierNameList.add("鴻通海")
+        outsourcedSupplierNameList.add("頡宥")
+        outsourcedSupplierNameList.add("頡亮")
+        outsourcedSupplierNameList.add("政泰")
+        outsourcedSupplierNameList.add("允潔")
+        outsourcedSupplierNameList.add("聖岱1")
+        outsourcedSupplierNameList.add("聖岱2")
+        outsourcedSupplierNameList.add("南隆")
+        outsourcedSupplierNameList.add("昶太")
+        outsourcedSupplierNameList.add("鋐偉1")
+        outsourcedSupplierNameList.add("鋐偉2")
 
         //disable Scan2Key Setting
         val disableServiceIntent = Intent()
@@ -486,6 +549,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         sendBroadcast(backIntent)
                     }
                 }
+                CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
+                    if (isReturnOfGoodsInDetail == 1) {
+                        fabBack!!.visibility = View.GONE
+                        fabSign!!.visibility = View.GONE
+
+                        val backIntent = Intent()
+                        backIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_BACK_TO_LIST
+                        sendBroadcast(backIntent)
+                    }
+                }
                 else -> {
                     Log.e(mTAG, "Unknown fragment")
                 }
@@ -495,9 +568,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fabSign = findViewById(R.id.fabSign)
         fabSign!!.setOnClickListener {
             val showIntent = Intent()
-            showIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION
-            sendBroadcast(showIntent)
+            when (currentFrag) {
+                CurrentFragment.OUTSOURCED_FRAGMENT -> {
+                    showIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION
+                }
 
+                CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
+                    showIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SHOW_SIGN_DIALOG_ACTION
+                }
+            }
+
+            sendBroadcast(showIntent)
 
         }
         //permission
@@ -584,14 +665,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(2).isVisible = true //storage
                         navView!!.menu.getItem(3).isVisible = true //material
                         navView!!.menu.getItem(4).isVisible = true //outsourced
-                        navView!!.menu.getItem(5).isVisible = user!!.userAccount == "0031" || user!!.userAccount == "0133"
+                        navView!!.menu.getItem(5).isVisible = true //retunr of goods
+                        navView!!.menu.getItem(6).isVisible = user!!.userAccount == "0031" || user!!.userAccount == "0133"
 
-                        navView!!.menu.getItem(6).isVisible = false //login
-                        navView!!.menu.getItem(7).isVisible = true //printer
-                        navView!!.menu.getItem(8).isVisible = true //setting
-                        navView!!.menu.getItem(9).isVisible = true //guest
-                        navView!!.menu.getItem(10).isVisible = true //about
-                        navView!!.menu.getItem(11).isVisible = true //logout
+                        navView!!.menu.getItem(7).isVisible = false //login
+                        navView!!.menu.getItem(8).isVisible = true //printer
+                        navView!!.menu.getItem(9).isVisible = true //setting
+                        navView!!.menu.getItem(10).isVisible = true //guest
+                        navView!!.menu.getItem(11).isVisible = true //about
+                        navView!!.menu.getItem(12).isVisible = true //logout
 
                         //hide keyboard
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
@@ -623,13 +705,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(2).isChecked = false //storage
                         navView!!.menu.getItem(3).isChecked = false //material
                         navView!!.menu.getItem(4).isChecked = false //outsourced
-                        navView!!.menu.getItem(5).isChecked = false //property
-                        navView!!.menu.getItem(6).isChecked = false //login
-                        navView!!.menu.getItem(7).isChecked = false //printer
-                        navView!!.menu.getItem(8).isChecked = false //setting
-                        navView!!.menu.getItem(9).isChecked = false //guest
-                        navView!!.menu.getItem(10).isChecked = false //about
-                        navView!!.menu.getItem(11).isChecked = false //logout
+                        navView!!.menu.getItem(5).isChecked = false //return of goods
+                        navView!!.menu.getItem(6).isChecked = false //property
+                        navView!!.menu.getItem(7).isChecked = false //login
+                        navView!!.menu.getItem(8).isChecked = false //printer
+                        navView!!.menu.getItem(9).isChecked = false //setting
+                        navView!!.menu.getItem(10).isChecked = false //guest
+                        navView!!.menu.getItem(11).isChecked = false //about
+                        navView!!.menu.getItem(12).isChecked = false //logout
 
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_LOGIN_FAILED, ignoreCase = true)) {
@@ -663,13 +746,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(2).isVisible = false //storage
                         navView!!.menu.getItem(3).isVisible = false //material
                         navView!!.menu.getItem(4).isVisible = false //outsourced
-                        navView!!.menu.getItem(5).isVisible = false //property
-                        navView!!.menu.getItem(6).isVisible = true //login
-                        navView!!.menu.getItem(7).isVisible = true //printer
-                        navView!!.menu.getItem(8).isVisible = false //setting
-                        navView!!.menu.getItem(9).isVisible = false //guest
-                        navView!!.menu.getItem(10).isVisible = true //about
-                        navView!!.menu.getItem(11).isVisible = false //logout
+                        navView!!.menu.getItem(5).isVisible = false //return of goods
+                        navView!!.menu.getItem(6).isVisible = false //property
+                        navView!!.menu.getItem(7).isVisible = true //login
+                        navView!!.menu.getItem(8).isVisible = true //printer
+                        navView!!.menu.getItem(9).isVisible = false //setting
+                        navView!!.menu.getItem(10).isVisible = false //guest
+                        navView!!.menu.getItem(11).isVisible = true //about
+                        navView!!.menu.getItem(12).isVisible = false //logout
 
 
                         var fragment: Fragment? = null
@@ -754,6 +838,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         }
                                         CurrentFragment.ISSUANCE_LOOKUP_FRAGMENT -> {
                                             getIssuanceLookup(inputNo)
+                                        }
+                                        CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
+                                            getReturnOfGoodsOrder(inputNo)
                                         }
 
                                         else -> {
@@ -1606,6 +1693,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //hide print again button
                         fabPrintAgain!!.hide()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION")
+
+                        isBarcodeScanning = false
+
+                        title = getString(R.string.nav_return_of_goods)
+
+                        menuItemBluetooth!!.isVisible = false
+                        menuItemKeyboard!!.isVisible = true
+                        menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
+                        menuItemEraser!!.isVisible = false
+                        menuItemEraser!!.setIcon(R.drawable.eraser_white)
+                        isEraser = false
+                        menuItemOutSourcedSupplier!!.isVisible = true
+
+                        //start with receipt fragment
+                        var fragment: Fragment? = null
+                        val fragmentClass = ReturnOfGoodsFragment::class.java
+
+                        try {
+                            fragment = fragmentClass.newInstance()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                        val fragmentManager = supportFragmentManager
+                        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
+
+                        currentFrag = CurrentFragment.RETURN_OF_GOODS_FRAGMENT
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON")
 
@@ -1751,6 +1875,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentOutSourcedSendOrder = sendOrder as String
 
                         confirmOutSourcedProcessSign(sendOrder , uploadSignFileName as  String, user!!.userAccount)
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER")
+
+                        val sendOrder = intent.getStringExtra("SEND_ORDER")
+
+                        getReturnOfGoodsDetail(sendOrder as String)
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION")
+
+                        val sendOrder = intent.getStringExtra("SEND_ORDER")
+                        val uploadSignFileName = intent.getStringExtra("SIGN_FILE_NAME")
+
+                        currentReturnOfGoodsOrder = sendOrder as String
+
+                        confirmReturnOfGoodsSign(sendOrder , uploadSignFileName as  String, user!!.userAccount)
                     }
                 }
 
@@ -1959,6 +2099,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                             getIssuanceLookup(text)
                                         }
+                                        CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
+                                            scanIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SCAN_BARCODE
+                                            scanIntent.putExtra("BARCODE", text)
+                                            sendBroadcast(scanIntent)
+
+                                            getReturnOfGoodsOrder(text)
+                                        }
                                         else -> {
                                             isBarcodeScanning = false
                                         }
@@ -2036,6 +2183,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_GUEST_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_PAINT_ACTION)
             filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_OUTSOURCED_ACTION)
+            filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION)
             //user setting
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON)
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF)
@@ -2060,6 +2208,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)
 
             filter.addAction(Constants.ACTION.ACTION_ISSUANCE_LOOKUP_SHOW_FAB_BACK)
+            //return of goods
+            filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER)
+            filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION)
+
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
             filter.addAction("unitech.scanservice.data")
@@ -2123,7 +2275,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
 
-        if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1 || isIssuanceLookupDetail == 1) { //if in outsourced detail
+        if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1 || isIssuanceLookupDetail == 1 || isReturnOfGoodsInDetail == 1) { //if in outsourced detail
 
             fabBack!!.visibility = View.GONE
             fabSign!!.visibility = View.GONE
@@ -2140,6 +2292,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 isIssuanceLookupDetail == 1 -> {
                     backIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_BACK_TO_LIST
+                    sendBroadcast(backIntent)
+                }
+                isReturnOfGoodsInDetail == 1 -> {
+                    backIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_BACK_TO_LIST
                     sendBroadcast(backIntent)
                 }
             }
@@ -2300,13 +2456,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.menu.getItem(2).isChecked = false //storage
         navView!!.menu.getItem(3).isChecked = false //material
         navView!!.menu.getItem(4).isChecked = false //outsourced
-        navView!!.menu.getItem(5).isChecked = false //property
-        navView!!.menu.getItem(6).isChecked = false //login
-        navView!!.menu.getItem(7).isChecked = false //printer
-        navView!!.menu.getItem(8).isChecked = false //setting
-        navView!!.menu.getItem(9).isChecked = false //guest
-        navView!!.menu.getItem(10).isChecked = false //about
-        navView!!.menu.getItem(11).isChecked = false //logout
+        navView!!.menu.getItem(5).isChecked = false //return of goods
+        navView!!.menu.getItem(6).isChecked = false //property
+        navView!!.menu.getItem(7).isChecked = false //login
+        navView!!.menu.getItem(8).isChecked = false //printer
+        navView!!.menu.getItem(9).isChecked = false //setting
+        navView!!.menu.getItem(10).isChecked = false //guest
+        navView!!.menu.getItem(11).isChecked = false //about
+        navView!!.menu.getItem(12).isChecked = false //logout
 
         var statusTitle = ""
         when(printerStatus) {
@@ -2610,6 +2767,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragmentClass = OutsourcedProcessingFragment::class.java
                 menuItem.isChecked = true
                 currentFrag = CurrentFragment.OUTSOURCED_FRAGMENT
+
+                //must hide fab print
+                //fabPrint!!.visibility = View.GONE
+                fabPrint!!.hide()
+                isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()
+            }
+            R.id.nav_return_of_goods -> {
+                menuItemKeyboard!!.isVisible = true
+                menuItemBluetooth!!.isVisible = false
+                menuItemSeekBar!!.isVisible = false
+                menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
+                menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = true
+                title = getString(R.string.nav_return_of_goods)
+                fragmentClass = ReturnOfGoodsFragment::class.java
+                menuItem.isChecked = true
+                currentFrag = CurrentFragment.RETURN_OF_GOODS_FRAGMENT
 
                 //must hide fab print
                 //fabPrint!!.visibility = View.GONE
@@ -2923,13 +3102,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(2).isChecked = false //storage
             navView!!.menu.getItem(3).isChecked = false //material
             navView!!.menu.getItem(4).isChecked = false //outsourced
-            navView!!.menu.getItem(5).isChecked = false //property
-            navView!!.menu.getItem(6).isChecked = true //login
-            navView!!.menu.getItem(7).isChecked = false //printer
-            navView!!.menu.getItem(8).isChecked = false //setting
-            navView!!.menu.getItem(9).isChecked = false //guest
-            navView!!.menu.getItem(10).isChecked = false //about
-            navView!!.menu.getItem(11).isChecked = false //logout
+            navView!!.menu.getItem(5).isChecked = false //return of goods
+            navView!!.menu.getItem(6).isChecked = false //property
+            navView!!.menu.getItem(7).isChecked = true //login
+            navView!!.menu.getItem(8).isChecked = false //printer
+            navView!!.menu.getItem(9).isChecked = false //setting
+            navView!!.menu.getItem(10).isChecked = false //guest
+            navView!!.menu.getItem(11).isChecked = false //about
+            navView!!.menu.getItem(12).isChecked = false //logout
 
 
         } else {
@@ -2952,14 +3132,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(2).isVisible = true //storage
             navView!!.menu.getItem(3).isVisible = true //material
             navView!!.menu.getItem(4).isVisible = true //outsourced
-            navView!!.menu.getItem(5).isVisible = account == "0031" || account == "0133"
+            navView!!.menu.getItem(5).isVisible = true //return of goods
+            navView!!.menu.getItem(6).isVisible = account == "0031" || account == "0133"
 
-            navView!!.menu.getItem(6).isVisible = false //login
-            navView!!.menu.getItem(7).isVisible = true //printer
-            navView!!.menu.getItem(8).isVisible = true //setting
-            navView!!.menu.getItem(9).isVisible = true //guest
-            navView!!.menu.getItem(10).isVisible = true //about
-            navView!!.menu.getItem(11).isVisible = true //logout
+            navView!!.menu.getItem(7).isVisible = false //login
+            navView!!.menu.getItem(8).isVisible = true //printer
+            navView!!.menu.getItem(9).isVisible = true //setting
+            navView!!.menu.getItem(10).isVisible = true //guest
+            navView!!.menu.getItem(11).isVisible = true //about
+            navView!!.menu.getItem(12).isVisible = true //logout
 
 
 
@@ -2982,13 +3163,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(2).isChecked = false //storage
             navView!!.menu.getItem(3).isChecked = false //material
             navView!!.menu.getItem(4).isChecked = false //outsourced
-            navView!!.menu.getItem(5).isChecked = false //property
-            navView!!.menu.getItem(6).isChecked = false //login
-            navView!!.menu.getItem(7).isChecked = false //printer
-            navView!!.menu.getItem(8).isChecked = false //setting
-            navView!!.menu.getItem(9).isChecked = false //guest
-            navView!!.menu.getItem(10).isChecked = false //about
-            navView!!.menu.getItem(11).isChecked = false //logout
+            navView!!.menu.getItem(5).isChecked = false //return of goods
+            navView!!.menu.getItem(6).isChecked = false //property
+            navView!!.menu.getItem(7).isChecked = false //login
+            navView!!.menu.getItem(8).isChecked = false //printer
+            navView!!.menu.getItem(9).isChecked = false //setting
+            navView!!.menu.getItem(10).isChecked = false //guest
+            navView!!.menu.getItem(11).isChecked = false //about
+            navView!!.menu.getItem(12).isChecked = false //logout
 
 
         }
@@ -3545,18 +3727,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.e(mTAG, "getReceipt poBarcode = "+barcode.poBarcode+ ", poLine = "+barcode.poLine)
             // to call api
             //acState = ReceiptACState.RECEIPT_GETTING_STATE
-            if (barcode.poBarcodeByScan.length == 16) {
-                val para = HttpReceiptGetPara()
-                para.pmn01 = barcode.poBarcode
-                para.pmn02 = barcode.poLine
+            //if (barcode.poBarcodeByScan.length == 16) {
+            when {
+                barcode.poBarcodeByScan.length >= 16 -> {
+                    val para = HttpReceiptGetPara()
+                    para.pmn01 = barcode.poBarcode
+                    para.pmn02 = barcode.poLine
 
-                ApiFunc().getReceipt(para, getReceiptCallback)
-            } else if (barcode.poBarcodeByScan.length == 13) {
-                val para = HttpReceiptPointGetPara()
-                para.pmn01 = barcode.poBarcodeByScan
-                para.pmn02 = "0"
+                    ApiFunc().getReceipt(para, getReceiptCallback)
+                }
+                barcode.poBarcodeByScan.length == 13 -> {
+                    val para = HttpReceiptPointGetPara()
+                    para.pmn01 = barcode.poBarcodeByScan
+                    para.pmn02 = "0"
 
-                ApiFunc().getReceiptPoint(para, getReceiptPointCallback)
+                    ApiFunc().getReceiptPoint(para, getReceiptPointCallback)
+                }
+                else -> {
+                    val unknownIntent = Intent()
+                    unknownIntent.action = Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH
+                    sendBroadcast(unknownIntent)
+                }
             }
 
 
@@ -5296,7 +5487,239 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }//onResponse
     }
 
+    //return of goods
+    fun getReturnOfGoodsOrder(supplier: String) {
+        Log.e(mTAG, "=== getReturnOfGoodsOrder start ===")
+        val newString = supplier.replace("\n", "")
+        Log.e(mTAG, "supplier = $newString ===")
+        val para = HttpReturnOfGoodsGetPara()
+        para.data1 = newString
+        ApiFunc().getReturnOfGoodsOrder(para, getReturnOfGoodsOrderCallback)
+    }
 
+    private var getReturnOfGoodsOrderCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+
+            runOnUiThread(netErrRunnable)
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            isBarcodeScanning = false
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
+            Log.e(mTAG, "jsonStr = $jsonStr")
+            //val res = ReceiveTransform.restoreToJsonStr(response.body()!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    val rJReturnOfGoodsListBySupplier = Gson().fromJson(jsonStr, ReceiveTransform.RJReturnOfGoodsListBySupplier::class.java)
+                    Log.e(mTAG, "RJReturnOfGoodsListBySupplier.dataList.size = " + rJReturnOfGoodsListBySupplier.dataList.size)
+
+                    returnOfGoodsListBySupplier.clear()
+
+                    if (rJReturnOfGoodsListBySupplier.dataList.size > 0) {
+                        if (rJReturnOfGoodsListBySupplier.dataList.size == 1) {
+                            if (rJReturnOfGoodsListBySupplier.dataList[0].result == "0" && rJReturnOfGoodsListBySupplier.dataList[0].result2 == "") { //success
+
+
+                                returnOfGoodsListBySupplier.add(rJReturnOfGoodsListBySupplier.dataList[0])
+
+                            } else {
+
+                                Log.e(mTAG, "rJReturnOfGoodsListBySupplier.dataList[0].result2 = ${rJReturnOfGoodsListBySupplier.dataList[0].result2}")
+                                toast(rJReturnOfGoodsListBySupplier.dataList[0].result2)
+                            }
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        } else { //rjOutSourceProcessedList.dataList.size > 1
+                            var error = 0
+
+                            for (rJReturnOfGoodsBySupplier in rJReturnOfGoodsListBySupplier.dataList) {
+                                if (rJReturnOfGoodsBySupplier.result == "0") { //0 success
+
+                                    returnOfGoodsListBySupplier.add(rJReturnOfGoodsBySupplier)
+
+                                } else { //failed
+                                    error++
+                                    Log.e(mTAG, "rJReturnOfGoodsBySupplier.result = ${rJReturnOfGoodsBySupplier.result2}")
+                                }
+                            }
+
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        }
+
+                    }
+
+
+                } catch (e: Exception) {
+                    Log.e(mTAG, "ex = $e")
+                    //system error
+                    //toast(getString(R.string.toast_server_error))
+                    //val failIntent = Intent()
+                    //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    //sendBroadcast(failIntent)
+                }
+            }
+
+
+        }//onResponse
+    }
+
+    fun getReturnOfGoodsDetail(order: String) {
+        Log.e(mTAG, "=== getReturnOfGoodsDetail start ===")
+        Log.e(mTAG, "order = $order ===")
+        val para = HttpReturnOfGoodsGetPara()
+        para.data1 = order
+        ApiFunc().getReturnOfGoodsDetail(para, getReturnOfGoodsDetailCallback)
+    }
+
+    private var getReturnOfGoodsDetailCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+
+            runOnUiThread(netErrRunnable)
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
+            Log.e(mTAG, "jsonStr = $jsonStr")
+            //val res = ReceiveTransform.restoreToJsonStr(response.body()!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    val rjReturnOfGoodsDetailList = Gson().fromJson(jsonStr, ReceiveTransform.RJReturnOfGoodsDetailList::class.java)
+                    Log.e(mTAG, "rjReturnOfGoodsDetailList.dataList.size = " + rjReturnOfGoodsDetailList.dataList.size)
+
+                    returnOfGoodsDetailList.clear()
+
+                    if (rjReturnOfGoodsDetailList.dataList.size > 0) {
+                        if (rjReturnOfGoodsDetailList.dataList.size == 1) {
+                            if (rjReturnOfGoodsDetailList.dataList[0].result == "0" && rjReturnOfGoodsDetailList.dataList[0].result2 == "") { //success
+
+
+                                returnOfGoodsDetailList.add(rjReturnOfGoodsDetailList.dataList[0])
+                                fabBack!!.visibility = View.VISIBLE
+                                fabSign!!.visibility = View.VISIBLE
+                            } else {
+
+                                Log.e(mTAG, "rjReturnOfGoodsDetailList.dataList[0].result2 = ${rjReturnOfGoodsDetailList.dataList[0].result2}")
+                                toast(rjReturnOfGoodsDetailList.dataList[0].result2)
+                            }
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        } else { //rjOutSourceProcessedList.dataList.size > 1
+                            var error = 0
+
+                            for (rfReturnOfGoodsDetail in rjReturnOfGoodsDetailList.dataList) {
+                                if (rfReturnOfGoodsDetail.result == "0") { //0 success
+
+                                    returnOfGoodsDetailList.add(rfReturnOfGoodsDetail)
+
+                                } else { //failed
+                                    error++
+                                    Log.e(mTAG, "rfReturnOfGoodsDetail.result = ${rfReturnOfGoodsDetail.result2}")
+                                }
+                            }
+
+                            fabBack!!.visibility = View.VISIBLE
+                            fabSign!!.visibility = View.VISIBLE
+
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
+                            mContext!!.sendBroadcast(successIntent)
+                        }
+
+                    }
+
+
+
+
+                } catch (e: Exception) {
+                    Log.e(mTAG, "ex = $e")
+                    //system error
+                    //toast(getString(R.string.toast_server_error))
+                    //val failIntent = Intent()
+                    //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    //sendBroadcast(failIntent)
+                }
+
+
+            }
+
+
+        }//onResponse
+    }
+
+    fun confirmReturnOfGoodsSign(returnOrder: String, signFileName: String, userName: String) {
+        Log.e(mTAG, "=== confirmReturnOfGoodsSign start ===")
+
+        Log.e(mTAG, "returnOrder = $returnOrder, signFileName = $signFileName, userName = $userName")
+
+        val para = HttpReturnOfGoodsConfirmGetPara()
+        para.data1 = returnOrder
+        para.data2 = signFileName
+        para.data3 = userName
+        ApiFunc().confirmReturnOfGoodsSign(para, confirmReturnOfGoodsSignCallback)
+    }
+
+    private var confirmReturnOfGoodsSignCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+
+            runOnUiThread(netErrRunnable)
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body!!.string())
+            val res = ReceiveTransform.restoreToJsonStr(response.body!!.string())
+            Log.e(mTAG, "res = $res")
+            //val res = ReceiveTransform.restoreToJsonStr(response.body()!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+
+                    //==== receive single record start ====
+                    val rjReturnOfGoodsConfirm: RJReturnOfGoodsConfirm = Gson().fromJson(res, RJReturnOfGoodsConfirm::class.java) as RJReturnOfGoodsConfirm
+
+                    if (rjReturnOfGoodsConfirm.result == "0") {
+                        val successIntent = Intent()
+                        successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS
+                        successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
+                        mContext!!.sendBroadcast(successIntent)
+                    } else {
+                        val failedIntent = Intent()
+                        failedIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED
+                        mContext!!.sendBroadcast(failedIntent)
+
+                        toast(rjReturnOfGoodsConfirm.result2)
+                    }
+
+
+                } catch (e: Exception) {
+                    Log.e(mTAG, "ex = $e")
+                    //system error
+                    //toast(getString(R.string.toast_server_error))
+                    //val failIntent = Intent()
+                    //failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    //sendBroadcast(failIntent)
+                }
+            }
+
+
+        }//onResponse
+    }
 
     internal var netErrRunnable: Runnable = Runnable {
 

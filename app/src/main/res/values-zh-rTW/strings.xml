@@ -208,4 +208,13 @@
     <string name="material_prev">上一頁</string>
     <string name="material_next">下一頁</string>
     <string name="receipt_storage_change">儲位變更為 %s</string>
+    <string name="return_of_goods">倉退簽名</string>
+    <string name="nav_return_of_goods">倉退簽名</string>
+    <string name="return_of_goods_sign_is_signed_already">此單已簽名</string>
+    <string name="return_of_goods_dialog_msg">為此張退貨單簽名？</string>
+    <string name="return_of_goods_dialog_order_header">退貨單號</string>
+    <string name="return_of_goods_dialog_type_header">異動類型</string>
+    <string name="return_of_goods_dialog_date_header">日期</string>
+    <string name="return_of_goods_sign_upload_success">簽名上傳成功. 請按退貨單簽名確認</string>
+    <string name="return_of_goods_order_sign_confirm">退貨單簽名確認</string>
 </resources>

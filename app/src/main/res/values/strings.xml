@@ -213,4 +213,13 @@
     <string name="material_prev">Prev</string>
     <string name="material_next">Next</string>
     <string name="receipt_storage_change">Storage change to %s</string>
+    <string name="return_of_goods">Return of Goods</string>
+    <string name="nav_return_of_goods">Return of Goods</string>
+    <string name="return_of_goods_sign_is_signed_already">This order is signed</string>
+    <string name="return_of_goods_dialog_msg">Sign this order?</string>
+    <string name="return_of_goods_dialog_order_header">Order</string>
+    <string name="return_of_goods_dialog_type_header">Type</string>
+    <string name="return_of_goods_dialog_date_header">Date</string>
+    <string name="return_of_goods_sign_upload_success">Sign upload success</string>
+    <string name="return_of_goods_order_sign_confirm">Signature Confirm</string>
 </resources>

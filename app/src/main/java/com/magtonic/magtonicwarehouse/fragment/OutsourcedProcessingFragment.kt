@@ -25,6 +25,8 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isOutSourcedInDetail
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderList
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderListBySupplier
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedSupplierHashMap
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedSupplierNameList
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
@@ -82,8 +84,8 @@ class OutsourcedProcessingFragment : Fragment() {
     private var currentSendOrder: String = ""
     private var currentSelectSendOrder: Int = -1
 
-    private val outsourcedSupplierHashMap = HashMap<String, String>()
-    private val outsourcedSupplierNameList = ArrayList<String>()
+    //private val outsourcedSupplierHashMap = HashMap<String, String>()
+    //private val outsourcedSupplierNameList = ArrayList<String>()
     var currentSelectedSupplier: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,60 +104,7 @@ class OutsourcedProcessingFragment : Fragment() {
 
         Log.d(mTAG, "onCreateView")
 
-        //create list
-        outsourcedSupplierHashMap.clear()
-        outsourcedSupplierHashMap["萬興"] = "24924616"
-        outsourcedSupplierHashMap["信旭"] = "22549100"
-        outsourcedSupplierHashMap["順升昌"] = "84431670"
-        outsourcedSupplierHashMap["廈興"] = "28861417"
-        outsourcedSupplierHashMap["迦賢"] = "23082263"
-        outsourcedSupplierHashMap["鋐偉"] = "20294906"
-        outsourcedSupplierHashMap["宏通"] = "10475032"
-        outsourcedSupplierHashMap["弘福興"] = "42929389"
-        outsourcedSupplierHashMap["原茂"] = "37577167"
-        outsourcedSupplierHashMap["佳滿利"] = "27800461"
-        outsourcedSupplierHashMap["日鋒"] = "97199386"
-        outsourcedSupplierHashMap["鈺晃"] = "25081394"
-        outsourcedSupplierHashMap["錦一"] = "53152589"
-        outsourcedSupplierHashMap["盛豐"] = "89342228"
-        outsourcedSupplierHashMap["鴻通海"] = "16660219"
-        outsourcedSupplierHashMap["頡宥"] = "42914225"
-        outsourcedSupplierHashMap["頡亮"] = "53610142"
-        outsourcedSupplierHashMap["政泰"] = "29128266"
-        outsourcedSupplierHashMap["允潔"] = "27887071"
-        outsourcedSupplierHashMap["聖岱1"] = "06515434"
-        outsourcedSupplierHashMap["聖岱2"] = "85031855"
-        outsourcedSupplierHashMap["南隆"] = "22814493"
-        outsourcedSupplierHashMap["昶太"] = "24276225"
-        outsourcedSupplierHashMap["鋐偉1"] = "85008897"
-        outsourcedSupplierHashMap["鋐偉2"] = "00294906"
 
-        outsourcedSupplierNameList.clear()
-        outsourcedSupplierNameList.add("萬興")
-        outsourcedSupplierNameList.add("信旭")
-        outsourcedSupplierNameList.add("順升昌")
-        outsourcedSupplierNameList.add("廈興")
-        outsourcedSupplierNameList.add("迦賢")
-        outsourcedSupplierNameList.add("鋐偉")
-        outsourcedSupplierNameList.add("宏通")
-        outsourcedSupplierNameList.add("弘福興")
-        outsourcedSupplierNameList.add("原茂")
-        outsourcedSupplierNameList.add("佳滿利")
-        outsourcedSupplierNameList.add("日鋒")
-        outsourcedSupplierNameList.add("鈺晃")
-        outsourcedSupplierNameList.add("錦一")
-        outsourcedSupplierNameList.add("盛豐")
-        outsourcedSupplierNameList.add("鴻通海")
-        outsourcedSupplierNameList.add("頡宥")
-        outsourcedSupplierNameList.add("頡亮")
-        outsourcedSupplierNameList.add("政泰")
-        outsourcedSupplierNameList.add("允潔")
-        outsourcedSupplierNameList.add("聖岱1")
-        outsourcedSupplierNameList.add("聖岱2")
-        outsourcedSupplierNameList.add("南隆")
-        outsourcedSupplierNameList.add("昶太")
-        outsourcedSupplierNameList.add("鋐偉1")
-        outsourcedSupplierNameList.add("鋐偉2")
 
         val view = inflater.inflate(R.layout.fragment_outsourced_process, container, false)
 
@@ -860,6 +809,8 @@ class OutsourcedProcessingFragment : Fragment() {
 
             val intent = Intent(outsourcedProcessContext, SignActivity::class.java)
             intent.putExtra("SEND_ORDER", currentSendOrder)
+            intent.putExtra("TITLE", getString(R.string.nav_outsourced))
+            intent.putExtra("SEND_FRAGMENT", "OUTSOURCED_PROCESS")
             startActivity(intent)
             /*
             val oldString: String = textViewShouldContent.text.toString()

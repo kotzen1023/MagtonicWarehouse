@@ -54,6 +54,9 @@ class HomeGridFragment : Fragment() {
         val item10 = HomeGridItem("OutSourced", R.drawable.baseline_edit_black_48, R.string.nav_outsourced)
         appList.add(item10)
 
+        val item11 = HomeGridItem("ReturnOfGoods", R.drawable.baseline_undo_black_48, R.string.return_of_goods)
+        appList.add(item11)
+
         Log.e(mTAG, "account = ${user!!.userAccount}")
 
         if (user!!.userAccount == "0031" || user!!.userAccount == "0133") {
@@ -155,6 +158,12 @@ class HomeGridFragment : Fragment() {
                 "OutSourced" -> {
                     val showIntent = Intent()
                     showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_OUTSOURCED_ACTION
+                    homeGridContext!!.sendBroadcast(showIntent)
+                }
+
+                "ReturnOfGoods" -> {
+                    val showIntent = Intent()
+                    showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION
                     homeGridContext!!.sendBroadcast(showIntent)
                 }
             }

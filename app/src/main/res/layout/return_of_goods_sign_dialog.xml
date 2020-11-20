@@ -5,12 +5,12 @@
         android:layout_height="wrap_content">
 
     <TextView
-            android:id="@+id/textViewOutsourcedProcessDialogMsg"
+            android:id="@+id/textViewReturnOfGoodsDialogMsg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="@dimen/text_size_30"
-            android:text="@string/outsourced_process_dialog_msg"
+            android:text="@string/return_of_goods_dialog_msg"
             android:gravity="center"/>
 
     <LinearLayout
@@ -25,15 +25,15 @@
                 android:orientation="horizontal">
 
             <TextView
-                    android:id="@+id/textViewOutsourcedProcessSendOrderHeader"
+                    android:id="@+id/textViewReturnOfGoodsOrderHeader"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textSize="@dimen/text_size_25"
                     android:layout_weight="2"
-                    android:text="@string/outsourced_process_dialog_send_no_header"/>
+                    android:text="@string/return_of_goods_dialog_order_header"/>
 
             <TextView
-                    android:id="@+id/textViewOutsourcedProcessSendOrderContent"
+                    android:id="@+id/textViewReturnOfGoodsOrderContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textSize="@dimen/text_size_25"
@@ -46,32 +46,54 @@
                 android:layout_height="3dp"
                 android:layout_weight="0"
                 android:background="#b7b7b7" />
-        <ScrollView
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            <LinearLayout
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <TextView
+                    android:id="@+id/textViewReturnOfGoodsTypeHeader"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/text_size_25"
+                    android:layout_weight="2"
+                    android:text="@string/return_of_goods_dialog_type_header"/>
 
-                <TextView
-                        android:id="@+id/textViewOutsourcedProcessWorkOrderHeader"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="@dimen/text_size_25"
-                        android:layout_weight="2"
-                        android:text="@string/outsourced_process_dialog_work_order_header"/>
+            <TextView
+                    android:id="@+id/textViewReturnOfGoodsTypeContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/text_size_25"
+                    android:textStyle="bold"
+                    android:layout_weight="1"/>
+        </LinearLayout>
+        <View
+                android:id="@+id/viewLine2"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_weight="0"
+                android:background="#b7b7b7" />
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <TextView
-                        android:id="@+id/textViewOutsourcedProcessWorkOrderContent"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="@dimen/text_size_25"
-                        android:textStyle="bold"
-                        android:layout_weight="1"/>
-            </LinearLayout>
-        </ScrollView>
+            <TextView
+                    android:id="@+id/textViewReturnOfGoodsDateHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/text_size_25"
+                    android:layout_weight="2"
+                    android:text="@string/return_of_goods_dialog_date_header"/>
 
+            <TextView
+                    android:id="@+id/textViewReturnOfGoodsDateContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/text_size_25"
+                    android:textStyle="bold"
+                    android:layout_weight="1"/>
+        </LinearLayout>
 
 
     </LinearLayout>
@@ -95,7 +117,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:textSize="@dimen/text_size_30"/>
+                android:textSize="@dimen/text_size_30"
+                android:text="@string/confirm"/>
 
     </LinearLayout>
 
