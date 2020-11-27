@@ -222,4 +222,14 @@
     <string name="return_of_goods_dialog_date_header">Date</string>
     <string name="return_of_goods_sign_upload_success">Sign upload success</string>
     <string name="return_of_goods_order_sign_confirm">Signature Confirm</string>
+    <string name="nav_supplier">Supplier Manage</string>
+    <string name="supplier_name">Supplier Name</string>
+    <string name="supplier_uninumber">uninumber</string>
+    <string name="supplier_add_dialog_title">Please input name and uninumber</string>
+    <string name="supplier_update_dialog_title">Update supplier info</string>
+    <string name="delete">Delete</string>
+    <string name="supplier_delete_dialog_title">Delete supplier</string>
+    <string name="supplier_enter_password">Please input password</string>
+    <string name="password_mismatch">Password mismatch</string>
+    <string name="supplier_add_empty_name_or_number">Empty name or number</string>
 </resources>

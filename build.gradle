@@ -23,9 +23,9 @@ buildscript {
         glide_version = '4.9.0'
         gms_strict_version_matcher_version = '1.0.3'
         gradle_version = '3.1.4'
-        gson_version = '2.8.5'
+        gson_version = '2.8.6'
         junit_version = '4.12'
-        kotlin_version = '1.4.10'
+        kotlin_version = '1.4.20'
         kotlin_coroutines = '1.1.0'
         materialVersion = '1.0.0'
         recycler_view_version = '1.0.0'
@@ -38,6 +38,12 @@ buildscript {
         commons_lang3_version = '3.4'
         kotlinx_coroutines_core_version = '1.3.7'
         kotlinx_coroutines_android_version = '1.3.7'
+
+        google_services_version = '4.3.3'
+        firebase_core_version = '18.0.0'
+        firebase_database_version = '19.5.1'
+
+        room_version = '2.2.5'
     }
 
     repositories {
@@ -48,8 +54,10 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:google-services:$google_services_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
     }
 }
 

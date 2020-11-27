@@ -11,6 +11,7 @@ import android.graphics.Color
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.*
+
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Xml
@@ -30,8 +31,16 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+
+
 import com.google.gson.Gson
 import com.magtonic.magtonicwarehouse.api.ApiFunc
 import com.magtonic.magtonicwarehouse.bluetoothchat.BluetoothChatService
@@ -44,6 +53,8 @@ import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.ME
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_TOAST
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_WRITE
 import com.magtonic.magtonicwarehouse.data.ReceiptConfirmFailLog
+import com.magtonic.magtonicwarehouse.data.Supplier
+import com.magtonic.magtonicwarehouse.data.SupplierController
 import com.magtonic.magtonicwarehouse.fragment.*
 import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.currentMaterialPage
 import com.magtonic.magtonicwarehouse.fragment.PropertyFragment.Companion.currentPropertyPage
@@ -52,6 +63,8 @@ import com.magtonic.magtonicwarehouse.model.send.*
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
 import com.magtonic.magtonicwarehouse.model.sys.User
 import com.magtonic.magtonicwarehouse.model.ui.*
+import com.magtonic.magtonicwarehouse.persistence.SupplierData
+import com.magtonic.magtonicwarehouse.persistence.SupplierDataDB
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -89,7 +102,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     enum class CurrentFragment {
         RECEIPT_FRAGMENT, STORAGE_FRAGMENT, MATERIAL_ISSUING_FRAGMENT, HOME_FRAGMENT, PRINTER_FRAGMENT,
-        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT
+        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT,
+        SUPPLIER_FRAGMENT
     }
 
     //for printer
@@ -182,6 +196,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var outsourcedSupplierHashMap = HashMap<String, String>()
         @JvmStatic var outsourcedSupplierNameList = ArrayList<String>()
         @JvmStatic var currentReturnOfGoodsOrder: String = ""
+        //for firebase
+        @JvmStatic var supplierList = ArrayList<Supplier>()
+        @JvmStatic var supplierDataList = ArrayList<SupplierData>()
+        @JvmStatic var db: SupplierDataDB? = null
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -241,60 +259,118 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mContext = applicationContext
 
-        //create list
-        outsourcedSupplierHashMap.clear()
-        outsourcedSupplierHashMap["萬興"] = "24924616"
-        outsourcedSupplierHashMap["信旭"] = "22549100"
-        outsourcedSupplierHashMap["順升昌"] = "84431670"
-        outsourcedSupplierHashMap["廈興"] = "28861417"
-        outsourcedSupplierHashMap["迦賢"] = "23082263"
-        outsourcedSupplierHashMap["鋐偉"] = "20294906"
-        outsourcedSupplierHashMap["宏通"] = "10475032"
-        outsourcedSupplierHashMap["弘福興"] = "42929389"
-        outsourcedSupplierHashMap["原茂"] = "37577167"
-        outsourcedSupplierHashMap["佳滿利"] = "27800461"
-        outsourcedSupplierHashMap["日鋒"] = "97199386"
-        outsourcedSupplierHashMap["鈺晃"] = "25081394"
-        outsourcedSupplierHashMap["錦一"] = "53152589"
-        outsourcedSupplierHashMap["盛豐"] = "89342228"
-        outsourcedSupplierHashMap["鴻通海"] = "16660219"
-        outsourcedSupplierHashMap["頡宥"] = "42914225"
-        outsourcedSupplierHashMap["頡亮"] = "53610142"
-        outsourcedSupplierHashMap["政泰"] = "29128266"
-        outsourcedSupplierHashMap["允潔"] = "27887071"
-        outsourcedSupplierHashMap["聖岱1"] = "06515434"
-        outsourcedSupplierHashMap["聖岱2"] = "85031855"
-        outsourcedSupplierHashMap["南隆"] = "22814493"
-        outsourcedSupplierHashMap["昶太"] = "24276225"
-        outsourcedSupplierHashMap["鋐偉1"] = "85008897"
-        outsourcedSupplierHashMap["鋐偉2"] = "00294906"
+        //val database = Firebase.database
+        val database = Firebase.database
+        //val myRef = database.getReference("suppliers").ref
+        val supplierController = SupplierController(database, mContext as Context)
+        //outsourcedSupplierHashMap.clear()
+        //outsourcedSupplierNameList.clear()
 
-        outsourcedSupplierNameList.clear()
-        outsourcedSupplierNameList.add("萬興")
-        outsourcedSupplierNameList.add("信旭")
-        outsourcedSupplierNameList.add("順升昌")
-        outsourcedSupplierNameList.add("廈興")
-        outsourcedSupplierNameList.add("迦賢")
-        outsourcedSupplierNameList.add("鋐偉")
-        outsourcedSupplierNameList.add("宏通")
-        outsourcedSupplierNameList.add("弘福興")
-        outsourcedSupplierNameList.add("原茂")
-        outsourcedSupplierNameList.add("佳滿利")
-        outsourcedSupplierNameList.add("日鋒")
-        outsourcedSupplierNameList.add("鈺晃")
-        outsourcedSupplierNameList.add("錦一")
-        outsourcedSupplierNameList.add("盛豐")
-        outsourcedSupplierNameList.add("鴻通海")
-        outsourcedSupplierNameList.add("頡宥")
-        outsourcedSupplierNameList.add("頡亮")
-        outsourcedSupplierNameList.add("政泰")
-        outsourcedSupplierNameList.add("允潔")
-        outsourcedSupplierNameList.add("聖岱1")
-        outsourcedSupplierNameList.add("聖岱2")
-        outsourcedSupplierNameList.add("南隆")
-        outsourcedSupplierNameList.add("昶太")
-        outsourcedSupplierNameList.add("鋐偉1")
-        outsourcedSupplierNameList.add("鋐偉2")
+        val migration12 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                //database.execSQL("ALTER TABLE '"+History.TABLE_NAME+"' ADD COLUMN 'timeStamp' LONG NOT NULL DEFAULT 0")
+            }
+        }
+
+        //load db
+        db = Room.databaseBuilder(mContext as Context, SupplierDataDB::class.java, SupplierDataDB.DATABASE_NAME)
+            .allowMainThreadQueries()
+            .addMigrations(migration12)
+            .build()
+
+        supplierDataList = db!!.supplierDataDao().getAll() as ArrayList<SupplierData>
+
+        Log.e(mTAG, "supplierDataList = ${supplierDataList.size}")
+
+        if (supplierDataList.size > 0) {
+            for (supplierData in supplierDataList) {
+                val supplier = Supplier(supplierData.getName(), supplierData.getNumber())
+                supplier.key = supplierData.getKey()
+                supplierList.add(supplier)
+            }
+        }
+
+        /*if (database != null) {
+
+            //supplierController.readAllSuppliers()
+
+
+            //val supplier = Supplier("萬興", "24924616")
+            //val key = supplierController.writeNewSupplier(supplier)
+            //supplier.key = key
+            //Log.e(mTAG, "key = ${supplier.key}")
+        } else {
+
+
+
+            outsourcedSupplierHashMap["萬興"] = "24924616"
+            outsourcedSupplierHashMap["信旭"] = "22549100"
+            outsourcedSupplierHashMap["順升昌"] = "84431670"
+            outsourcedSupplierHashMap["廈興"] = "28861417"
+            outsourcedSupplierHashMap["迦賢"] = "23082263"
+            outsourcedSupplierHashMap["鋐偉"] = "20294906"
+            outsourcedSupplierHashMap["宏通"] = "10475032"
+            outsourcedSupplierHashMap["弘福興"] = "42929389"
+            outsourcedSupplierHashMap["原茂"] = "37577167"
+            outsourcedSupplierHashMap["佳滿利"] = "27800461"
+            outsourcedSupplierHashMap["日鋒"] = "97199386"
+            outsourcedSupplierHashMap["鈺晃"] = "25081394"
+            outsourcedSupplierHashMap["錦一"] = "53152589"
+            outsourcedSupplierHashMap["盛豐"] = "89342228"
+            outsourcedSupplierHashMap["鴻通海"] = "16660219"
+            outsourcedSupplierHashMap["頡宥"] = "42914225"
+            outsourcedSupplierHashMap["頡亮"] = "53610142"
+            outsourcedSupplierHashMap["政泰"] = "29128266"
+            outsourcedSupplierHashMap["允潔"] = "27887071"
+            outsourcedSupplierHashMap["聖岱1"] = "06515434"
+            outsourcedSupplierHashMap["聖岱2"] = "85031855"
+            outsourcedSupplierHashMap["南隆"] = "22814493"
+            outsourcedSupplierHashMap["昶太"] = "24276225"
+            outsourcedSupplierHashMap["鋐偉1"] = "85008897"
+            outsourcedSupplierHashMap["鋐偉2"] = "00294906"
+            outsourcedSupplierHashMap["聚惠"] = "88654026"
+            outsourcedSupplierHashMap["溢倫"] = "22291827"
+            outsourcedSupplierHashMap["福記"] = "73637773"
+            outsourcedSupplierHashMap["衫億"] = "80355469"
+            outsourcedSupplierHashMap["雙龍興"] = "69750962"
+
+
+
+            outsourcedSupplierNameList.add("萬興")
+            outsourcedSupplierNameList.add("信旭")
+            outsourcedSupplierNameList.add("順升昌")
+            outsourcedSupplierNameList.add("廈興")
+            outsourcedSupplierNameList.add("迦賢")
+            outsourcedSupplierNameList.add("鋐偉")
+            outsourcedSupplierNameList.add("宏通")
+            outsourcedSupplierNameList.add("弘福興")
+            outsourcedSupplierNameList.add("原茂")
+            outsourcedSupplierNameList.add("佳滿利")
+            outsourcedSupplierNameList.add("日鋒")
+            outsourcedSupplierNameList.add("鈺晃")
+            outsourcedSupplierNameList.add("錦一")
+            outsourcedSupplierNameList.add("盛豐")
+            outsourcedSupplierNameList.add("鴻通海")
+            outsourcedSupplierNameList.add("頡宥")
+            outsourcedSupplierNameList.add("頡亮")
+            outsourcedSupplierNameList.add("政泰")
+            outsourcedSupplierNameList.add("允潔")
+            outsourcedSupplierNameList.add("聖岱1")
+            outsourcedSupplierNameList.add("聖岱2")
+            outsourcedSupplierNameList.add("南隆")
+            outsourcedSupplierNameList.add("昶太")
+            outsourcedSupplierNameList.add("鋐偉1")
+            outsourcedSupplierNameList.add("鋐偉2")
+            outsourcedSupplierNameList.add("聚惠")
+            outsourcedSupplierNameList.add("溢倫")
+            outsourcedSupplierNameList.add("福記")
+            outsourcedSupplierNameList.add("衫億")
+            outsourcedSupplierNameList.add("雙龍興")
+        }*/
+        
+        //create list
+        
+
 
         //disable Scan2Key Setting
         val disableServiceIntent = Intent()
@@ -322,7 +398,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //read user info
 
 
-        pref = getSharedPreferences(fileName, Context.MODE_PRIVATE)
+        pref = getSharedPreferences(fileName, MODE_PRIVATE)
         account = pref!!.getString(User.USER_ACCOUNT, "") as String
         password = pref!!.getString(User.PASSWORD, "") as String
         username = pref!!.getString(User.USER_NAME, "") as String
@@ -355,7 +431,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         //get virtual keyboard
-        imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         /*val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -576,6 +652,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
                     showIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SHOW_SIGN_DIALOG_ACTION
                 }
+                else -> {
+                    Log.e(mTAG, "Unknown Fragment")
+                }
             }
 
             sendBroadcast(showIntent)
@@ -667,13 +746,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(4).isVisible = true //outsourced
                         navView!!.menu.getItem(5).isVisible = true //retunr of goods
                         navView!!.menu.getItem(6).isVisible = user!!.userAccount == "0031" || user!!.userAccount == "0133"
-
-                        navView!!.menu.getItem(7).isVisible = false //login
-                        navView!!.menu.getItem(8).isVisible = true //printer
-                        navView!!.menu.getItem(9).isVisible = true //setting
-                        navView!!.menu.getItem(10).isVisible = true //guest
-                        navView!!.menu.getItem(11).isVisible = true //about
-                        navView!!.menu.getItem(12).isVisible = true //logout
+                        navView!!.menu.getItem(7).isVisible = true //supplier
+                        navView!!.menu.getItem(8).isVisible = false //login
+                        navView!!.menu.getItem(9).isVisible = true //printer
+                        navView!!.menu.getItem(10).isVisible = true //setting
+                        navView!!.menu.getItem(11).isVisible = true //guest
+                        navView!!.menu.getItem(12).isVisible = true //about
+                        navView!!.menu.getItem(13).isVisible = true //logout
 
                         //hide keyboard
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
@@ -707,12 +786,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(4).isChecked = false //outsourced
                         navView!!.menu.getItem(5).isChecked = false //return of goods
                         navView!!.menu.getItem(6).isChecked = false //property
-                        navView!!.menu.getItem(7).isChecked = false //login
-                        navView!!.menu.getItem(8).isChecked = false //printer
-                        navView!!.menu.getItem(9).isChecked = false //setting
-                        navView!!.menu.getItem(10).isChecked = false //guest
-                        navView!!.menu.getItem(11).isChecked = false //about
-                        navView!!.menu.getItem(12).isChecked = false //logout
+                        navView!!.menu.getItem(7).isChecked = false //supplier
+                        navView!!.menu.getItem(8).isChecked = false //login
+                        navView!!.menu.getItem(9).isChecked = false //printer
+                        navView!!.menu.getItem(10).isChecked = false //setting
+                        navView!!.menu.getItem(11).isChecked = false //guest
+                        navView!!.menu.getItem(12).isChecked = false //about
+                        navView!!.menu.getItem(13).isChecked = false //logout
 
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_LOGIN_FAILED, ignoreCase = true)) {
@@ -748,12 +828,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(4).isVisible = false //outsourced
                         navView!!.menu.getItem(5).isVisible = false //return of goods
                         navView!!.menu.getItem(6).isVisible = false //property
-                        navView!!.menu.getItem(7).isVisible = true //login
-                        navView!!.menu.getItem(8).isVisible = true //printer
-                        navView!!.menu.getItem(9).isVisible = false //setting
-                        navView!!.menu.getItem(10).isVisible = false //guest
-                        navView!!.menu.getItem(11).isVisible = true //about
-                        navView!!.menu.getItem(12).isVisible = false //logout
+                        navView!!.menu.getItem(7).isVisible = false //supplier
+                        navView!!.menu.getItem(8).isVisible = true //login
+                        navView!!.menu.getItem(9).isVisible = true //printer
+                        navView!!.menu.getItem(10).isVisible = false //setting
+                        navView!!.menu.getItem(11).isVisible = false //guest
+                        navView!!.menu.getItem(12).isVisible = true //about
+                        navView!!.menu.getItem(13).isVisible = false //logout
 
 
                         var fragment: Fragment? = null
@@ -1730,6 +1811,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //hide print again button
                         fabPrintAgain!!.hide()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_HOME_GO_TO_SUPPLIER_ACTION")
+
+                        isBarcodeScanning = false
+
+                        title = getString(R.string.nav_supplier)
+
+                        menuItemBluetooth!!.isVisible = false
+                        menuItemKeyboard!!.isVisible = false
+                        menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
+                        menuItemEraser!!.isVisible = false
+                        menuItemEraser!!.setIcon(R.drawable.eraser_white)
+                        isEraser = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
+
+                        //start with receipt fragment
+                        var fragment: Fragment? = null
+                        val fragmentClass = SupplierFragment::class.java
+
+                        try {
+                            fragment = fragmentClass.newInstance()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                        val fragmentManager = supportFragmentManager
+                        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
+
+                        currentFrag = CurrentFragment.SUPPLIER_FRAGMENT
+
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON")
 
@@ -1891,6 +2010,64 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         currentReturnOfGoodsOrder = sendOrder as String
 
                         confirmReturnOfGoodsSign(sendOrder , uploadSignFileName as  String, user!!.userAccount)
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SUPPLIER_DATA_ADD, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SUPPLIER_DATA_ADD")
+
+                        val supplierName = intent.getStringExtra("SUPPLIER_NAME")
+                        val supplierNumber = intent.getStringExtra("SUPPLIER_NUMBER")
+
+                        Log.e(mTAG, "supplierName = $supplierName, supplierNumber = $supplierNumber")
+                        //val supplier = Supplier("萬興", "24924616")
+                        //val key = supplierController.writeNewSupplier(supplier)
+                        //supplier.key = key
+                        //Log.e(mTAG, "key = ${supplier.key}")
+
+                        val supplier = Supplier(supplierName as String, supplierNumber as String)
+
+                        val key = supplierController.writeNewSupplier(supplier)
+                        supplier.key = key
+                        Log.e(mTAG, "key = ${supplier.key}")
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SUPPLIER_DATA_UPDATE, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SUPPLIER_DATA_UPDATE")
+
+                        val supplierName = intent.getStringExtra("SUPPLIER_NAME")
+                        val supplierNumber = intent.getStringExtra("SUPPLIER_NUMBER")
+                        val supplierKey = intent.getStringExtra("SUPPLIER_KEY")
+
+
+
+                        Log.e(mTAG, "supplierName = $supplierName, supplierNumber = $supplierNumber, supplierKey = $supplierKey")
+                        //val supplier = Supplier("萬興", "24924616")
+                        //val key = supplierController.writeNewSupplier(supplier)
+                        //supplier.key = key
+                        //Log.e(mTAG, "key = ${supplier.key}")
+
+                        //val supplier = Supplier(supplierName as String, supplierNumber as String)
+
+                        supplierController.updateSupplier(supplierName as String, supplierNumber as String, supplierKey as String)
+
+                        //Log.e(mTAG, "key = ${supplier.key}")
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SUPPLIER_DATA_DELETE, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SUPPLIER_DATA_DELETE")
+
+                        //val supplierName = intent.getStringExtra("SUPPLIER_NAME")
+                        //val supplierNumber = intent.getStringExtra("SUPPLIER_NUMBER")
+                        val supplierKey = intent.getStringExtra("SUPPLIER_KEY")
+
+                        Log.e(mTAG, "supplierKey = $supplierKey")
+                        //val supplier = Supplier("萬興", "24924616")
+                        //val key = supplierController.writeNewSupplier(supplier)
+                        //supplier.key = key
+                        //Log.e(mTAG, "key = ${supplier.key}")
+
+                        //val supplier = Supplier(supplierName as String, supplierNumber as String)
+
+                        supplierController.removeSupplier(supplierKey as String)
+                        //supplier.key = key
+                        //Log.e(mTAG, "key = ${supplier.key}")
+
                     }
                 }
 
@@ -1899,7 +2076,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Log.e(mTAG, "Wifi STATE_CHANGE")
 
                     //val wifiMgr = getSystemService(Context.WIFI_SERVICE) as WifiManager
-                    val wifiMgr = mContext!!.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiMgr = mContext!!.getSystemService(WIFI_SERVICE) as WifiManager
                     if (wifiMgr.isWifiEnabled) { // Wi-Fi adapter is ON
                         val wifiInfo: WifiInfo = wifiMgr.connectionInfo
                         if (wifiInfo.networkId == -1) {
@@ -2211,6 +2388,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //return of goods
             filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER)
             filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION)
+            //supplier
+            filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION)
+            filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_ADD)
+            filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_UPDATE)
+            filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_DELETE)
 
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
@@ -2458,12 +2640,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.menu.getItem(4).isChecked = false //outsourced
         navView!!.menu.getItem(5).isChecked = false //return of goods
         navView!!.menu.getItem(6).isChecked = false //property
-        navView!!.menu.getItem(7).isChecked = false //login
-        navView!!.menu.getItem(8).isChecked = false //printer
-        navView!!.menu.getItem(9).isChecked = false //setting
-        navView!!.menu.getItem(10).isChecked = false //guest
-        navView!!.menu.getItem(11).isChecked = false //about
-        navView!!.menu.getItem(12).isChecked = false //logout
+        navView!!.menu.getItem(7).isChecked = false //supplier
+        navView!!.menu.getItem(8).isChecked = false //login
+        navView!!.menu.getItem(9).isChecked = false //printer
+        navView!!.menu.getItem(10).isChecked = false //setting
+        navView!!.menu.getItem(11).isChecked = false //guest
+        navView!!.menu.getItem(12).isChecked = false //about
+        navView!!.menu.getItem(13).isChecked = false //logout
 
         var statusTitle = ""
         when(printerStatus) {
@@ -2797,6 +2980,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 //hide print again button
                 fabPrintAgain!!.hide()
             }
+            R.id.nav_supplier -> {
+                /*menuItemKeyboard!!.isVisible = false
+                menuItemBluetooth!!.isVisible = false
+                menuItemSeekBar!!.isVisible = false
+                menuItemReceiptSetting!!.isVisible = false
+                menuItemShowReceiptConfirmFailed!!.isVisible = false
+                menuItemReconnectPrinter!!.isVisible = false
+                menuItemPrintAgain!!.isVisible = false
+                menuItemEraser!!.isVisible = false
+                menuItemOutSourcedSupplier!!.isVisible = false
+                title = getString(R.string.nav_supplier)
+                fragmentClass = SupplierFragment::class.java
+                menuItem.isChecked = true
+                currentFrag = CurrentFragment.SUPPLIER_FRAGMENT
+
+                //must hide fab print
+                //fabPrint!!.visibility = View.GONE
+                fabPrint!!.hide()
+                isBarcodeScanning = false
+                //hide print again button
+                fabPrintAgain!!.hide()*/
+                showInputPasswordDialog()
+            }
         }
 
         if (fragmentClass != null) {
@@ -2929,10 +3135,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (requestCode) {
             requestIdMultiplePermission -> {
 
-                val perms: HashMap<String, Int>? = HashMap()
+                val perms: HashMap<String, Int> = HashMap()
 
                 // Initialize the map with both permissions
-                perms!![Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
+                perms[Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.INTERNET] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.ACCESS_COARSE_LOCATION] = PackageManager.PERMISSION_GRANTED
@@ -3104,12 +3310,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(4).isChecked = false //outsourced
             navView!!.menu.getItem(5).isChecked = false //return of goods
             navView!!.menu.getItem(6).isChecked = false //property
-            navView!!.menu.getItem(7).isChecked = true //login
-            navView!!.menu.getItem(8).isChecked = false //printer
-            navView!!.menu.getItem(9).isChecked = false //setting
-            navView!!.menu.getItem(10).isChecked = false //guest
-            navView!!.menu.getItem(11).isChecked = false //about
-            navView!!.menu.getItem(12).isChecked = false //logout
+            navView!!.menu.getItem(7).isChecked = false //supplier
+            navView!!.menu.getItem(8).isChecked = true //login
+            navView!!.menu.getItem(9).isChecked = false //printer
+            navView!!.menu.getItem(10).isChecked = false //setting
+            navView!!.menu.getItem(11).isChecked = false //guest
+            navView!!.menu.getItem(12).isChecked = false //about
+            navView!!.menu.getItem(13).isChecked = false //logout
 
 
         } else {
@@ -3134,13 +3341,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(4).isVisible = true //outsourced
             navView!!.menu.getItem(5).isVisible = true //return of goods
             navView!!.menu.getItem(6).isVisible = account == "0031" || account == "0133"
-
-            navView!!.menu.getItem(7).isVisible = false //login
-            navView!!.menu.getItem(8).isVisible = true //printer
-            navView!!.menu.getItem(9).isVisible = true //setting
-            navView!!.menu.getItem(10).isVisible = true //guest
-            navView!!.menu.getItem(11).isVisible = true //about
-            navView!!.menu.getItem(12).isVisible = true //logout
+            navView!!.menu.getItem(7).isVisible = true //supplier
+            navView!!.menu.getItem(8).isVisible = false //login
+            navView!!.menu.getItem(9).isVisible = true //printer
+            navView!!.menu.getItem(10).isVisible = true //setting
+            navView!!.menu.getItem(11).isVisible = true //guest
+            navView!!.menu.getItem(12).isVisible = true //about
+            navView!!.menu.getItem(13).isVisible = true //logout
 
 
 
@@ -3165,12 +3372,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             navView!!.menu.getItem(4).isChecked = false //outsourced
             navView!!.menu.getItem(5).isChecked = false //return of goods
             navView!!.menu.getItem(6).isChecked = false //property
-            navView!!.menu.getItem(7).isChecked = false //login
-            navView!!.menu.getItem(8).isChecked = false //printer
-            navView!!.menu.getItem(9).isChecked = false //setting
-            navView!!.menu.getItem(10).isChecked = false //guest
-            navView!!.menu.getItem(11).isChecked = false //about
-            navView!!.menu.getItem(12).isChecked = false //logout
+            navView!!.menu.getItem(7).isChecked = false //supplier
+            navView!!.menu.getItem(8).isChecked = false //login
+            navView!!.menu.getItem(9).isChecked = false //printer
+            navView!!.menu.getItem(10).isChecked = false //setting
+            navView!!.menu.getItem(11).isChecked = false //guest
+            navView!!.menu.getItem(12).isChecked = false //about
+            navView!!.menu.getItem(13).isChecked = false //logout
 
 
         }
@@ -6269,6 +6477,73 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val uploadIntent = Intent()
             uploadIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_ACTION
             receiptContext!!.sendBroadcast(uploadIntent)*/
+
+            alertDialogBuilder.dismiss()
+        }
+        alertDialogBuilder.show()
+    }
+
+    private fun showInputPasswordDialog() {
+
+        Log.e(mTAG, "=== showInputPasswordDialog start ===")
+
+
+
+        // get prompts.xml view
+        /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);*/
+        val promptView = View.inflate(this@MainActivity, R.layout.fragment_supplier_add_supplier_dialog, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(this@MainActivity).create()
+        alertDialogBuilder.setView(promptView)
+
+        //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
+        val textViewSupplierDialog = promptView.findViewById<TextView>(R.id.textViewSupplierDialog)
+
+        textViewSupplierDialog.setText(R.string.supplier_enter_password)
+
+        val editTextSupplierName = promptView.findViewById<EditText>(R.id.editTextSupplierName)
+        val editTextSupplierNumber = promptView.findViewById<EditText>(R.id.editTextSupplierNumber)
+        editTextSupplierName.hint = ""
+        editTextSupplierNumber.visibility = View.GONE
+
+
+
+        val btnCancel = promptView.findViewById<Button>(R.id.btnSupplierDialogCancel)
+        val btnConfirm = promptView.findViewById<Button>(R.id.btnSupplierDialogConfirm)
+        //val btnDelete = promptView.findViewById<Button>(R.id.btnSupplierDialogDelete)
+        //btnDelete.visibility = View.VISIBLE
+
+
+
+        alertDialogBuilder.setCancelable(false)
+
+        //btnDelete!!.setOnClickListener {
+        //    alertDialogBuilder.dismiss()
+        //}
+
+        btnCancel!!.setOnClickListener {
+            alertDialogBuilder.dismiss()
+        }
+        btnConfirm!!.setOnClickListener {
+
+            if (editTextSupplierName.text.toString() == "magtonicwarehouse") {
+
+
+
+                val goIntent = Intent()
+                goIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION
+                this@MainActivity.sendBroadcast(goIntent)
+
+                val drawer : DrawerLayout = findViewById(R.id.drawer_layout)
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START)
+                }
+            } else {
+                toast(getString(R.string.password_mismatch))
+            }
+
+
 
             alertDialogBuilder.dismiss()
         }

@@ -112,6 +112,7 @@ class Constants {
             const val ACTION_HOME_GO_TO_PAINT_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToPaintAction"
             const val ACTION_HOME_GO_TO_OUTSOURCED_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToOutsourcedAction"
             const val ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToReturnOfGoodsAction"
+            const val ACTION_HOME_GO_TO_SUPPLIER_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToSupplierAction"
             //property
             const val ACTION_PROPERTY_FRAGMENT_REFRESH : String ="com.magtonic.MagtonicWarehoouse.PropertyFragmentRefresh"
             const val ACTION_PROPERTY_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.PropertyMoreDetailRefresh"
@@ -197,6 +198,11 @@ class Constants {
             const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
 
             const val ACTION_RETURN_OF_GOODS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsShowSignDialogAction"
+            //supplier manage
+            const val ACTION_SUPPLIER_DATA_CHANGE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataChange"
+            const val ACTION_SUPPLIER_DATA_ADD : String ="com.magtonic.MagtonicWarehoouse.SupplierDataAdd"
+            const val ACTION_SUPPLIER_DATA_UPDATE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataUpdate"
+            const val ACTION_SUPPLIER_DATA_DELETE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataDelete"
         }
 
     }

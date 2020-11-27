@@ -47,6 +47,13 @@
                 android:icon="@drawable/baseline_monetization_on_black_48"
                 android:title="@string/nav_property"
                 android:visible="false"/>
+
+        <item
+                android:id="@+id/nav_supplier"
+                android:icon="@drawable/baseline_store_black_48"
+                android:title="@string/nav_supplier"
+                android:visible="false"/>
+
         <item
                 android:id="@+id/nav_login"
                 android:icon="@drawable/baseline_touch_app_black_48"

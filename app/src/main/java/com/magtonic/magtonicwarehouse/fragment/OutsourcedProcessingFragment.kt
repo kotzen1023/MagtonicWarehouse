@@ -915,45 +915,49 @@ class OutsourcedProcessingFragment : Fragment() {
         }
         btnConfirm!!.setOnClickListener {
 
-            textViewSupplier!!.visibility = View.VISIBLE
-            textViewSupplier!!.text = outsourcedSupplierNameList[currentSelectedSupplier]
+            if (outsourcedSupplierNameList.size > 0) {
+                textViewSupplier!!.visibility = View.VISIBLE
+                textViewSupplier!!.text = outsourcedSupplierNameList[currentSelectedSupplier]
 
-            linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
-            linearLayoutDetailHeader!!.visibility = View.GONE
-            viewLine!!.visibility = View.GONE
+                linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
+                linearLayoutDetailHeader!!.visibility = View.GONE
+                viewLine!!.visibility = View.GONE
 
-            progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
-            progressBar!!.visibility = View.VISIBLE
+                progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
+                progressBar!!.visibility = View.VISIBLE
 
-            /*outsourcedProcessDetailList.clear()
-            if (outsourcedProcessOrderDetailItemAdapter != null) {
-                outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
-            }*/
-            outsourcedProcessListBySupplier.clear()
-            if (outsourcedProcessSupplierItemAdapter != null) {
-                outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
+                /*outsourcedProcessDetailList.clear()
+                if (outsourcedProcessOrderDetailItemAdapter != null) {
+                    outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
+                }*/
+                outsourcedProcessListBySupplier.clear()
+                if (outsourcedProcessSupplierItemAdapter != null) {
+                    outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
+                }
+
+                outsourcedProcessDetailList.clear()
+                if (outsourcedProcessDetailItemAdapter != null) {
+                    outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
+                }
+
+                outsourcedProcessMoreDetailList.clear()
+                if (outsourcedProcessMoreDetailAdapter != null) {
+                    outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
+                }
+
+                listViewBySupplier!!.visibility = View.VISIBLE
+                listViewDetail!!.visibility = View.GONE
+                listViewMoreDetail!!.visibility = View.GONE
+
+                isOutSourcedInDetail = 0
+
+                val searchIntent = Intent()
+                searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
+                searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                outsourcedProcessContext?.sendBroadcast(searchIntent)
             }
 
-            outsourcedProcessDetailList.clear()
-            if (outsourcedProcessDetailItemAdapter != null) {
-                outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
-            }
 
-            outsourcedProcessMoreDetailList.clear()
-            if (outsourcedProcessMoreDetailAdapter != null) {
-                outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
-            }
-
-            listViewBySupplier!!.visibility = View.VISIBLE
-            listViewDetail!!.visibility = View.GONE
-            listViewMoreDetail!!.visibility = View.GONE
-
-            isOutSourcedInDetail = 0
-
-            val searchIntent = Intent()
-            searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-            searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
-            outsourcedProcessContext?.sendBroadcast(searchIntent)
 
 
             alertDialogBuilder.dismiss()

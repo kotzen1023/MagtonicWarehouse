@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "642060842890",
+    "firebase_url": "https://warehouse-supplier.firebaseio.com",
+    "project_id": "warehouse-supplier",
+    "storage_bucket": "warehouse-supplier.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642060842890:android:e6f529579788b4c90a7a73",
+        "android_client_info": {
+          "package_name": "com.magtonic.magtonicwarehouse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642060842890-i0j5986oe8cuuegbu3373bbd3t6njm0f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.magtonic.magtonicwarehouse",
+            "certificate_hash": "a2a1418aa0461612dc55ef66d0d234f98d578d02"
+          }
+        },
+        {
+          "client_id": "642060842890-e0qgunii1deipv5r7fkad9e83gqrojic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU6Hk29lTxZf0M5BLcGUmqavCjgVcbotY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642060842890-e0qgunii1deipv5r7fkad9e83gqrojic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

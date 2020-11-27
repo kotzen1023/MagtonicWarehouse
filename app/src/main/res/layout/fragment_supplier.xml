@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:paddingTop="?attr/actionBarSize"
+        android:id="@+id/supplier_list_container">
+
+
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:focusableInTouchMode="true">
+        <ListView
+                android:id="@+id/listViewSupplier"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+        </ListView>
+
+        <Button
+                android:id="@+id/btnAddSupplier"
+                android:text="新增供應商"
+                android:layout_width="match_parent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_height="60dp"
+                android:visibility="visible"/>
+
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

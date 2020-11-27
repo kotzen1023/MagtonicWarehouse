@@ -1,13 +1,16 @@
 package com.magtonic.magtonicwarehouse.fragment
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.user
 
@@ -23,6 +26,8 @@ class HomeGridFragment : Fragment() {
     private var appList = ArrayList<HomeGridItem>()
 
     private var homeGridItemAdapter: HomeGridItemAdapter? = null
+
+    private var toastHandle: Toast? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,8 +86,10 @@ class HomeGridFragment : Fragment() {
         val item8 = HomeGridItem("About", R.drawable.baseline_info_black_48, R.string.nav_about)
         appList.add(item8)
 
-        /*val item9 = HomeGridItem("Paint", R.drawable.baseline_edit_black_48, R.string.nav_paint)
-        appList.add(item9)*/
+        if (user!!.userAccount == "0031" || user!!.userAccount == "0133") {
+            val item9 = HomeGridItem("SupplierManage", R.drawable.baseline_store_black_48, R.string.nav_supplier)
+            appList.add(item9)
+        }
 
 
 
@@ -165,6 +172,13 @@ class HomeGridFragment : Fragment() {
                     val showIntent = Intent()
                     showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION
                     homeGridContext!!.sendBroadcast(showIntent)
+                }
+
+                "SupplierManage" -> {
+                    showInputPasswordDialog()
+                    //val showIntent = Intent()
+                    //showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION
+                    //homeGridContext!!.sendBroadcast(showIntent)
                 }
             }
 
@@ -324,5 +338,80 @@ class HomeGridFragment : Fragment() {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }
+
+    private fun toast(message: String) {
+
+        if (toastHandle != null)
+            toastHandle!!.cancel()
+
+        val toast = Toast.makeText(homeGridContext, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+
+        /*val toast = Toast.makeText(propertyContext, message, Toast.LENGTH_SHORT)
+         toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+         val group = toast.view as ViewGroup
+         val textView = group.getChildAt(0) as TextView
+         textView.textSize = 30.0f*/
+        toast.show()
+
+        toastHandle = toast
+    }
+
+    private fun showInputPasswordDialog() {
+
+        Log.e(mTAG, "=== showInputPasswordDialog start ===")
+
+
+
+        // get prompts.xml view
+        /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);*/
+        val promptView = View.inflate(homeGridContext, R.layout.fragment_supplier_add_supplier_dialog, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(homeGridContext).create()
+        alertDialogBuilder.setView(promptView)
+
+        //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
+        val textViewSupplierDialog = promptView.findViewById<TextView>(R.id.textViewSupplierDialog)
+
+        textViewSupplierDialog.setText(R.string.supplier_enter_password)
+
+        val editTextSupplierName = promptView.findViewById<EditText>(R.id.editTextSupplierName)
+        val editTextSupplierNumber = promptView.findViewById<EditText>(R.id.editTextSupplierNumber)
+        editTextSupplierName.hint = ""
+        editTextSupplierNumber.visibility = View.GONE
+
+
+
+        val btnCancel = promptView.findViewById<Button>(R.id.btnSupplierDialogCancel)
+        val btnConfirm = promptView.findViewById<Button>(R.id.btnSupplierDialogConfirm)
+        //val btnDelete = promptView.findViewById<Button>(R.id.btnSupplierDialogDelete)
+        //btnDelete.visibility = View.VISIBLE
+
+
+
+        alertDialogBuilder.setCancelable(false)
+
+        //btnDelete!!.setOnClickListener {
+        //    alertDialogBuilder.dismiss()
+        //}
+
+        btnCancel!!.setOnClickListener {
+            alertDialogBuilder.dismiss()
+        }
+        btnConfirm!!.setOnClickListener {
+
+            if (editTextSupplierName.text.toString() == "magtonicwarehouse") {
+                val goIntent = Intent()
+                goIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION
+                homeGridContext!!.sendBroadcast(goIntent)
+            } else {
+                toast(getString(R.string.password_mismatch))
+            }
+
+            alertDialogBuilder.dismiss()
+        }
+        alertDialogBuilder.show()
     }
 }

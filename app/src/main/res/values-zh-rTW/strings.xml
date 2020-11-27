@@ -217,4 +217,14 @@
     <string name="return_of_goods_dialog_date_header">日期</string>
     <string name="return_of_goods_sign_upload_success">簽名上傳成功. 請按退貨單簽名確認</string>
     <string name="return_of_goods_order_sign_confirm">退貨單簽名確認</string>
+    <string name="nav_supplier">供應商統編</string>
+    <string name="supplier_name">廠商名稱</string>
+    <string name="supplier_uninumber">統編</string>
+    <string name="supplier_add_dialog_title">請輸入廠商名稱與統編</string>
+    <string name="supplier_update_dialog_title">更新廠商資訊</string>
+    <string name="delete">刪除</string>
+    <string name="supplier_delete_dialog_title">刪除廠商資訊</string>
+    <string name="supplier_enter_password">請輸入密碼</string>
+    <string name="password_mismatch">密碼不符</string>
+    <string name="supplier_add_empty_name_or_number">廠商名稱或統編為空</string>
 </resources>
