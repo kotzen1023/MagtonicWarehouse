@@ -55,6 +55,8 @@ class SupplierController(private val database: FirebaseDatabase, private val con
                 db!!.supplierDataDao().insert(supplierData)
             }
 
+            
+
             supplierDataList = db!!.supplierDataDao().getAll() as ArrayList<SupplierData>
 
             val showIntent = Intent()

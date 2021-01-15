@@ -7,9 +7,9 @@
     <TextView
             android:id="@+id/textViewReturnOfGoodsDialogMsg"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_weight="1"
-            android:textSize="@dimen/text_size_30"
+            android:textSize="@dimen/text_size_20"
             android:text="@string/return_of_goods_dialog_msg"
             android:gravity="center"/>
 
@@ -28,7 +28,7 @@
                     android:id="@+id/textViewReturnOfGoodsOrderHeader"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_weight="2"
                     android:text="@string/return_of_goods_dialog_order_header"/>
 
@@ -36,7 +36,7 @@
                     android:id="@+id/textViewReturnOfGoodsOrderContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="bold"
                     android:layout_weight="1"/>
         </LinearLayout>
@@ -55,7 +55,7 @@
                     android:id="@+id/textViewReturnOfGoodsTypeHeader"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_weight="2"
                     android:text="@string/return_of_goods_dialog_type_header"/>
 
@@ -63,7 +63,7 @@
                     android:id="@+id/textViewReturnOfGoodsTypeContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="bold"
                     android:layout_weight="1"/>
         </LinearLayout>
@@ -82,7 +82,7 @@
                     android:id="@+id/textViewReturnOfGoodsDateHeader"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_weight="2"
                     android:text="@string/return_of_goods_dialog_date_header"/>
 
@@ -90,7 +90,7 @@
                     android:id="@+id/textViewReturnOfGoodsDateContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_25"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textStyle="bold"
                     android:layout_weight="1"/>
         </LinearLayout>
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:textSize="@dimen/text_size_30"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/cancel"/>
 
         <Button
@@ -117,7 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:textSize="@dimen/text_size_30"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/confirm"/>
 
     </LinearLayout>

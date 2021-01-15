@@ -200,6 +200,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var supplierList = ArrayList<Supplier>()
         @JvmStatic var supplierDataList = ArrayList<SupplierData>()
         @JvmStatic var db: SupplierDataDB? = null
+        //for diable bluetooth
+        @JvmStatic var isBluetoothPrinterEnable: Boolean = true
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -405,6 +407,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         isReceiptUploadAutoConfirm = pref!!.getBoolean("IS_RECEIPT_UPLOAD_AUTO_CONFIRM", true)
         isLogEnable = pref!!.getBoolean("IS_LOG_ENABLE", true)
         timeOutSeconds = pref!!.getLong("CONNECT_TIMEOUT", 60)
+        isBluetoothPrinterEnable = pref!!.getBoolean("IS_BLUETOOTH_PRINTER_ENABLE", true)
 
         isSecurityGuard = pref!!.getBoolean("IS_SECURITY_GUARD", false)
 
@@ -502,86 +505,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             showPrintAgainConfirmDialog()
 
-            /*if (itemReceipt != null) {
-
-                when(printerStatus) {
-                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                        toast(getString(R.string.tag_printer_status_not_connected))
-                    }
-
-                    BluetoothChatService.STATE_CONNECTED-> {
-                        when(printStatus) {
-                            PrintStatus.PRINT_SUCCESS -> {
-                                val confirmdialog = AlertDialog.Builder(this@MainActivity)
-                                confirmdialog.setIcon(R.drawable.baseline_warning_black_48)
-                                confirmdialog.setTitle(resources.getString(R.string.nav_printer))
-                                confirmdialog.setMessage(resources.getString(R.string.fab_print_confirm))
-                                confirmdialog.setPositiveButton(
-                                    resources.getString(R.string.confirm)
-                                ) { _, _ ->
-
-                                    val addString = when (itemReceipt!!.receiveLine.length) {
-                                        0 -> "00"
-                                        1 -> "0"
-                                        else -> ""
-                                    }
-
-
-                                    val printContent: String = itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
-
-                                    //print 1
-                                    val ret: Int
-                                    ret = printLabel(
-                                        itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                        printContent,
-                                        itemReceipt!!.rjReceipt!!.pmn04,
-                                        itemReceipt!!.rjReceipt!!.pmn20,
-                                        itemReceipt!!.rjReceipt!!.pmnud02,
-                                        itemReceipt!!.rjReceipt!!.ima36,
-                                        itemReceipt!!.rjReceipt!!.rvb38
-                                    )
-
-                                    when(ret) {
-                                        0 -> {
-                                            //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED
-                                            Log.d(mTAG, "(fabPrintAgain) Print 1 tag success")
-                                            toast(getString(R.string.receipt_tag_printed))
-                                            printStatus = PrintStatus.PRINT_SUCCESS
-                                        }
-                                        else -> {
-                                            Log.d(mTAG, "(fabPrintAgain) tag was printed failed")
-                                            toast(getString(R.string.print_error))
-                                            fabPrint!!.visibility = View.VISIBLE
-                                            printStatus = PrintStatus.PRINT_ERROR
-                                            //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED_FAILED
-                                        }
-                                    }
-
-                                }
-                                confirmdialog.setNegativeButton(
-                                    resources.getString(R.string.cancel)
-                                ) { _, _ ->
-
-                                }
-                                confirmdialog.show()
-                            }
-
-                            PrintStatus.PRINT_ERROR -> {
-                                toast(getString(R.string.print_error))
-                                fabPrint!!.visibility = View.VISIBLE
-                                //printStatus = PrintStatus.PRINT_WAITING
-
-                                //val connectIntent = Intent()
-                                //connectIntent.action = Constants.ACTION.ACTION_PRINT_ERROR
-                                //sendBroadcast(connectIntent)
-                            }
-                        }
-                    }
-                }
-
-            } else {
-                Log.e(mTAG, "itemReceipt = null")
-            }*/
         }
 
         fabBack = findViewById(R.id.fabBack)
@@ -953,31 +876,70 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         if (itemReceipt != null) {
 
-                            when(printerStatus) {
-                                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> { //printer not connected, cancel
-                                    toast(getString(R.string.tag_printer_status_not_connected))
+                            if (isBluetoothPrinterEnable) {
+                                when (printerStatus) {
+                                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> { //printer not connected, cancel
+                                        toast(getString(R.string.tag_printer_status_not_connected))
+
+                                        when {
+                                            barcode!!.poBarcodeByScan.length >= 16 -> {
+
+                                            }
+                                            barcode!!.poBarcodeByScan.length == 13 -> {
+                                                Log.d(mTAG, "==>state INITIAL")
+                                                uploadReceipt()
+                                            }
+                                            else -> {
+
+                                            }
+                                        }
+
+                                        /*val failedIntent = Intent()
+                                    failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_FAILED_SEND_TO_FRAGMENT
+                                    sendBroadcast(failedIntent)*/
+                                    }
+
+                                    BluetoothChatService.STATE_CONNECTED -> {
+
+                                        when (itemReceipt!!.state) {
+                                            ItemReceipt.ItemState.UPLOADED -> {
+                                                Log.d(mTAG, "==>state UPLOADED")
+                                            }
+                                            ItemReceipt.ItemState.UPLOAD_FAILED -> {
+                                                Log.d(mTAG, "==>state UPLOAD_FAILED")
+                                                uploadReceipt()
+                                            }
+                                            ItemReceipt.ItemState.INITIAL -> {
+                                                Log.d(mTAG, "==>state INITIAL")
+                                                uploadReceipt()
+                                            }
+                                            ItemReceipt.ItemState.CONFIRMED -> {
+                                                Log.d(mTAG, "==>state CONFIRMED")
+                                            }
+                                            ItemReceipt.ItemState.CONFIRM_FAILED -> {
+                                                Log.d(mTAG, "==>state UPLOAD_FAILED")
+                                            }
+                                        }
+                                    }
                                 }
-
-                                BluetoothChatService.STATE_CONNECTED-> {
-
-                                    when(itemReceipt!!.state) {
-                                        ItemReceipt.ItemState.UPLOADED-> {
-                                            Log.d(mTAG, "==>state UPLOADED")
-                                        }
-                                        ItemReceipt.ItemState.UPLOAD_FAILED-> {
-                                            Log.d(mTAG, "==>state UPLOAD_FAILED")
-                                            uploadReceipt()
-                                        }
-                                        ItemReceipt.ItemState.INITIAL-> {
-                                            Log.d(mTAG, "==>state INITIAL")
-                                            uploadReceipt()
-                                        }
-                                        ItemReceipt.ItemState.CONFIRMED-> {
-                                            Log.d(mTAG, "==>state CONFIRMED")
-                                        }
-                                        ItemReceipt.ItemState.CONFIRM_FAILED-> {
-                                            Log.d(mTAG, "==>state UPLOAD_FAILED")
-                                        }
+                            } else { //isBluetoothPrinterEnable => diable
+                                when (itemReceipt!!.state) {
+                                    ItemReceipt.ItemState.UPLOADED -> {
+                                        Log.d(mTAG, "==>state UPLOADED")
+                                    }
+                                    ItemReceipt.ItemState.UPLOAD_FAILED -> {
+                                        Log.d(mTAG, "==>state UPLOAD_FAILED")
+                                        uploadReceipt()
+                                    }
+                                    ItemReceipt.ItemState.INITIAL -> {
+                                        Log.d(mTAG, "==>state INITIAL")
+                                        uploadReceipt()
+                                    }
+                                    ItemReceipt.ItemState.CONFIRMED -> {
+                                        Log.d(mTAG, "==>state CONFIRMED")
+                                    }
+                                    ItemReceipt.ItemState.CONFIRM_FAILED -> {
+                                        Log.d(mTAG, "==>state UPLOAD_FAILED")
                                     }
                                 }
                             }
@@ -1026,75 +988,87 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                             Log.d(mTAG, "============= [item end] =============")
 
-                            when(printerStatus) {
-                                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                                    toast(getString(R.string.tag_printer_status_not_connected))
-                                }
+                            if (isBluetoothPrinterEnable) {
 
-                                BluetoothChatService.STATE_CONNECTED-> {
-                                    //var addString: String
-
-                                    val addString = when(itemReceipt!!.receiveLine.length) {
-                                        1 -> "00"
-                                        2 -> "0"
-                                        else -> ""
+                                when (printerStatus) {
+                                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                                        toast(getString(R.string.tag_printer_status_not_connected))
                                     }
 
-                                    /*if (itemReceipt!!.receiveLine.length == 1) {
+                                    BluetoothChatService.STATE_CONNECTED -> {
+                                        //var addString: String
+
+                                        val addString = when (itemReceipt!!.receiveLine.length) {
+                                            1 -> "00"
+                                            2 -> "0"
+                                            else -> ""
+                                        }
+
+                                        /*if (itemReceipt!!.receiveLine.length == 1) {
                                         addString = "00"
                                     } else if (itemReceipt!!.receiveLine.length == 2) {
                                         addString = "0"
                                     } else {
                                         addString = ""
                                     }*/
-                                    val printContent = itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
-                                    //print x 2
-                                    var ret: Int
-                                    ret = printLabel(
-                                        itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                        printContent,
-                                        itemReceipt!!.rjReceipt!!.pmn04,
-                                        itemReceipt!!.rjReceipt!!.pmn20,
-                                        itemReceipt!!.rjReceipt!!.pmnud02,
-                                        itemReceipt!!.rjReceipt!!.ima36,
-                                        itemReceipt!!.rjReceipt!!.rvb38
-                                    )
-                                    ret += printLabel(
-                                        itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                        printContent,
-                                        itemReceipt!!.rjReceipt!!.pmn04,
-                                        itemReceipt!!.rjReceipt!!.pmn20,
-                                        itemReceipt!!.rjReceipt!!.pmnud02,
-                                        itemReceipt!!.rjReceipt!!.ima36,
-                                        itemReceipt!!.rjReceipt!!.rvb38
-                                    )
+                                        val printContent =
+                                            itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
+                                        //print x 2
+                                        var ret: Int
+                                        ret = printLabel(
+                                            itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                            printContent,
+                                            itemReceipt!!.rjReceipt!!.pmn04,
+                                            itemReceipt!!.rjReceipt!!.pmn20,
+                                            itemReceipt!!.rjReceipt!!.pmnud02,
+                                            itemReceipt!!.rjReceipt!!.ima36,
+                                            itemReceipt!!.rjReceipt!!.rvb38
+                                        )
+                                        ret += printLabel(
+                                            itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                            printContent,
+                                            itemReceipt!!.rjReceipt!!.pmn04,
+                                            itemReceipt!!.rjReceipt!!.pmn20,
+                                            itemReceipt!!.rjReceipt!!.pmnud02,
+                                            itemReceipt!!.rjReceipt!!.ima36,
+                                            itemReceipt!!.rjReceipt!!.rvb38
+                                        )
 
-                                    when(ret) {
-                                        0 -> {
-                                            //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED
-                                            Log.d(mTAG, "(upload success) Print 2 tag success")
-                                            toast(getString(R.string.receipt_tag_printed))
-                                            printStatus = PrintStatus.PRINT_SUCCESS
+                                        when (ret) {
+                                            0 -> {
+                                                //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED
+                                                Log.d(mTAG, "(upload success) Print 2 tag success")
+                                                toast(getString(R.string.receipt_tag_printed))
+                                                printStatus = PrintStatus.PRINT_SUCCESS
+                                            }
+
+                                            1 -> {
+                                                Log.d(
+                                                    mTAG,
+                                                    "(upload success) Print 1 tag, 1 failed"
+                                                )
+                                                //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED
+                                                toast(getString(R.string.print_error))
+                                                fabPrint!!.visibility = View.VISIBLE
+                                                printStatus = PrintStatus.PRINT_ERROR
+                                            }
+
+                                            else -> {
+                                                Log.e(
+                                                    mTAG,
+                                                    "(upload success) 2 tags were printed failed"
+                                                )
+                                                toast(getString(R.string.print_error))
+                                                fabPrint!!.visibility = View.VISIBLE
+                                                //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED_FAILED
+                                                printStatus = PrintStatus.PRINT_ERROR
+                                            }
                                         }
 
-                                        1 -> {
-                                            Log.d(mTAG, "(upload success) Print 1 tag, 1 failed")
-                                            //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED
-                                            toast(getString(R.string.print_error))
-                                            fabPrint!!.visibility = View.VISIBLE
-                                            printStatus = PrintStatus.PRINT_ERROR
-                                        }
-
-                                        else -> {
-                                            Log.e(mTAG, "(upload success) 2 tags were printed failed")
-                                            toast(getString(R.string.print_error))
-                                            fabPrint!!.visibility = View.VISIBLE
-                                            //itemReceipt!!.state = ItemReceipt.ItemState.PRINTED_FAILED
-                                            printStatus = PrintStatus.PRINT_ERROR
-                                        }
                                     }
-
                                 }
+                            } else { //isBluetoothPrinterEnable => diable
+                                Log.d(mTAG, "isBluetoothPrinterEnable => diable: will not print tag")
                             }
 
                             //send to receiptfragment to change status
@@ -1107,7 +1081,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
 
                         //show print again button
-                        fabPrintAgain!!.visibility = View.VISIBLE
+                        if (isBluetoothPrinterEnable) {
+                            fabPrintAgain!!.visibility = View.VISIBLE
+                        } else {
+                            Log.d(mTAG, "isBluetoothPrinterEnable => diable: will not show print again button")
+                        }
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_UPLOAD_RETURN_PO_DIFF, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_RECEIPT_UPLOAD_RETURN_PO_DIFF")
@@ -1340,20 +1318,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         itemReceipt = null
 
                         var statusTitle = ""
-                        when(printerStatus) {
-                            BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN-> {
-                                statusTitle = getString(R.string.tag_printer_status_not_connected)
-                            }
-                            BluetoothChatService.STATE_CONNECTING-> {
-                                statusTitle = getString(R.string.tag_printer_status_connecting)
-                            }
-                            BluetoothChatService.STATE_CONNECTED-> {
-                                statusTitle = getString(R.string.tag_printer_status_connected)
-                            }
+                        if (isBluetoothPrinterEnable) {
+                            when (printerStatus) {
+                                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN -> {
+                                    statusTitle =
+                                        getString(R.string.tag_printer_status_not_connected)
+                                }
+                                BluetoothChatService.STATE_CONNECTING -> {
+                                    statusTitle = getString(R.string.tag_printer_status_connecting)
+                                }
+                                BluetoothChatService.STATE_CONNECTED -> {
+                                    statusTitle = getString(R.string.tag_printer_status_connected)
+                                }
 
+                            }
                         }
 
-                        title = getString(R.string.nav_receipt) +" - "+ statusTitle
+                        if (isBluetoothPrinterEnable) {
+                            title = getString(R.string.nav_receipt) + " - " + statusTitle
+                        } else {
+                            title = getString(R.string.nav_receipt)
+                        }
 
                         menuItemBluetooth!!.isVisible = true
                         menuItemKeyboard!!.isVisible = true
@@ -1379,14 +1364,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
 
                         //show depends on bluetooth connect
-                        when(printerStatus) {
-                            BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                                fabPrint!!.visibility = View.VISIBLE
-                            }
+                        if (isBluetoothPrinterEnable) {
+                            when (printerStatus) {
+                                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                                    fabPrint!!.show()
+                                }
 
-                            BluetoothChatService.STATE_CONNECTED-> {
-                                fabPrint!!.visibility = View.GONE
+                                BluetoothChatService.STATE_CONNECTED -> {
+                                    fabPrint!!.hide()
+                                }
                             }
+                        } else {
+                            fabPrint!!.hide()
                         }
 
                         currentFrag = CurrentFragment.RECEIPT_FRAGMENT
@@ -1888,6 +1877,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                         process!!.destroy()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_ON, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_ON")
+
+                        isBluetoothPrinterEnable = true
+                        //save
+                        editor = pref!!.edit()
+                        editor!!.putBoolean("IS_BLUETOOTH_PRINTER_ENABLE", isBluetoothPrinterEnable)
+                        editor!!.apply()
+
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_OFF, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_OFF")
+
+                        isBluetoothPrinterEnable = false
+                        //save
+                        editor = pref!!.edit()
+                        editor!!.putBoolean("IS_BLUETOOTH_PRINTER_ENABLE", isBluetoothPrinterEnable)
+                        editor!!.apply()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_TIMEOUT_CHANGE, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_TIMEOUT_CHANGE")
 
@@ -2366,6 +2373,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_OFF)
             filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_ON)
             filter.addAction(Constants.ACTION.ACTION_SETTING_LOG_ENABLE_OFF)
+            filter.addAction(Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_ON)
+            filter.addAction(Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_OFF)
             filter.addAction(Constants.ACTION.ACTION_SETTING_TIMEOUT_CHANGE)
             //guest
             filter.addAction(Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST)
@@ -2649,17 +2658,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.menu.getItem(13).isChecked = false //logout
 
         var statusTitle = ""
-        when(printerStatus) {
-            BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN-> {
-                statusTitle = getString(R.string.tag_printer_status_not_connected)
-            }
-            BluetoothChatService.STATE_CONNECTING-> {
-                statusTitle = getString(R.string.tag_printer_status_connecting)
-            }
-            BluetoothChatService.STATE_CONNECTED-> {
-                statusTitle = getString(R.string.tag_printer_status_connected)
-            }
+        if (isBluetoothPrinterEnable) {
+            when (printerStatus) {
+                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN -> {
+                    statusTitle = getString(R.string.tag_printer_status_not_connected)
+                }
+                BluetoothChatService.STATE_CONNECTING -> {
+                    statusTitle = getString(R.string.tag_printer_status_connecting)
+                }
+                BluetoothChatService.STATE_CONNECTED -> {
+                    statusTitle = getString(R.string.tag_printer_status_connected)
+                }
 
+            }
         }
 
         currentSelectMenuItem = menuItem
@@ -2676,22 +2687,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 menuItemEraser!!.isVisible = false
                 menuItemOutSourcedSupplier!!.isVisible = false
 
-                title = getString(R.string.nav_receipt) +" - "+ statusTitle
+                title = if (isBluetoothPrinterEnable) {
+                    getString(R.string.nav_receipt) + " - " + statusTitle
+                } else {
+                    getString(R.string.nav_receipt)
+                }
                 fragmentClass = ReceiptFragment::class.java
                 menuItem.isChecked = true
                 currentFrag = CurrentFragment.RECEIPT_FRAGMENT
 
                 //show depends on bluetooth connect
-                when(printerStatus) {
-                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                        //fabPrint!!.visibility = View.VISIBLE
-                        fabPrint!!.show()
-                    }
+                if (isBluetoothPrinterEnable) {
+                    when (printerStatus) {
+                        BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                            //fabPrint!!.visibility = View.VISIBLE
+                            fabPrint!!.show()
+                        }
 
-                    BluetoothChatService.STATE_CONNECTED-> {
-                        //fabPrint!!.visibility = View.GONE
-                        fabPrint!!.hide()
+                        BluetoothChatService.STATE_CONNECTED -> {
+                            //fabPrint!!.visibility = View.GONE
+                            fabPrint!!.hide()
+                        }
                     }
+                } else {
+                    fabPrint!!.hide()
                 }
                 isBarcodeScanning = false
                 //hide print again button
@@ -3050,8 +3069,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val writePermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        val networkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+        var manageExternalPermission = 0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            manageExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+        }
 
+
+
+        val networkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
 
         val coarsePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
 
@@ -3074,6 +3099,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (writePermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (manageExternalPermission != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+            }
         }
 
         if (networkPermission != PackageManager.PERMISSION_GRANTED) {
@@ -3131,7 +3162,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         permissions: Array<String>, grantResults: IntArray
     ) {
 
-        Log.d(mTAG, "Permission callback called-------")
+        Log.d(mTAG, "Permission callback called------- permissions.size = ${permissions.size}")
         when (requestCode) {
             requestIdMultiplePermission -> {
 
@@ -3140,6 +3171,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Initialize the map with both permissions
                 perms[Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
+                }
+
                 perms[Manifest.permission.INTERNET] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.ACCESS_COARSE_LOCATION] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.BLUETOOTH_ADMIN] = PackageManager.PERMISSION_GRANTED
@@ -3151,8 +3186,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Fill with actual results from user
                 //if (grantResults.size > 0) {
                 if (grantResults.isNotEmpty()) {
-                    for (i in permissions.indices)
+                    for (i in permissions.indices) {
                         perms[permissions[i]] = grantResults[i]
+                        Log.e(mTAG, "perms[permissions[$i]] = ${permissions[i]}")
+
+                    }
                     // Check for both permissions
                     if (perms[Manifest.permission.READ_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
@@ -3165,13 +3203,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         && perms[Manifest.permission.CHANGE_WIFI_STATE] == PackageManager.PERMISSION_GRANTED
                     ) {
                         Log.d(mTAG, "write permission granted")
-
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            if (perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED) {
+                                initView()
+                                initLog()
+                            }
+                        } else {
+                            initView()
+                            initLog()
+                        }
                         // process the normal flow
                         //else any one or both the permissions are not granted
                         //init_folder_and_files()
                         //init_setting();
-                        initView()
-                        initLog()
+
                     } else {
                         Log.d(mTAG, "Some permissions are not granted ask again ")
                         //permission is denied (this is the first time, when "never ask again" is not checked) so ask again explaining the usage of permission
@@ -3185,7 +3230,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 this,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE
                             )
-                            || ActivityCompat.shouldShowRequestPermissionRationale(
+                            ||
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                this,
+                                Manifest.permission.MANAGE_EXTERNAL_STORAGE
+                            )
+                            ||
+                            ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 Manifest.permission.INTERNET
                             )
@@ -3734,51 +3785,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    /*fun checkUploadSuccessList(barcode: ScanBarcode?): Boolean{
-        Log.e(mTAG, "=== checkUploadSuccessList start ===")
-
+    fun checkServerErrorString(res: String): Boolean {
         var ret = false
-
-        val poLineInt = ScanBarcode.removeLeadingZeroes(barcode!!.poLine)
-
-        if (barcode != null) {
-            Log.e(mTAG, "checkUploadSuccessList poBarcode = " + barcode.poBarcode + ", poLineInt = " + poLineInt)
-
-            /*
-            para.pmn01 = barcode.poBarcode
-            para.pmn02 = barcode.poLine
-             */
-
-            if (receiptUploadedList.size > 0) {
-
-                for (i in 0 until receiptUploadedList.size) {
-
-                    if (receiptUploadedList[i].poNumSplit == barcode.poBarcode && receiptUploadedList[i].poLineInt == poLineInt) {
-                        Log.e(mTAG, "Found uploaded po")
-                        itemReceipt = receiptUploadedList[i]
-                        ret = true
-                        break
-                    }
-
-                }
-            } else {
-                Log.e(mTAG, "receiptUploadedList empty")
-            }
-        } else {
-            Log.e(mTAG, "barcode = null")
+        if (res.contains("System.OutOfMemoryException")) {
+            ret = true
         }
 
-        Log.e(mTAG, "=== checkUploadSuccessList end ===")
-
         return ret
-    }*/
-
-    /*
-    fun setReceiptACState(state: ReceiptACState) {
-        this.acState = state
-    }//setReceiptACState
-    */
-
+    }
 
     fun callAPILogin(account: String, password: String) {
         Log.e(mTAG, "callAPILogin")
@@ -3804,35 +3818,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     //val  rjUser: RJUser? = null
                     //val  rjUser: RJUser = Gson().fromJson<Any>(res, RJUser::class.javaObjectType) as RJUser
                     Log.e(mTAG, "res = $res")
-                    val rjUser = Gson().fromJson<Any>(res, RJUser::class.java) as RJUser
 
-                    //if (rjUser.result.equals("0")) {
-                    if (rjUser.result == "0") {
-                        //fail
-                        //mLoadingView.setStatus(LoadingView.GONE)
-                        // Toast.makeText(mContext,rjUser.tc_zx104,Toast.LENGTH_LONG).show();
-                        //showMyToast(rjUser.tc_zx104, mContext)
-                        toast(rjUser.tc_zx104)
+                    if (!checkServerErrorString(res)) {
 
-                        val failIntent = Intent()
-                        failIntent.action = Constants.ACTION.ACTION_LOGIN_FAILED
-                        sendBroadcast(failIntent)
-                    } else {
-                        //success
-                        Log.e(mTAG, "loginCallback success")
+                        val rjUser = Gson().fromJson<Any>(res, RJUser::class.java) as RJUser
 
-                        val successIntent = Intent()
-                        successIntent.action = Constants.ACTION.ACTION_LOGIN_SUCCESS
-                        sendBroadcast(successIntent)
+                        //if (rjUser.result.equals("0")) {
+                        if (rjUser.result == "0") {
+                            //fail
+                            //mLoadingView.setStatus(LoadingView.GONE)
+                            // Toast.makeText(mContext,rjUser.tc_zx104,Toast.LENGTH_LONG).show();
+                            //showMyToast(rjUser.tc_zx104, mContext)
+                            toast(rjUser.tc_zx104)
+
+                            val failIntent = Intent()
+                            failIntent.action = Constants.ACTION.ACTION_LOGIN_FAILED
+                            sendBroadcast(failIntent)
+                        } else {
+                            //success
+                            Log.e(mTAG, "loginCallback success")
+
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_LOGIN_SUCCESS
+                            sendBroadcast(successIntent)
 
 
-                        username = rjUser.tc_zx104
+                            username = rjUser.tc_zx104
 
 
-                        Log.e(
-                            mTAG,
-                            "username = " + rjUser.tc_zx104 + " account = " + account + " password = " + password
-                        )
+                            Log.e(
+                                mTAG,
+                                "username = " + rjUser.tc_zx104 + " account = " + account + " password = " + password
+                            )
+                        }
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
                 }// try
@@ -3997,55 +4017,63 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
-                    val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceipt(res, barcode!!.poBarcode)
+                    if (!checkServerErrorString(res)) {
+
+                        val retItemReceipt =
+                            ItemReceipt.transRJReceiptStrToItemReceipt(res, barcode!!.poBarcode)
 
 
-                    if (retItemReceipt != null) {
-                        if (!retItemReceipt.rjReceipt?.result.equals(ItemReceipt.RESULT_CORRECT)) {
-                            Log.e(
-                                mTAG,
-                                "result = " + retItemReceipt.rjReceipt?.result + " result2 = " + retItemReceipt.rjReceipt?.result2
-                            )
-                            //can't receive the item
-                            //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
-                            val mess = retItemReceipt.rjReceipt?.result2 as String
-                            toastLong(mess)
+                        if (retItemReceipt != null) {
+                            if (!retItemReceipt.rjReceipt?.result.equals(ItemReceipt.RESULT_CORRECT)) {
+                                Log.e(
+                                    mTAG,
+                                    "result = " + retItemReceipt.rjReceipt?.result + " result2 = " + retItemReceipt.rjReceipt?.result2
+                                )
+                                //can't receive the item
+                                //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                                val mess = retItemReceipt.rjReceipt?.result2 as String
+                                toastLong(mess)
 
 
-                            val receiptNoIntent = Intent()
-                            receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
-                            sendBroadcast(receiptNoIntent)
-                        }// result  = 0
-                        else {
-                            // success receive ,update list ,update fragment
-                            //if(Fristpmc3.equals("") || Fristpmm02.equals("") || Fristpmc3.equals(itemReceipt.rjReceipt.pmc03) || Fristpmm02.equals(itemReceipt.rjReceipt.pmm02)) {
+                                val receiptNoIntent = Intent()
+                                receiptNoIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                                sendBroadcast(receiptNoIntent)
+                            }// result  = 0
+                            else {
+                                // success receive ,update list ,update fragment
+                                //if(Fristpmc3.equals("") || Fristpmm02.equals("") || Fristpmc3.equals(itemReceipt.rjReceipt.pmc03) || Fristpmm02.equals(itemReceipt.rjReceipt.pmm02)) {
 
-                            //multi
-                            /*if (ReceiptList.size() > 0 ) {
+                                //multi
+                                /*if (ReceiptList.size() > 0 ) {
                                 ReceiptList.removeAllItem()
                             }
 
                             addResult = ReceiptList.add(retItemReceipt)
                             itemReceipt = ReceiptList.getReceiptItem(0)*/
 
-                            //single
-                            itemReceipt = retItemReceipt
+                                //single
+                                itemReceipt = retItemReceipt
 
-                            Log.e(mTAG, "2")
-                            val refreshIntent = Intent()
-                            refreshIntent.action = Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH
-                            //refreshIntent.putExtra("RVA06", rva06)
-                            mContext!!.sendBroadcast(refreshIntent)
+                                Log.e(mTAG, "2")
+                                val refreshIntent = Intent()
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH
+                                //refreshIntent.putExtra("RVA06", rva06)
+                                mContext!!.sendBroadcast(refreshIntent)
 
-                        }//result = 1
-                    } else {
-                        Log.e(mTAG, "retItemReceipt = null")
+                            }//result = 1
+                        } else {
+                            Log.e(mTAG, "retItemReceipt = null")
 
-                        toast(getString(R.string.receipt_this_receipt_not_exist))
+                            toast(getString(R.string.receipt_this_receipt_not_exist))
 
-                        val receiptNoIntent = Intent()
-                        receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
-                        sendBroadcast(receiptNoIntent)
+                            val receiptNoIntent = Intent()
+                            receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                            sendBroadcast(receiptNoIntent)
+                        }
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -4100,56 +4128,64 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-
-                    val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceiptPoint(res, barcode!!.poBarcodeByScan)
-
-
-                    if (retItemReceipt != null) {
-                        if (!retItemReceipt.rjReceipt?.result.equals(ItemReceipt.RESULT_CORRECT)) {
-                            Log.e(
-                                mTAG,
-                                "result = " + retItemReceipt.rjReceipt?.result + " result2 = " + retItemReceipt.rjReceipt?.result2
-                            )
-                            //can't receive the item
-                            //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
-                            val mess = retItemReceipt.rjReceipt?.result2 as String
-                            toastLong(mess)
+                    if (!checkServerErrorString(res)) {
+                        val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceiptPoint(
+                            res,
+                            barcode!!.poBarcodeByScan
+                        )
 
 
-                            val receiptNoIntent = Intent()
-                            receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
-                            sendBroadcast(receiptNoIntent)
-                        }// result  = 0
-                        else {
-                            // success receive ,update list ,update fragment
-                            //if(Fristpmc3.equals("") || Fristpmm02.equals("") || Fristpmc3.equals(itemReceipt.rjReceipt.pmc03) || Fristpmm02.equals(itemReceipt.rjReceipt.pmm02)) {
+                        if (retItemReceipt != null) {
+                            if (!retItemReceipt.rjReceipt?.result.equals(ItemReceipt.RESULT_CORRECT)) {
+                                Log.e(
+                                    mTAG,
+                                    "result = " + retItemReceipt.rjReceipt?.result + " result2 = " + retItemReceipt.rjReceipt?.result2
+                                )
+                                //can't receive the item
+                                //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                                val mess = retItemReceipt.rjReceipt?.result2 as String
+                                toastLong(mess)
 
-                            //multi
-                            /*if (ReceiptList.size() > 0 ) {
+
+                                val receiptNoIntent = Intent()
+                                receiptNoIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                                sendBroadcast(receiptNoIntent)
+                            }// result  = 0
+                            else {
+                                // success receive ,update list ,update fragment
+                                //if(Fristpmc3.equals("") || Fristpmm02.equals("") || Fristpmc3.equals(itemReceipt.rjReceipt.pmc03) || Fristpmm02.equals(itemReceipt.rjReceipt.pmm02)) {
+
+                                //multi
+                                /*if (ReceiptList.size() > 0 ) {
                                 ReceiptList.removeAllItem()
                             }
 
                             addResult = ReceiptList.add(retItemReceipt)
                             itemReceipt = ReceiptList.getReceiptItem(0)*/
 
-                            //single
-                            itemReceipt = retItemReceipt
+                                //single
+                                itemReceipt = retItemReceipt
 
-                            Log.e(mTAG, "2")
-                            val refreshIntent = Intent()
-                            refreshIntent.action = Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH
-                            //refreshIntent.putExtra("RVA06", rva06)
-                            mContext!!.sendBroadcast(refreshIntent)
+                                Log.e(mTAG, "2")
+                                val refreshIntent = Intent()
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_FRAGMENT_REFRESH
+                                //refreshIntent.putExtra("RVA06", rva06)
+                                mContext!!.sendBroadcast(refreshIntent)
 
-                        }//result = 1
-                    } else {
-                        Log.e(mTAG, "retItemReceipt = null")
+                            }//result = 1
+                        } else {
+                            Log.e(mTAG, "retItemReceipt = null")
 
-                        toast(getString(R.string.receipt_this_receipt_not_exist))
+                            toast(getString(R.string.receipt_this_receipt_not_exist))
 
-                        val receiptNoIntent = Intent()
-                        receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
-                        sendBroadcast(receiptNoIntent)
+                            val receiptNoIntent = Intent()
+                            receiptNoIntent.action = Constants.ACTION.ACTION_RECEIPT_NO_NOT_EXIST
+                            sendBroadcast(receiptNoIntent)
+                        }
+                    } else { //checkServerErrorString true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -4179,12 +4215,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //single
         if (itemReceipt != null) {
-            val para = HttpParaUploadReceipt.itemReceiptToHttpParaUploadReceipt(
-                itemReceipt as ItemReceipt, user as User
-            )
 
 
-            ApiFunc().uploadReceiptSingle(para, upLoadReceiptCallback)
+            when {
+                barcode!!.poBarcodeByScan.length >= 16 -> {
+                    val para = HttpParaUploadReceipt.itemReceiptToHttpParaUploadReceipt(
+                        itemReceipt as ItemReceipt, user as User
+                    )
+                    ApiFunc().uploadReceiptSingle(para, upLoadReceiptCallback)
+                }
+                barcode!!.poBarcodeByScan.length == 13 -> {
+                    Log.d(mTAG, "=== uploadReceiptPointSingle start ===")
+                    val para = HttpParaUploadReceiptPoint.itemReceiptToHttpParaUploadReceiptPoint(
+                        itemReceipt as ItemReceipt, user as User, barcode!!.poBarcodeByScan
+                    )
+
+                    ApiFunc().uploadReceiptPointSingle(para, upLoadReceiptPointCallback)
+                }
+                else -> {
+                    val unknownIntent = Intent()
+                    unknownIntent.action = Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH
+                    sendBroadcast(unknownIntent)
+                }
+            }
+
+
+
+
         } else {
             Log.e(mTAG, "itemReceipt = null")
         }
@@ -4246,64 +4303,208 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {   // trans to list data
                     //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
                     Log.e(mTAG, "res = $res")
+                    if (!checkServerErrorString(res)) {
+                        //==== receive single record start ====
+                        val rjReceiptUpload: RJReceiptUpload =
+                            Gson().fromJson(res, RJReceiptUpload::class.java) as RJReceiptUpload
 
-                    //==== receive single record start ====
-                    val rjReceiptUpload: RJReceiptUpload = Gson().fromJson(res, RJReceiptUpload::class.java) as RJReceiptUpload
+
+                        val poLineInt = Integer.valueOf(rjReceiptUpload.pmn02)
+                        val po = rjReceiptUpload.pmn01
+                        val uploadResult = rjReceiptUpload.result
+                        val receiveNum = rjReceiptUpload.rva01// error mess when fail
+                        val receiveLine = rjReceiptUpload.rvb02
+                        //start find the raw data in list
+                        Log.e(mTAG, "po = $po")
+                        Log.e(mTAG, "uploadResult = $uploadResult")
+                        Log.e(mTAG, "receiveNum = $receiveNum")
+                        Log.e(mTAG, "receiveLine = $receiveLine")
+                        if (itemReceipt != null) {
+
+                            if (uploadResult == "1") { //success
+
+                                if (itemReceipt!!.poNumSplit == po && poLineInt == itemReceipt!!.poLineInt) {
+                                    itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
+                                    itemReceipt!!.receiveNum = receiveNum
+                                    itemReceipt!!.receiveLine = receiveLine
+                                    receiveNumUploadSuccess = receiveNum
+                                    //ReceiptList.replaceItem(item, j)
+
+                                    val successIntent = Intent()
+                                    successIntent.action =
+                                        Constants.ACTION.ACTION_RECEIPT_UPLOAD_SUCCESS
+                                    sendBroadcast(successIntent)
+
+                                } else { //po is different
+                                    val poDiffIntent = Intent()
+                                    poDiffIntent.action =
+                                        Constants.ACTION.ACTION_RECEIPT_UPLOAD_RETURN_PO_DIFF
+                                    sendBroadcast(poDiffIntent)
+
+                                    itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
+                                    Log.e(
+                                        mTAG,
+                                        getString(R.string.upload_receipt_failed_po_not_match)
+                                    )
+                                    toast(getString(R.string.upload_receipt_failed_po_not_match))
+                                }
 
 
-                    val poLineInt = Integer.valueOf(rjReceiptUpload.pmn02)
-                    val po = rjReceiptUpload.pmn01
-                    val uploadResult = rjReceiptUpload.result
-                    val receiveNum = rjReceiptUpload.rva01// error mess when fail
-                    val receiveLine = rjReceiptUpload.rvb02
-                    //start find the raw data in list
-                    Log.e(mTAG, "po = $po")
-                    Log.e(mTAG, "uploadResult = $uploadResult")
-                    Log.e(mTAG, "receiveNum = $receiveNum")
-                    Log.e(mTAG, "receiveLine = $receiveLine")
-                    if (itemReceipt != null) {
+                            } else { // upload failed, uploadResult == 0
+                                itemReceipt!!.state = ItemReceipt.ItemState.UPLOAD_FAILED
 
-                        if (uploadResult == "1") { //success
+                                val errorString: String =
+                                    getString(R.string.receipt_upload_error) + " $receiveNum " + rjReceiptUpload.rva01
+                                toast(errorString)
 
-                            if (itemReceipt!!.poNumSplit == po && poLineInt == itemReceipt!!.poLineInt) {
-                                itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
-                                itemReceipt!!.receiveNum = receiveNum
-                                itemReceipt!!.receiveLine = receiveLine
-                                receiveNumUploadSuccess = receiveNum
-                                //ReceiptList.replaceItem(item, j)
+                                val failedIntent = Intent()
+                                failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_FAILED
+                                failedIntent.putExtra("REASON", rjReceiptUpload.rva01)
+                                sendBroadcast(failedIntent)
+                            }// upload fail
 
-                                val successIntent = Intent()
-                                successIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_SUCCESS
-                                sendBroadcast(successIntent)
 
-                            } else { //po is different
-                                val poDiffIntent = Intent()
+                        } else {
+                            Log.e(mTAG, "itemReceipt = null")
+                        }
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
+                    }
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e(mTAG, "===>Exception ")
+                    // itemReceiptFromScanDifferentHeader = null;
+                    //String temp = ex.toString();
+
+                    itemReceipt!!.state = ItemReceipt.ItemState.UPLOAD_FAILED
+
+                    val exceptionIntent = Intent()
+                    exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    sendBroadcast(exceptionIntent)
+
+                    runOnUiThread {
+                        //mLoadingView.setStatus(LoadingView.GONE)
+                        //setUIToEditMode()
+                        toast(getString(R.string.toast_server_error))
+                    }
+                }
+
+                Log.e(mTAG, "===>upLoadReceiptCallback : onResponse end")
+            }
+
+
+        }//onResponse
+    }
+
+    private var upLoadReceiptPointCallback: Callback = object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            itemReceipt!!.state = ItemReceipt.ItemState.UPLOAD_FAILED
+
+            Log.e(mTAG, "upLoadReceiptPointCallback err msg = $e")
+            //itemReceiptFromScanDifferentHeader = null;
+            //runOnUiThread(netErrRunnable)
+            runOnUiThread {
+                val failIntent = Intent()
+                failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+                sendBroadcast(failIntent)
+            }
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "upLoadReceiptPointCallback onResponse : "+response.body.toString())
+            val res = ReceiveTransform.restoreToJsonStr(response.body!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                Log.e(mTAG, "===>upLoadReceiptPointCallback : onResponse start")
+                try {   // trans to list data
+                    //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
+                    Log.e(mTAG, "res = $res")
+                    if (!checkServerErrorString(res)) {
+
+                        //==== receive single record start ====
+                        val rjReceiptUpload: RJReceiptUpload =
+                            Gson().fromJson(res, RJReceiptUpload::class.java) as RJReceiptUpload
+
+
+                        val poLineInt = Integer.valueOf(rjReceiptUpload.pmn02)
+                        val po = rjReceiptUpload.pmn01
+                        val uploadResult = rjReceiptUpload.result
+                        val receiveNum = rjReceiptUpload.rva01// error mess when fail
+                        val receiveLine = rjReceiptUpload.rvb02
+                        //start find the raw data in list
+                        Log.e(mTAG, "po = $po")
+                        Log.e(mTAG, "uploadResult = $uploadResult")
+                        Log.e(mTAG, "receiveNum = $receiveNum")
+                        Log.e(mTAG, "receiveLine = $receiveLine")
+                        if (itemReceipt != null) {
+
+                            if (uploadResult == "1") { //success
+
+                                Log.e(
+                                    mTAG,
+                                    "itemReceipt!!.poNumSplit = ${itemReceipt!!.poNumSplit}, po = $po"
+                                )
+                                Log.e(
+                                    mTAG,
+                                    "poLineInt = $poLineInt, itemReceipt!!.poLineInt = ${itemReceipt!!.poLineInt}"
+                                )
+
+                                if (itemReceipt!!.poNumSplit == po && poLineInt == itemReceipt!!.poLineInt) {
+                                    itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
+                                    itemReceipt!!.receiveNum = receiveNum
+                                    itemReceipt!!.receiveLine = receiveLine
+                                    receiveNumUploadSuccess = receiveNum
+                                    //ReceiptList.replaceItem(item, j)
+
+                                    val successIntent = Intent()
+                                    successIntent.action =
+                                        Constants.ACTION.ACTION_RECEIPT_UPLOAD_SUCCESS
+                                    sendBroadcast(successIntent)
+
+                                } else { //po is different
+                                    itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
+                                    itemReceipt!!.receiveNum = receiveNum
+                                    itemReceipt!!.receiveLine = receiveLine
+                                    receiveNumUploadSuccess = receiveNum
+
+                                    val successIntent = Intent()
+                                    successIntent.action =
+                                        Constants.ACTION.ACTION_RECEIPT_UPLOAD_SUCCESS
+                                    sendBroadcast(successIntent)
+
+                                    /*val poDiffIntent = Intent()
                                 poDiffIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_RETURN_PO_DIFF
                                 sendBroadcast(poDiffIntent)
 
                                 itemReceipt!!.state = ItemReceipt.ItemState.UPLOADED
                                 Log.e(mTAG, getString(R.string.upload_receipt_failed_po_not_match))
-                                toast(getString(R.string.upload_receipt_failed_po_not_match))
-                            }
+                                toast(getString(R.string.upload_receipt_failed_po_not_match))*/
+                                }
 
 
-                        } else { // upload failed, uploadResult == 0
-                            itemReceipt!!.state = ItemReceipt.ItemState.UPLOAD_FAILED
+                            } else { // upload failed, uploadResult == 0
+                                itemReceipt!!.state = ItemReceipt.ItemState.UPLOAD_FAILED
 
-                            val errorString: String =
-                                getString(R.string.receipt_upload_error) + " $receiveNum " + rjReceiptUpload.rva01
-                            toast(errorString)
+                                val errorString: String =
+                                    getString(R.string.receipt_upload_error) + " $receiveNum " + rjReceiptUpload.rva01
+                                toast(errorString)
 
-                            val failedIntent = Intent()
-                            failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_FAILED
-                            failedIntent.putExtra("REASON", rjReceiptUpload.rva01)
-                            sendBroadcast(failedIntent)
-                        }// upload fail
+                                val failedIntent = Intent()
+                                failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOAD_FAILED
+                                failedIntent.putExtra("REASON", rjReceiptUpload.rva01)
+                                sendBroadcast(failedIntent)
+                            }// upload fail
 
 
-                    } else {
-                        Log.e(mTAG, "itemReceipt = null")
+                        } else {
+                            Log.e(mTAG, "itemReceipt = null")
+                        }
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
+
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -4390,70 +4591,93 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 Log.e(mTAG, "===>confirmUploadReceiptCallback : onResponse start")
                 try {
-                    //Log.e(mTAG, "resXmlString = $resXmlString")
-                    //var res = ReceiveTransform.restoreToJsonStr2(resString)
-                    var res = resXmlString.replace("&lt;", "<")
-                    res = res.replace("&gt;", ">")
-                    Log.e(mTAG, "res = $res")
+
+                    if (!checkServerErrorString(resXmlString)) {
+
+                        //Log.e(mTAG, "resXmlString = $resXmlString")
+                        //var res = ReceiveTransform.restoreToJsonStr2(resString)
+                        var res = resXmlString.replace("&lt;", "<")
+                        res = res.replace("&gt;", ">")
+                        Log.e(mTAG, "res = $res")
 
 
 
-                    if (res.contentEquals("Proxy encountered error during request processing")) {
-                        toast(getString(R.string.receipt_upload_confirm_retry))
+                        if (res.contentEquals("Proxy encountered error during request processing")) {
+                            toast(getString(R.string.receipt_upload_confirm_retry))
 
-                        if (itemReceipt != null)
-                            itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
-
-                        //add this to failLogList
-                        val receiptConfirmFailLog = ReceiptConfirmFailLog("Proxy Error", itemReceipt!!.receiveNum, currentDate, currentTime, "Proxy encountered error during request processing")
-                        confirmFailLogList.add(receiptConfirmFailLog)
-
-                        val failedIntent = Intent()
-                        failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
-                        sendBroadcast(failedIntent)
-                    } else {
-
-                        val stream = ByteArrayInputStream(res.toByteArray())
-                        val rjReceiptUploadConfirm = loadAndParseXML(stream)
-
-                        if (rjReceiptUploadConfirm.code == "0") {
-                            var successString: String = getString(R.string.receipt_confirm_success)
-
-                            if (rjReceiptUploadConfirm.description.isNotEmpty()) {
-                                successString += ": " + rjReceiptUploadConfirm.description
-                            }
-                            toast(successString)
-
-                            if (itemReceipt != null)
-                                itemReceipt!!.state = ItemReceipt.ItemState.CONFIRMED
-
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS
-                            sendBroadcast(successIntent)
-
-                        } else {
-
-
-                            //add this to failLogList
-                            val receiptConfirmFailLog = ReceiptConfirmFailLog(rjReceiptUploadConfirm.code, itemReceipt!!.receiveNum, currentDate, currentTime, rjReceiptUploadConfirm.description)
-                            confirmFailLogList.add(receiptConfirmFailLog)
-
-                            var errorString: String = getString(R.string.receipt_confirm_fail) + rjReceiptUploadConfirm.code + " " + rjReceiptUploadConfirm.description
-
-                            if (itemReceipt != null) {
-                                errorString += " " + getString(R.string.receipt_confirm_receipt_no) + " " + itemReceipt!!.receiveNum
-                            }
-
-
-
-                            toast(errorString)
                             if (itemReceipt != null)
                                 itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
 
+                            //add this to failLogList
+                            val receiptConfirmFailLog = ReceiptConfirmFailLog(
+                                "Proxy Error",
+                                itemReceipt!!.receiveNum,
+                                currentDate,
+                                currentTime,
+                                "Proxy encountered error during request processing"
+                            )
+                            confirmFailLogList.add(receiptConfirmFailLog)
+
                             val failedIntent = Intent()
-                            failedIntent.action = Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
+                            failedIntent.action =
+                                Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
                             sendBroadcast(failedIntent)
+                        } else {
+
+                            val stream = ByteArrayInputStream(res.toByteArray())
+                            val rjReceiptUploadConfirm = loadAndParseXML(stream)
+
+                            if (rjReceiptUploadConfirm.code == "0") {
+                                var successString: String =
+                                    getString(R.string.receipt_confirm_success)
+
+                                if (rjReceiptUploadConfirm.description.isNotEmpty()) {
+                                    successString += ": " + rjReceiptUploadConfirm.description
+                                }
+                                toast(successString)
+
+                                if (itemReceipt != null)
+                                    itemReceipt!!.state = ItemReceipt.ItemState.CONFIRMED
+
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS
+                                sendBroadcast(successIntent)
+
+                            } else {
+
+
+                                //add this to failLogList
+                                val receiptConfirmFailLog = ReceiptConfirmFailLog(
+                                    rjReceiptUploadConfirm.code,
+                                    itemReceipt!!.receiveNum,
+                                    currentDate,
+                                    currentTime,
+                                    rjReceiptUploadConfirm.description
+                                )
+                                confirmFailLogList.add(receiptConfirmFailLog)
+
+                                var errorString: String =
+                                    getString(R.string.receipt_confirm_fail) + rjReceiptUploadConfirm.code + " " + rjReceiptUploadConfirm.description
+
+                                if (itemReceipt != null) {
+                                    errorString += " " + getString(R.string.receipt_confirm_receipt_no) + " " + itemReceipt!!.receiveNum
+                                }
+
+
+
+                                toast(errorString)
+                                if (itemReceipt != null)
+                                    itemReceipt!!.state = ItemReceipt.ItemState.CONFIRM_FAILED
+
+                                val failedIntent = Intent()
+                                failedIntent.action =
+                                    Constants.ACTION.ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED
+                                sendBroadcast(failedIntent)
+                            }
                         }
+                    } else { // checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -4547,58 +4771,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     Log.e(mTAG, "=== receiptStorageList end ===")
                     */
+                    if (!checkServerErrorString(res)) {
+
+                        //single
+                        val retItemStorage = ItemStorage.transRJStorageStrToItemStorage(res)
 
 
-                    //single
-                    val retItemStorage = ItemStorage.transRJStorageStrToItemStorage(res)
+                        if (retItemStorage != null) {
+                            Log.e(
+                                mTAG,
+                                "p_cmd = " + retItemStorage.rjStorage!!.p_cmd + " p_cmd2 = " + retItemStorage.rjStorage!!.p_cmd2
+                            )
+                            //toast("p_cmd = "+retItemStorage.rjStorage!!.p_cmd+" p_cmd2 = "+retItemStorage.rjStorage!!.p_cmd2)
 
+                            if (retItemStorage.rjStorage!!.p_cmd == "0") { //1 failed
 
-                    if (retItemStorage != null) {
-                        Log.e(
-                            mTAG,
-                            "p_cmd = " + retItemStorage.rjStorage!!.p_cmd + " p_cmd2 = " + retItemStorage.rjStorage!!.p_cmd2
-                        )
-                        //toast("p_cmd = "+retItemStorage.rjStorage!!.p_cmd+" p_cmd2 = "+retItemStorage.rjStorage!!.p_cmd2)
+                                //can't receive the item
+                                //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
 
-                        if (retItemStorage.rjStorage!!.p_cmd == "0") { //1 failed
+                                //toastLong(retItemStorage.rjStorage!!.p_cmd2)
 
-                            //can't receive the item
-                            //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                                if (retItemStorage.rjStorage!!.p_cmd2.isNotEmpty()) {
+                                    //toastLong(getString(R.string.stock_in_stock_no_exist))
+                                    toastLong(retItemStorage.rjStorage!!.p_cmd2)
 
-                            //toastLong(retItemStorage.rjStorage!!.p_cmd2)
+                                    val uploadedIntent = Intent()
+                                    uploadedIntent.action =
+                                        Constants.ACTION.ACTION_STORAGE_UPLOADED_CANNOT_LOAD
+                                    sendBroadcast(uploadedIntent)
+                                } else { //not check yet
 
-                            if (retItemStorage.rjStorage!!.p_cmd2.isNotEmpty()) {
-                                //toastLong(getString(R.string.stock_in_stock_no_exist))
-                                toastLong(retItemStorage.rjStorage!!.p_cmd2)
-
-                                val uploadedIntent = Intent()
-                                uploadedIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOADED_CANNOT_LOAD
-                                sendBroadcast(uploadedIntent)
-                            } else { //not check yet
-
-                                toastLong(retItemStorage.rjStorage!!.p_cmd2)
-
-                                val receiptNoIntent = Intent()
-                                receiptNoIntent.action = Constants.ACTION.ACTION_STORAGE_RECEIPT_NO_NOT_EXIST
-                                sendBroadcast(receiptNoIntent)
-                            }
-
-
-                        } else { //p_cmd = 1,2
-
-                            if (retItemStorage.rjStorage!!.p_cmd == "1" && retItemStorage.rjStorage!!.p_cmd2.isNotEmpty()) {
-                                //
-
-                                if (retItemStorage.rjStorage!!.p_cmd2 == "1") {
-
-                                    //toastLong(getString(R.string.stock_not_in_stock_barcode))
-                                    toastLong(retItemStorage.rjStorage!!.rvb01)
+                                    toastLong(retItemStorage.rjStorage!!.p_cmd2)
 
                                     val receiptNoIntent = Intent()
                                     receiptNoIntent.action =
                                         Constants.ACTION.ACTION_STORAGE_RECEIPT_NO_NOT_EXIST
                                     sendBroadcast(receiptNoIntent)
-                                } /*else {
+                                }
+
+
+                            } else { //p_cmd = 1,2
+
+                                if (retItemStorage.rjStorage!!.p_cmd == "1" && retItemStorage.rjStorage!!.p_cmd2.isNotEmpty()) {
+                                    //
+
+                                    if (retItemStorage.rjStorage!!.p_cmd2 == "1") {
+
+                                        //toastLong(getString(R.string.stock_not_in_stock_barcode))
+                                        toastLong(retItemStorage.rjStorage!!.rvb01)
+
+                                        val receiptNoIntent = Intent()
+                                        receiptNoIntent.action =
+                                            Constants.ACTION.ACTION_STORAGE_RECEIPT_NO_NOT_EXIST
+                                        sendBroadcast(receiptNoIntent)
+                                    } /*else {
 
                                             toastLong(getString(R.string.stock_in_stock_no_exist))
 
@@ -4606,26 +4832,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                             uploadedIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOADED_CANNOT_LOAD
                                             sendBroadcast(uploadedIntent)
                                         }*/
-                            } else {
-
-                                //itemReceiptStorage = retItemReceiptStorage
-
-                                itemStorage = retItemStorage
-
-                                val refreshIntent = Intent()
-                                if (retItemStorage.rjStorage!!.p_cmd == "2") {
-                                    refreshIntent.putExtra("STOCK", true)
                                 } else {
-                                    refreshIntent.putExtra("STOCK", false)
+
+                                    //itemReceiptStorage = retItemReceiptStorage
+
+                                    itemStorage = retItemStorage
+
+                                    val refreshIntent = Intent()
+                                    if (retItemStorage.rjStorage!!.p_cmd == "2") {
+                                        refreshIntent.putExtra("STOCK", true)
+                                    } else {
+                                        refreshIntent.putExtra("STOCK", false)
+                                    }
+                                    refreshIntent.action =
+                                        Constants.ACTION.ACTION_STORAGE_FRAGMENT_REFRESH
+                                    mContext!!.sendBroadcast(refreshIntent)
                                 }
-                                refreshIntent.action = Constants.ACTION.ACTION_STORAGE_FRAGMENT_REFRESH
-                                mContext!!.sendBroadcast(refreshIntent)
                             }
+
+
+                        } else {
+                            Log.e(mTAG, "retItemReceiptStorage = null")
                         }
-
-
-                    } else {
-                        Log.e(mTAG, "retItemReceiptStorage = null")
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -4705,31 +4935,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {   // trans to list data
                     //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
                     Log.e(mTAG, "res = $res")
+                    if (!checkServerErrorString(res)) {
+                        //==== receive single record start ====
+                        val rjStorageUpload: RJStorageUpload =
+                            Gson().fromJson(res, RJStorageUpload::class.java) as RJStorageUpload
 
-                    //==== receive single record start ====
-                    val rjStorageUpload: RJStorageUpload =
-                        Gson().fromJson(res, RJStorageUpload::class.java) as RJStorageUpload
+                        val uploadResult = rjStorageUpload.result
 
-                    val uploadResult = rjStorageUpload.result
+                        Log.e(mTAG, "uploadResult = $uploadResult")
 
-                    Log.e(mTAG, "uploadResult = $uploadResult")
+                        if (uploadResult == "1") {
+                            itemStorage!!.state = ItemStorage.ItemState.UPLOADED
 
-                    if (uploadResult == "1") {
-                        itemStorage!!.state = ItemStorage.ItemState.UPLOADED
+                            val successIntent = Intent()
+                            successIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOAD_SUCCESS
+                            successIntent.putExtra("RVU01", rjStorageUpload.rvu01)
+                            sendBroadcast(successIntent)
+                        } else {
+                            itemStorage!!.state = ItemStorage.ItemState.UPLOAD_FAILED
+                            val errorString: String = rjStorageUpload.rvu01
+                            toast(errorString)
 
-                        val successIntent = Intent()
-                        successIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOAD_SUCCESS
-                        successIntent.putExtra("RVU01", rjStorageUpload.rvu01)
-                        sendBroadcast(successIntent)
-                    } else {
-                        itemStorage!!.state = ItemStorage.ItemState.UPLOAD_FAILED
-                        val errorString: String = rjStorageUpload.rvu01
-                        toast(errorString)
-
-                        val failedIntent = Intent()
-                        failedIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOAD_FAILED
-                        failedIntent.putExtra("REASON", rjStorageUpload.rvu01)
-                        sendBroadcast(failedIntent)
+                            val failedIntent = Intent()
+                            failedIntent.action = Constants.ACTION.ACTION_STORAGE_UPLOAD_FAILED
+                            failedIntent.putExtra("REASON", rjStorageUpload.rvu01)
+                            sendBroadcast(failedIntent)
+                        }
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
                     /*
@@ -4854,41 +5087,50 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
+                    if (!checkServerErrorString(jsonStr)) {
+                        materialList.clear()
 
-                    materialList.clear()
+                        val rjMaterialList =
+                            Gson().fromJson(jsonStr, ReceiveTransform.RJMaterialList::class.java)
+                        Log.e(
+                            mTAG,
+                            "rjMaterialList.dataList.size = " + rjMaterialList.dataList.size
+                        )
 
-                    val rjMaterialList = Gson().fromJson(jsonStr, ReceiveTransform.RJMaterialList::class.java)
-                    Log.e(mTAG, "rjMaterialList.dataList.size = " + rjMaterialList.dataList.size)
 
 
+                        if (rjMaterialList.dataList.size > 0) {
+                            if (rjMaterialList.dataList.size == 1) {
+                                if (rjMaterialList.dataList[0].result2.isNotEmpty()) {
+                                    val noExistIntent = Intent()
+                                    noExistIntent.action =
+                                        Constants.ACTION.ACTION_MATERIAL_NO_NOT_EXIST
+                                    mContext!!.sendBroadcast(noExistIntent)
 
-                    if (rjMaterialList.dataList.size > 0) {
-                        if (rjMaterialList.dataList.size == 1) {
-                            if (rjMaterialList.dataList[0].result2.isNotEmpty()) {
-                                val noExistIntent = Intent()
-                                noExistIntent.action = Constants.ACTION.ACTION_MATERIAL_NO_NOT_EXIST
-                                mContext!!.sendBroadcast(noExistIntent)
-
-                                toastLong(rjMaterialList.dataList[0].result2)
-                            }
-                        } else { //size > 1
-                            Log.e(mTAG, "=== materialList start ===")
-                            for (rjMaterial in rjMaterialList.dataList) {
-                                if (rjMaterial.result == "0") { //0 success
-                                    materialList.add(rjMaterial)
-                                    //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
-                                } else { //failed
-                                    Log.e(mTAG, "result = ${rjMaterial.result}")
+                                    toastLong(rjMaterialList.dataList[0].result2)
                                 }
-                            }
-                            Log.e(mTAG, "=== materialList end ===")
+                            } else { //size > 1
+                                Log.e(mTAG, "=== materialList start ===")
+                                for (rjMaterial in rjMaterialList.dataList) {
+                                    if (rjMaterial.result == "0") { //0 success
+                                        materialList.add(rjMaterial)
+                                        //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
+                                    } else { //failed
+                                        Log.e(mTAG, "result = ${rjMaterial.result}")
+                                    }
+                                }
+                                Log.e(mTAG, "=== materialList end ===")
 
-                            val refreshIntent = Intent()
-                            refreshIntent.action = Constants.ACTION.ACTION_MATERIAL_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(refreshIntent)
+                                val refreshIntent = Intent()
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_MATERIAL_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(refreshIntent)
+                            }
+                        } else { //size == 0
+                            Log.e(mTAG, "rjMaterialList size = 0")
                         }
-                    } else { //size == 0
-                        Log.e(mTAG, "rjMaterialList size = 0")
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -4941,38 +5183,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val res = response.body.toString()
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
-                Log.e(mTAG, "===>updateMaterialSendCallback : onResponse start")
-                try {   // trans to list data
-                    //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
-                    Log.e(mTAG, "res = $res")
+                if (!checkServerErrorString(res)) {
+                    Log.e(mTAG, "===>updateMaterialSendCallback : onResponse start")
+                    try {   // trans to list data
+                        //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
+                        Log.e(mTAG, "res = $res")
 
-                    //==== receive single record start ====
-                    val rjMaterialUpload: RJMaterialUpload =
-                        Gson().fromJson(res, RJMaterialUpload::class.java) as RJMaterialUpload
+                        //==== receive single record start ====
+                        val rjMaterialUpload: RJMaterialUpload =
+                            Gson().fromJson(res, RJMaterialUpload::class.java) as RJMaterialUpload
 
-                    if (rjMaterialUpload.result == ItemMaterial.RESULT_CORRECT) {
-                        val successIntent = Intent()
-                        successIntent.action = Constants.ACTION.ACTION_MATERIAL_SEND_CHANGED_SUCCESS
-                        mContext!!.sendBroadcast(successIntent)
-                    } else {
-                        val failedIntent = Intent()
-                        failedIntent.action = Constants.ACTION.ACTION_MATERIAL_SEND_CHANGED_FAILED
-                        mContext!!.sendBroadcast(failedIntent)
+                        if (rjMaterialUpload.result == ItemMaterial.RESULT_CORRECT) {
+                            val successIntent = Intent()
+                            successIntent.action =
+                                Constants.ACTION.ACTION_MATERIAL_SEND_CHANGED_SUCCESS
+                            mContext!!.sendBroadcast(successIntent)
+                        } else {
+                            val failedIntent = Intent()
+                            failedIntent.action =
+                                Constants.ACTION.ACTION_MATERIAL_SEND_CHANGED_FAILED
+                            mContext!!.sendBroadcast(failedIntent)
+                        }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.e(mTAG, "===>Exception ")
+
+                        runOnUiThread {
+                            //mLoadingView.setStatus(LoadingView.GONE)
+                            //setUIToEditMode()
+                            toast(getString(R.string.toast_server_error))
+                        }
+
                     }
 
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e(mTAG, "===>Exception ")
-
-                    runOnUiThread {
-                        //mLoadingView.setStatus(LoadingView.GONE)
-                        //setUIToEditMode()
-                        toast(getString(R.string.toast_server_error))
-                    }
-
+                    Log.e(mTAG, "===>updateMaterialSendCallback : onResponse end")
+                } else { //checkServerErrorString = true
+                    toast(getString(R.string.toast_server_error))
                 }
-
-                Log.e(mTAG, "===>updateMaterialSendCallback : onResponse end")
             }
 
 
@@ -5014,14 +5262,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-                    propertyList.clear()
+                    if (!checkServerErrorString(jsonStr)) {
+                        propertyList.clear()
 
-                    val rjPropertyList = Gson().fromJson(jsonStr, ReceiveTransform.RJPropertyList::class.java)
-                    Log.e(mTAG, "rjPropertyList.dataList.size = " + rjPropertyList.dataList.size)
+                        val rjPropertyList =
+                            Gson().fromJson(jsonStr, ReceiveTransform.RJPropertyList::class.java)
+                        Log.e(
+                            mTAG,
+                            "rjPropertyList.dataList.size = " + rjPropertyList.dataList.size
+                        )
 
-                    if (rjPropertyList.dataList.size > 0) {
-                        if (rjPropertyList.dataList.size == 1) {
-                            if (rjPropertyList.dataList[0].result == "0") {
+                        if (rjPropertyList.dataList.size > 0) {
+                            if (rjPropertyList.dataList.size == 1) {
+                                if (rjPropertyList.dataList[0].result == "0") {
+                                    Log.e(mTAG, "=== propertyList start ===")
+                                    for (rjProperty in rjPropertyList.dataList) {
+                                        if (rjProperty.result == "0") { //0 success
+                                            propertyList.add(rjProperty)
+                                            //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
+                                        } else { //failed
+                                            Log.e(mTAG, "rjProperty.result = ${rjProperty.result}")
+                                        }
+                                    }
+                                    Log.e(mTAG, "=== propertyList end ===")
+
+                                    val refreshIntent = Intent()
+                                    refreshIntent.action =
+                                        Constants.ACTION.ACTION_PROPERTY_FRAGMENT_REFRESH
+                                    mContext!!.sendBroadcast(refreshIntent)
+                                } else {
+                                    val noExistIntent = Intent()
+                                    noExistIntent.action =
+                                        Constants.ACTION.ACTION_PROPERTY_NO_NOT_EXIST
+                                    mContext!!.sendBroadcast(noExistIntent)
+
+                                    toastLong(rjPropertyList.dataList[0].faj01)
+                                }
+
+                                //if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
+
+                                //}
+                            } else { //size > 1
                                 Log.e(mTAG, "=== propertyList start ===")
                                 for (rjProperty in rjPropertyList.dataList) {
                                     if (rjProperty.result == "0") { //0 success
@@ -5034,37 +5315,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 Log.e(mTAG, "=== propertyList end ===")
 
                                 val refreshIntent = Intent()
-                                refreshIntent.action = Constants.ACTION.ACTION_PROPERTY_FRAGMENT_REFRESH
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_PROPERTY_FRAGMENT_REFRESH
                                 mContext!!.sendBroadcast(refreshIntent)
-                            } else {
-                                val noExistIntent = Intent()
-                                noExistIntent.action = Constants.ACTION.ACTION_PROPERTY_NO_NOT_EXIST
-                                mContext!!.sendBroadcast(noExistIntent)
-
-                                toastLong(rjPropertyList.dataList[0].faj01)
                             }
-
-                            //if (rjPropertyList.dataList[0].faj01.isNotEmpty()) {
-
-                            //}
-                        } else { //size > 1
-                            Log.e(mTAG, "=== propertyList start ===")
-                            for (rjProperty in rjPropertyList.dataList) {
-                                if (rjProperty.result == "0") { //0 success
-                                    propertyList.add(rjProperty)
-                                    //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
-                                } else { //failed
-                                    Log.e(mTAG, "rjProperty.result = ${rjProperty.result}")
-                                }
-                            }
-                            Log.e(mTAG, "=== propertyList end ===")
-
-                            val refreshIntent = Intent()
-                            refreshIntent.action = Constants.ACTION.ACTION_PROPERTY_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(refreshIntent)
+                        } else { //size == 0
+                            Log.e(mTAG, "rjMaterialList size = 0")
                         }
-                    } else { //size == 0
-                        Log.e(mTAG, "rjMaterialList size = 0")
+                    } else {// checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5118,37 +5377,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
-                    val retItemGuest = ItemGuest.transRJGuestStrToItemGuest(res)
+                    if (!checkServerErrorString(res)) {
 
-                    if (retItemGuest != null) {
-                        if (!retItemGuest.rjGuest?.result.equals(ItemGuest.RESULT_CORRECT)) {
-                            Log.e(mTAG, "result = " + retItemGuest.rjGuest?.result + " result2 = " + retItemGuest.rjGuest?.result2)
-                            //can't receive the item
-                            //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
-                            val mess = retItemGuest.rjGuest?.result2 as String
-                            toastLong(mess)
+                        val retItemGuest = ItemGuest.transRJGuestStrToItemGuest(res)
 
-
-                            val refreshIntent = Intent()
-                            refreshIntent.action = Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_FAILED
-                            mContext!!.sendBroadcast(refreshIntent)
-                        }// result  = 0
-                        else {
-                            // success receive ,update list ,update fragment
-                            Log.d(mTAG, "guest In or Out success!")
-
-                            val msg = retItemGuest.rjGuest?.data1 as String
-                            toastLong(msg)
-
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_SUCCESS
-                            mContext!!.sendBroadcast(successIntent)
-
-                        }//result = 1
-                    } else {
-                        Log.e(mTAG, "retItemGuest = null")
+                        if (retItemGuest != null) {
+                            if (!retItemGuest.rjGuest?.result.equals(ItemGuest.RESULT_CORRECT)) {
+                                Log.e(
+                                    mTAG,
+                                    "result = " + retItemGuest.rjGuest?.result + " result2 = " + retItemGuest.rjGuest?.result2
+                                )
+                                //can't receive the item
+                                //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                                val mess = retItemGuest.rjGuest?.result2 as String
+                                toastLong(mess)
 
 
+                                val refreshIntent = Intent()
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_FAILED
+                                mContext!!.sendBroadcast(refreshIntent)
+                            }// result  = 0
+                            else {
+                                // success receive ,update list ,update fragment
+                                Log.d(mTAG, "guest In or Out success!")
+
+                                val msg = retItemGuest.rjGuest?.data1 as String
+                                toastLong(msg)
+
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_GUEST_IN_OR_LEAVE_SUCCESS
+                                mContext!!.sendBroadcast(successIntent)
+
+                            }//result = 1
+                        } else {
+                            Log.e(mTAG, "retItemGuest = null")
+
+
+                        }
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5192,73 +5461,77 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-                    //guestList.clear()
-                    when(currentSearchPlant) {
-                        "A" -> guestListA.clear()
-                        "B" -> guestListB.clear()
-                        else -> guestListT.clear()
-                    }
+                    if (!checkServerErrorString(jsonStr)) {
+                        //guestList.clear()
+                        when (currentSearchPlant) {
+                            "A" -> guestListA.clear()
+                            "B" -> guestListB.clear()
+                            else -> guestListT.clear()
+                        }
 
-                    val rjGuestList = Gson().fromJson(jsonStr, ReceiveTransform.RJGuestList::class.java)
-                    Log.e(mTAG, "rjGuestList.dataList.size = " + rjGuestList.dataList.size)
+                        val rjGuestList =
+                            Gson().fromJson(jsonStr, ReceiveTransform.RJGuestList::class.java)
+                        Log.e(mTAG, "rjGuestList.dataList.size = " + rjGuestList.dataList.size)
 
-                    if (rjGuestList.dataList.size > 0) {
+                        if (rjGuestList.dataList.size > 0) {
 
-                        Log.e(mTAG, "=== guestList start ===")
+                            Log.e(mTAG, "=== guestList start ===")
 
-                        if (rjGuestList.dataList.size == 1) {
-                            if (rjGuestList.dataList[0].result == "0") { //0 success
-                                when(currentSearchPlant) {
-                                    "A" -> {
-                                        guestListA.add(rjGuestList.dataList[0])
-                                        val successIntent = Intent()
-                                        //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                        successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                        mContext!!.sendBroadcast(successIntent)
+                            if (rjGuestList.dataList.size == 1) {
+                                if (rjGuestList.dataList[0].result == "0") { //0 success
+                                    when (currentSearchPlant) {
+                                        "A" -> {
+                                            guestListA.add(rjGuestList.dataList[0])
+                                            val successIntent = Intent()
+                                            //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                            successIntent.action =
+                                                Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                            mContext!!.sendBroadcast(successIntent)
+                                        }
+                                        "B" -> {
+                                            guestListB.add(rjGuestList.dataList[0])
+                                            val successIntent = Intent()
+                                            successIntent.action =
+                                                Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                            mContext!!.sendBroadcast(successIntent)
+                                        }
+                                        else -> {
+                                            guestListT.add(rjGuestList.dataList[0])
+                                            val successIntent = Intent()
+                                            //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                            successIntent.action =
+                                                Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                            mContext!!.sendBroadcast(successIntent)
+                                        }
                                     }
-                                    "B" -> {
-                                        guestListB.add(rjGuestList.dataList[0])
-                                        val successIntent = Intent()
-                                        successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                        mContext!!.sendBroadcast(successIntent)
-                                    }
-                                    else -> {
-                                        guestListT.add(rjGuestList.dataList[0])
-                                        val successIntent = Intent()
-                                        //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                        successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                        mContext!!.sendBroadcast(successIntent)
-                                    }
-                                }
-                                //guestList.add(rjGuestList.dataList[0])
+                                    //guestList.add(rjGuestList.dataList[0])
 
-                                /*val successIntent = Intent()
+                                    /*val successIntent = Intent()
                                 successIntent.action = Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_SUCCESS
                                 mContext!!.sendBroadcast(successIntent)*/
-                            } else {
+                                } else {
 
-                                isBarcodeScanning = false
-                                //val errorString = intent.getStringExtra("result2")
-                                val errorString = rjGuestList.dataList[0].result2
-                                toast(errorString)
-
-
-                                val errorIntent = Intent()
-                                errorIntent.action = Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED
-                                //errorIntent.putExtra("result2", rjGuestList.dataList[0].result2)
-                                mContext!!.sendBroadcast(errorIntent)
+                                    isBarcodeScanning = false
+                                    //val errorString = intent.getStringExtra("result2")
+                                    val errorString = rjGuestList.dataList[0].result2
+                                    toast(errorString)
 
 
+                                    val errorIntent = Intent()
+                                    errorIntent.action =
+                                        Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED
+                                    //errorIntent.putExtra("result2", rjGuestList.dataList[0].result2)
+                                    mContext!!.sendBroadcast(errorIntent)
 
 
-                                /*if (currentSearchPlant.contentEquals(currentPlant)) {
+                                    /*if (currentSearchPlant.contentEquals(currentPlant)) {
                                     val errorIntent = Intent()
                                     errorIntent.action = Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_FAILED
                                     errorIntent.putExtra("result2", rjGuestList.dataList[0].result2)
                                     mContext!!.sendBroadcast(errorIntent)
                                 }*/
 
-                                /*when(currentSearchPlant) {
+                                    /*when(currentSearchPlant) {
                                     "A" -> {
                                         val nextIntent = Intent()
                                         nextIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
@@ -5276,84 +5549,93 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     }
                                 }*/
 
-                            }
+                                }
 
-                        } else { //size > 1
-                            var error = 0
-                            for (rjGuest in rjGuestList.dataList) {
-                                if (rjGuest.result == "0") { //0 success
-                                    when(currentSearchPlant) {
-                                        "A" -> guestListA.add(rjGuest)
-                                        "B" -> guestListB.add(rjGuest)
-                                        else -> guestListT.add(rjGuest)
+                            } else { //size > 1
+                                var error = 0
+                                for (rjGuest in rjGuestList.dataList) {
+                                    if (rjGuest.result == "0") { //0 success
+                                        when (currentSearchPlant) {
+                                            "A" -> guestListA.add(rjGuest)
+                                            "B" -> guestListB.add(rjGuest)
+                                            else -> guestListT.add(rjGuest)
+                                        }
+                                        //guestList.add(rjGuest)
+                                        //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
+
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(mTAG, "rjGuest.result = ${rjGuest.result}")
                                     }
-                                    //guestList.add(rjGuest)
-                                    //Log.d(mTAG, "rjMaterial = "+rjMaterial.ima02)
+                                }
 
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rjGuest.result = ${rjGuest.result}")
+                                Log.d(mTAG, "error = $error")
+                                when (currentSearchPlant) {
+                                    "A" -> {
+                                        val successIntent = Intent()
+                                        //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                        successIntent.action =
+                                            Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                        mContext!!.sendBroadcast(successIntent)
+                                    }
+                                    "B" -> {
+                                        val successIntent = Intent()
+                                        successIntent.action =
+                                            Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                        mContext!!.sendBroadcast(successIntent)
+                                    }
+                                    else -> {
+                                        val successIntent = Intent()
+                                        //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                        successIntent.action =
+                                            Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                        mContext!!.sendBroadcast(successIntent)
+                                    }
                                 }
-                            }
-
-                            Log.d(mTAG, "error = $error")
-                            when(currentSearchPlant) {
-                                "A" -> {
-                                    val successIntent = Intent()
-                                    //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                    successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                    mContext!!.sendBroadcast(successIntent)
-                                }
-                                "B" -> {
-                                    val successIntent = Intent()
-                                    successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                    mContext!!.sendBroadcast(successIntent)
-                                }
-                                else -> {
-                                    val successIntent = Intent()
-                                    //successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                    successIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                    mContext!!.sendBroadcast(successIntent)
-                                }
-                            }
-                            /*val successIntent = Intent()
+                                /*val successIntent = Intent()
                             successIntent.action = Constants.ACTION.ACTION_GUEST_GET_CURRENT_PLANT_GUEST_SUCCESS
                             mContext!!.sendBroadcast(successIntent)*/
-                        }
-
-
-                        Log.e(mTAG, "=== guestList end ===")
-
-                        //val refreshIntent = Intent()
-                        //refreshIntent.action = Constants.ACTION.ACTION_GUEST_FRAGMENT_REFRESH
-                        //!!.sendBroadcast(refreshIntent)
-
-                    } else { //size == 0
-                        when(currentSearchPlant) {
-                            "A" -> {
-                                val noExistIntent = Intent()
-                                //noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                mContext!!.sendBroadcast(noExistIntent)
                             }
-                            "B" -> {
-                                val noExistIntent = Intent()
-                                noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                mContext!!.sendBroadcast(noExistIntent)
-                            }
-                            else -> {
-                                val noExistIntent = Intent()
-                                //noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
-                                noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
-                                mContext!!.sendBroadcast(noExistIntent)
-                            }
-                        }
 
-                        /*Log.e(mTAG, "rjGuestList size = 0")
+
+                            Log.e(mTAG, "=== guestList end ===")
+
+                            //val refreshIntent = Intent()
+                            //refreshIntent.action = Constants.ACTION.ACTION_GUEST_FRAGMENT_REFRESH
+                            //!!.sendBroadcast(refreshIntent)
+
+                        } else { //size == 0
+                            when (currentSearchPlant) {
+                                "A" -> {
+                                    val noExistIntent = Intent()
+                                    //noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                    noExistIntent.action =
+                                        Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                    mContext!!.sendBroadcast(noExistIntent)
+                                }
+                                "B" -> {
+                                    val noExistIntent = Intent()
+                                    noExistIntent.action =
+                                        Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                    mContext!!.sendBroadcast(noExistIntent)
+                                }
+                                else -> {
+                                    val noExistIntent = Intent()
+                                    //noExistIntent.action = Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_NEXT_ACTION
+                                    noExistIntent.action =
+                                        Constants.ACTION.ACTION_GUEST_SEARCH_GUEST_COMPLETE
+                                    mContext!!.sendBroadcast(noExistIntent)
+                                }
+                            }
+
+                            /*Log.e(mTAG, "rjGuestList size = 0")
                         val noExistIntent = Intent()
                         noExistIntent.action = Constants.ACTION.ACTION_GUEST_LIST_CLEAR
                         mContext!!.sendBroadcast(noExistIntent)*/
+                        }
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5395,50 +5677,67 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(jsonStr)) {
+                        val rjOutSourceProcessedList = Gson().fromJson(
+                            jsonStr,
+                            ReceiveTransform.RJOutSourcedProcesseList::class.java
+                        )
+                        Log.e(
+                            mTAG,
+                            "rjOutSourceProcessedList.dataList.size = " + rjOutSourceProcessedList.dataList.size
+                        )
 
-                    val rjOutSourceProcessedList = Gson().fromJson(jsonStr, ReceiveTransform.RJOutSourcedProcesseList::class.java)
-                    Log.e(mTAG, "rjOutSourceProcessedList.dataList.size = " + rjOutSourceProcessedList.dataList.size)
+                        outsourcedProcessOrderList.clear()
 
-                    outsourcedProcessOrderList.clear()
-
-                    if (rjOutSourceProcessedList.dataList.size > 0) {
-                        if (rjOutSourceProcessedList.dataList.size == 1) {
-                            if (rjOutSourceProcessedList.dataList[0].result == "0" && rjOutSourceProcessedList.dataList[0].result2 == "") { //success
+                        if (rjOutSourceProcessedList.dataList.size > 0) {
+                            if (rjOutSourceProcessedList.dataList.size == 1) {
+                                if (rjOutSourceProcessedList.dataList[0].result == "0" && rjOutSourceProcessedList.dataList[0].result2 == "") { //success
 
 
-                                outsourcedProcessOrderList.add(rjOutSourceProcessedList.dataList[0])
+                                    outsourcedProcessOrderList.add(rjOutSourceProcessedList.dataList[0])
+                                    fabBack!!.visibility = View.VISIBLE
+                                    fabSign!!.visibility = View.VISIBLE
+                                } else {
+
+                                    Log.e(
+                                        mTAG,
+                                        "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedList.dataList[0].result2}"
+                                    )
+                                    toast(rjOutSourceProcessedList.dataList[0].result2)
+                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
+                            } else { //rjOutSourceProcessedList.dataList.size > 1
+                                var error = 0
+
+                                for (rjOutSourceProcessed in rjOutSourceProcessedList.dataList) {
+                                    if (rjOutSourceProcessed.result == "0") { //0 success
+
+                                        outsourcedProcessOrderList.add(rjOutSourceProcessed)
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(
+                                            mTAG,
+                                            "rjOutSourceProcessed.result = ${rjOutSourceProcessed.result2}"
+                                        )
+                                    }
+                                }
+
                                 fabBack!!.visibility = View.VISIBLE
                                 fabSign!!.visibility = View.VISIBLE
-                            } else {
 
-                                Log.e(mTAG, "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedList.dataList[0].result2}")
-                                toast(rjOutSourceProcessedList.dataList[0].result2)
-                            }
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
-                        } else { //rjOutSourceProcessedList.dataList.size > 1
-                            var error = 0
-
-                            for (rjOutSourceProcessed in rjOutSourceProcessedList.dataList) {
-                                if (rjOutSourceProcessed.result == "0") { //0 success
-
-                                    outsourcedProcessOrderList.add(rjOutSourceProcessed)
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rjOutSourceProcessed.result = ${rjOutSourceProcessed.result2}")
-                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
                             }
 
-                            fabBack!!.visibility = View.VISIBLE
-                            fabSign!!.visibility = View.VISIBLE
-
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_DETAIL_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
                         }
-
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5487,45 +5786,67 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
-                    val rjOutSourceProcessedListBySupplier = Gson().fromJson(jsonStr, ReceiveTransform.RJOutSourcedProcesseListBySupplier::class.java)
-                    Log.e(mTAG, "rjOutSourceProcessedListBySupplier.dataList.size = " + rjOutSourceProcessedListBySupplier.dataList.size)
+                    if (!checkServerErrorString(jsonStr)) {
+                        val rjOutSourceProcessedListBySupplier = Gson().fromJson(
+                            jsonStr,
+                            ReceiveTransform.RJOutSourcedProcesseListBySupplier::class.java
+                        )
+                        Log.e(
+                            mTAG,
+                            "rjOutSourceProcessedListBySupplier.dataList.size = " + rjOutSourceProcessedListBySupplier.dataList.size
+                        )
 
-                    outsourcedProcessOrderListBySupplier.clear()
+                        outsourcedProcessOrderListBySupplier.clear()
 
-                    if (rjOutSourceProcessedListBySupplier.dataList.size > 0) {
-                        if (rjOutSourceProcessedListBySupplier.dataList.size == 1) {
-                            if (rjOutSourceProcessedListBySupplier.dataList[0].result == "0" && rjOutSourceProcessedListBySupplier.dataList[0].result2 == "") { //success
+                        if (rjOutSourceProcessedListBySupplier.dataList.size > 0) {
+                            if (rjOutSourceProcessedListBySupplier.dataList.size == 1) {
+                                if (rjOutSourceProcessedListBySupplier.dataList[0].result == "0" && rjOutSourceProcessedListBySupplier.dataList[0].result2 == "") { //success
 
 
-                                outsourcedProcessOrderListBySupplier.add(rjOutSourceProcessedListBySupplier.dataList[0])
+                                    outsourcedProcessOrderListBySupplier.add(
+                                        rjOutSourceProcessedListBySupplier.dataList[0]
+                                    )
 
-                            } else {
+                                } else {
 
-                                Log.e(mTAG, "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedListBySupplier.dataList[0].result2}")
-                                toast(rjOutSourceProcessedListBySupplier.dataList[0].result2)
-                            }
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
-                        } else { //rjOutSourceProcessedList.dataList.size > 1
-                            var error = 0
-
-                            for (rjOutSourceProcessedBySupplier in rjOutSourceProcessedListBySupplier.dataList) {
-                                if (rjOutSourceProcessedBySupplier.result == "0") { //0 success
-
-                                    outsourcedProcessOrderListBySupplier.add(rjOutSourceProcessedBySupplier)
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rjOutSourceProcessedBySupplier.result = ${rjOutSourceProcessedBySupplier.result2}")
+                                    Log.e(
+                                        mTAG,
+                                        "rjOutSourceProcessedList.dataList[0].result2 = ${rjOutSourceProcessedListBySupplier.dataList[0].result2}"
+                                    )
+                                    toast(rjOutSourceProcessedListBySupplier.dataList[0].result2)
                                 }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
+                            } else { //rjOutSourceProcessedList.dataList.size > 1
+                                var error = 0
+
+                                for (rjOutSourceProcessedBySupplier in rjOutSourceProcessedListBySupplier.dataList) {
+                                    if (rjOutSourceProcessedBySupplier.result == "0") { //0 success
+
+                                        outsourcedProcessOrderListBySupplier.add(
+                                            rjOutSourceProcessedBySupplier
+                                        )
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(
+                                            mTAG,
+                                            "rjOutSourceProcessedBySupplier.result = ${rjOutSourceProcessedBySupplier.result2}"
+                                        )
+                                    }
+                                }
+
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
                             }
 
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
                         }
-
+                    } else { //checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5572,21 +5893,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(res)) {
+                        //==== receive single record start ====
+                        val rjOutSourcedConfirm: RJOutSourcedConfirm = Gson().fromJson(
+                            res,
+                            RJOutSourcedConfirm::class.java
+                        ) as RJOutSourcedConfirm
 
-                    //==== receive single record start ====
-                    val rjOutSourcedConfirm: RJOutSourcedConfirm = Gson().fromJson(res, RJOutSourcedConfirm::class.java) as RJOutSourcedConfirm
+                        if (rjOutSourcedConfirm.result == "0") {
+                            val successIntent = Intent()
+                            successIntent.action =
+                                Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
+                            successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
+                            mContext!!.sendBroadcast(successIntent)
+                        } else {
+                            val failedIntent = Intent()
+                            failedIntent.action =
+                                Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED
+                            mContext!!.sendBroadcast(failedIntent)
 
-                    if (rjOutSourcedConfirm.result == "0") {
-                        val successIntent = Intent()
-                        successIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
-                        successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
-                        mContext!!.sendBroadcast(successIntent)
-                    } else {
-                        val failedIntent = Intent()
-                        failedIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED
-                        mContext!!.sendBroadcast(failedIntent)
-
-                        toast(rjOutSourcedConfirm.result2)
+                            toast(rjOutSourcedConfirm.result2)
+                        }
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5630,50 +5959,67 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(jsonStr)) {
+                        val rjIssuanceLookupList = Gson().fromJson(
+                            jsonStr,
+                            ReceiveTransform.RJIssuanceLookupList::class.java
+                        )
+                        Log.e(
+                            mTAG,
+                            "rjIssuanceLookupList.dataList.size = " + rjIssuanceLookupList.dataList.size
+                        )
 
-                    val rjIssuanceLookupList = Gson().fromJson(jsonStr, ReceiveTransform.RJIssuanceLookupList::class.java)
-                    Log.e(mTAG, "rjIssuanceLookupList.dataList.size = " + rjIssuanceLookupList.dataList.size)
+                        issuanceLookupList.clear()
 
-                    issuanceLookupList.clear()
-
-                    if (rjIssuanceLookupList.dataList.size > 0) {
-                        if (rjIssuanceLookupList.dataList.size == 1) {
-                            if (rjIssuanceLookupList.dataList[0].result == "0" && rjIssuanceLookupList.dataList[0].result2 == "") { //success
+                        if (rjIssuanceLookupList.dataList.size > 0) {
+                            if (rjIssuanceLookupList.dataList.size == 1) {
+                                if (rjIssuanceLookupList.dataList[0].result == "0" && rjIssuanceLookupList.dataList[0].result2 == "") { //success
 
 
-                                issuanceLookupList.add(rjIssuanceLookupList.dataList[0])
+                                    issuanceLookupList.add(rjIssuanceLookupList.dataList[0])
+                                    //fabBack!!.visibility = View.VISIBLE
+                                    //fabSign!!.visibility = View.VISIBLE
+                                } else {
+
+                                    Log.e(
+                                        mTAG,
+                                        "rjIssuanceLookupList.dataList[0].result2 = ${rjIssuanceLookupList.dataList[0].result2}"
+                                    )
+                                    toast(rjIssuanceLookupList.dataList[0].result2)
+                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
+                            } else { //rjOutSourceProcessedList.dataList.size > 1
+                                var error = 0
+
+                                for (rjIssuanceLookup in rjIssuanceLookupList.dataList) {
+                                    if (rjIssuanceLookup.result == "0") { //0 success
+
+                                        issuanceLookupList.add(rjIssuanceLookup)
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(
+                                            mTAG,
+                                            "rjIssuanceLookup.result = ${rjIssuanceLookup.result2}"
+                                        )
+                                    }
+                                }
+
                                 //fabBack!!.visibility = View.VISIBLE
                                 //fabSign!!.visibility = View.VISIBLE
-                            } else {
 
-                                Log.e(mTAG, "rjIssuanceLookupList.dataList[0].result2 = ${rjIssuanceLookupList.dataList[0].result2}")
-                                toast(rjIssuanceLookupList.dataList[0].result2)
-                            }
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
-                        } else { //rjOutSourceProcessedList.dataList.size > 1
-                            var error = 0
-
-                            for (rjIssuanceLookup in rjIssuanceLookupList.dataList) {
-                                if (rjIssuanceLookup.result == "0") { //0 success
-
-                                    issuanceLookupList.add(rjIssuanceLookup)
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rjIssuanceLookup.result = ${rjIssuanceLookup.result2}")
-                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
                             }
 
-                            //fabBack!!.visibility = View.VISIBLE
-                            //fabSign!!.visibility = View.VISIBLE
-
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_ISSUANCE_LOOKUP_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
                         }
-
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5722,46 +6068,63 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(jsonStr)) {
+                        val rJReturnOfGoodsListBySupplier = Gson().fromJson(
+                            jsonStr,
+                            ReceiveTransform.RJReturnOfGoodsListBySupplier::class.java
+                        )
+                        Log.e(
+                            mTAG,
+                            "RJReturnOfGoodsListBySupplier.dataList.size = " + rJReturnOfGoodsListBySupplier.dataList.size
+                        )
 
-                    val rJReturnOfGoodsListBySupplier = Gson().fromJson(jsonStr, ReceiveTransform.RJReturnOfGoodsListBySupplier::class.java)
-                    Log.e(mTAG, "RJReturnOfGoodsListBySupplier.dataList.size = " + rJReturnOfGoodsListBySupplier.dataList.size)
+                        returnOfGoodsListBySupplier.clear()
 
-                    returnOfGoodsListBySupplier.clear()
-
-                    if (rJReturnOfGoodsListBySupplier.dataList.size > 0) {
-                        if (rJReturnOfGoodsListBySupplier.dataList.size == 1) {
-                            if (rJReturnOfGoodsListBySupplier.dataList[0].result == "0" && rJReturnOfGoodsListBySupplier.dataList[0].result2 == "") { //success
+                        if (rJReturnOfGoodsListBySupplier.dataList.size > 0) {
+                            if (rJReturnOfGoodsListBySupplier.dataList.size == 1) {
+                                if (rJReturnOfGoodsListBySupplier.dataList[0].result == "0" && rJReturnOfGoodsListBySupplier.dataList[0].result2 == "") { //success
 
 
-                                returnOfGoodsListBySupplier.add(rJReturnOfGoodsListBySupplier.dataList[0])
+                                    returnOfGoodsListBySupplier.add(rJReturnOfGoodsListBySupplier.dataList[0])
 
-                            } else {
+                                } else {
 
-                                Log.e(mTAG, "rJReturnOfGoodsListBySupplier.dataList[0].result2 = ${rJReturnOfGoodsListBySupplier.dataList[0].result2}")
-                                toast(rJReturnOfGoodsListBySupplier.dataList[0].result2)
-                            }
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
-                        } else { //rjOutSourceProcessedList.dataList.size > 1
-                            var error = 0
-
-                            for (rJReturnOfGoodsBySupplier in rJReturnOfGoodsListBySupplier.dataList) {
-                                if (rJReturnOfGoodsBySupplier.result == "0") { //0 success
-
-                                    returnOfGoodsListBySupplier.add(rJReturnOfGoodsBySupplier)
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rJReturnOfGoodsBySupplier.result = ${rJReturnOfGoodsBySupplier.result2}")
+                                    Log.e(
+                                        mTAG,
+                                        "rJReturnOfGoodsListBySupplier.dataList[0].result2 = ${rJReturnOfGoodsListBySupplier.dataList[0].result2}"
+                                    )
+                                    toast(rJReturnOfGoodsListBySupplier.dataList[0].result2)
                                 }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
+                            } else { //rjOutSourceProcessedList.dataList.size > 1
+                                var error = 0
+
+                                for (rJReturnOfGoodsBySupplier in rJReturnOfGoodsListBySupplier.dataList) {
+                                    if (rJReturnOfGoodsBySupplier.result == "0") { //0 success
+
+                                        returnOfGoodsListBySupplier.add(rJReturnOfGoodsBySupplier)
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(
+                                            mTAG,
+                                            "rJReturnOfGoodsBySupplier.result = ${rJReturnOfGoodsBySupplier.result2}"
+                                        )
+                                    }
+                                }
+
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
                             }
 
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
                         }
-
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5803,50 +6166,67 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(jsonStr)) {
+                        val rjReturnOfGoodsDetailList = Gson().fromJson(
+                            jsonStr,
+                            ReceiveTransform.RJReturnOfGoodsDetailList::class.java
+                        )
+                        Log.e(
+                            mTAG,
+                            "rjReturnOfGoodsDetailList.dataList.size = " + rjReturnOfGoodsDetailList.dataList.size
+                        )
 
-                    val rjReturnOfGoodsDetailList = Gson().fromJson(jsonStr, ReceiveTransform.RJReturnOfGoodsDetailList::class.java)
-                    Log.e(mTAG, "rjReturnOfGoodsDetailList.dataList.size = " + rjReturnOfGoodsDetailList.dataList.size)
+                        returnOfGoodsDetailList.clear()
 
-                    returnOfGoodsDetailList.clear()
-
-                    if (rjReturnOfGoodsDetailList.dataList.size > 0) {
-                        if (rjReturnOfGoodsDetailList.dataList.size == 1) {
-                            if (rjReturnOfGoodsDetailList.dataList[0].result == "0" && rjReturnOfGoodsDetailList.dataList[0].result2 == "") { //success
+                        if (rjReturnOfGoodsDetailList.dataList.size > 0) {
+                            if (rjReturnOfGoodsDetailList.dataList.size == 1) {
+                                if (rjReturnOfGoodsDetailList.dataList[0].result == "0" && rjReturnOfGoodsDetailList.dataList[0].result2 == "") { //success
 
 
-                                returnOfGoodsDetailList.add(rjReturnOfGoodsDetailList.dataList[0])
+                                    returnOfGoodsDetailList.add(rjReturnOfGoodsDetailList.dataList[0])
+                                    fabBack!!.visibility = View.VISIBLE
+                                    fabSign!!.visibility = View.VISIBLE
+                                } else {
+
+                                    Log.e(
+                                        mTAG,
+                                        "rjReturnOfGoodsDetailList.dataList[0].result2 = ${rjReturnOfGoodsDetailList.dataList[0].result2}"
+                                    )
+                                    toast(rjReturnOfGoodsDetailList.dataList[0].result2)
+                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
+                            } else { //rjOutSourceProcessedList.dataList.size > 1
+                                var error = 0
+
+                                for (rfReturnOfGoodsDetail in rjReturnOfGoodsDetailList.dataList) {
+                                    if (rfReturnOfGoodsDetail.result == "0") { //0 success
+
+                                        returnOfGoodsDetailList.add(rfReturnOfGoodsDetail)
+
+                                    } else { //failed
+                                        error++
+                                        Log.e(
+                                            mTAG,
+                                            "rfReturnOfGoodsDetail.result = ${rfReturnOfGoodsDetail.result2}"
+                                        )
+                                    }
+                                }
+
                                 fabBack!!.visibility = View.VISIBLE
                                 fabSign!!.visibility = View.VISIBLE
-                            } else {
 
-                                Log.e(mTAG, "rjReturnOfGoodsDetailList.dataList[0].result2 = ${rjReturnOfGoodsDetailList.dataList[0].result2}")
-                                toast(rjReturnOfGoodsDetailList.dataList[0].result2)
-                            }
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
-                        } else { //rjOutSourceProcessedList.dataList.size > 1
-                            var error = 0
-
-                            for (rfReturnOfGoodsDetail in rjReturnOfGoodsDetailList.dataList) {
-                                if (rfReturnOfGoodsDetail.result == "0") { //0 success
-
-                                    returnOfGoodsDetailList.add(rfReturnOfGoodsDetail)
-
-                                } else { //failed
-                                    error++
-                                    Log.e(mTAG, "rfReturnOfGoodsDetail.result = ${rfReturnOfGoodsDetail.result2}")
-                                }
+                                val successIntent = Intent()
+                                successIntent.action =
+                                    Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
+                                mContext!!.sendBroadcast(successIntent)
                             }
 
-                            fabBack!!.visibility = View.VISIBLE
-                            fabSign!!.visibility = View.VISIBLE
-
-                            val successIntent = Intent()
-                            successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH
-                            mContext!!.sendBroadcast(successIntent)
                         }
-
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 
@@ -5897,21 +6277,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
+                    if (!checkServerErrorString(res)) {
+                        //==== receive single record start ====
+                        val rjReturnOfGoodsConfirm: RJReturnOfGoodsConfirm = Gson().fromJson(
+                            res,
+                            RJReturnOfGoodsConfirm::class.java
+                        ) as RJReturnOfGoodsConfirm
 
-                    //==== receive single record start ====
-                    val rjReturnOfGoodsConfirm: RJReturnOfGoodsConfirm = Gson().fromJson(res, RJReturnOfGoodsConfirm::class.java) as RJReturnOfGoodsConfirm
+                        if (rjReturnOfGoodsConfirm.result == "0") {
+                            val successIntent = Intent()
+                            successIntent.action =
+                                Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS
+                            successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
+                            mContext!!.sendBroadcast(successIntent)
+                        } else {
+                            val failedIntent = Intent()
+                            failedIntent.action =
+                                Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED
+                            mContext!!.sendBroadcast(failedIntent)
 
-                    if (rjReturnOfGoodsConfirm.result == "0") {
-                        val successIntent = Intent()
-                        successIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS
-                        successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
-                        mContext!!.sendBroadcast(successIntent)
-                    } else {
-                        val failedIntent = Intent()
-                        failedIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED
-                        mContext!!.sendBroadcast(failedIntent)
-
-                        toast(rjReturnOfGoodsConfirm.result2)
+                            toast(rjReturnOfGoodsConfirm.result2)
+                        }
+                    } else {//checkServerErrorString = true
+                        toast(getString(R.string.toast_server_error))
                     }
 
 

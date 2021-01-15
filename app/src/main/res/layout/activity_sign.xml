@@ -35,7 +35,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:text="@string/btn_prev"
-                        android:textSize="@dimen/text_size_20"/>
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <Button
                         android:id="@+id/signBtnClear"
@@ -43,14 +43,15 @@
                         android:layout_height="match_parent"
                         android:text="@string/draw_clear_screen"
                         android:textSize="@dimen/text_size_20"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <Button
                         android:id="@+id/signBtnSave"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/draw_save_file"
-                        android:textSize="@dimen/text_size_20"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:layout_weight="1"/>
             </LinearLayout>
         </LinearLayout>

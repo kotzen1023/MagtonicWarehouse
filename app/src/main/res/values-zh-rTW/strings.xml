@@ -163,8 +163,8 @@
     <string name="guest_in_or_out_dialog_in_date">入廠日期</string>
     <string name="nav_paint">手寫簽名</string>
     <string name="draw_save_title">簽名存檔並上傳?</string>
-    <string name="draw_clear_screen">清除螢幕</string>
-    <string name="draw_save_file">簽名上傳</string>
+    <string name="draw_clear_screen">清除</string>
+    <string name="draw_save_file">上傳</string>
     <string name="btn_prev">上一步</string>
     <string name="btn_ok">好</string>
     <string name="receipt_uploaded_confirm_failed_info">上傳確認失敗，請按確認按鈕重新確認。</string>
@@ -202,7 +202,7 @@
     <string name="issuance_work_order">工單單號</string>
     <string name="issuance_part_no">料件編號</string>
     <string name="issuance_part_name">品名</string>
-    <string name="setting_connect_timeout">連線逾時設定(秒)</string>
+    <string name="setting_connect_timeout">連線逾時(秒)</string>
     <string name="no_route_to_host">400 - 無法連線到伺服器(No Route to host)</string>
     <string name="material_slide_to_left_nextpage">左滑進入下一頁</string>
     <string name="material_prev">上一頁</string>
@@ -227,4 +227,5 @@
     <string name="supplier_enter_password">請輸入密碼</string>
     <string name="password_mismatch">密碼不符</string>
     <string name="supplier_add_empty_name_or_number">廠商名稱或統編為空</string>
+    <string name="bluetooth_printer_enable">藍芽標籤機限制</string>
 </resources>

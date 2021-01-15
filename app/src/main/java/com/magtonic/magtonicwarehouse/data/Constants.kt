@@ -130,6 +130,8 @@ class Constants {
             const val ACTION_SETTING_LOG_ENABLE_ON : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOn"
             const val ACTION_SETTING_LOG_ENABLE_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingLogEnableOff"
             const val ACTION_SETTING_TIMEOUT_CHANGE : String ="com.magtonic.MagtonicWarehoouse.SettingTimeoutChange"
+            const val ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_ON : String ="com.magtonic.MagtonicWarehoouse.SettingBluetoothPrinterEnableOn"
+            const val ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_OFF : String ="com.magtonic.MagtonicWarehoouse.SettingBluetoothPrinterEnableOff"
             //guest
             const val ACTION_GUEST_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.GuestScanBarcode"
             const val ACTION_GUEST_GET_CURRENT_PLANT_GUEST_LIST : String = "com.magtonic.MagtonicWarehoouse.GuestGetCurrentPlantGuestList"

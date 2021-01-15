@@ -48,7 +48,8 @@
                 android:layout_margin="@dimen/fab_margin"
                 app:srcCompat="@drawable/baseline_print_black_48"
                 app:backgroundTint="@color/md_blue_600"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:contentDescription="" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabPrintAgain"
@@ -57,6 +58,7 @@
                 android:layout_gravity="center|start"
                 android:layout_margin="@dimen/fab_margin"
                 app:srcCompat="@drawable/baseline_print_white_48"
+                android:contentDescription="@string/receipt_print_again"
                 android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -67,6 +69,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 app:srcCompat="@drawable/baseline_signal_wifi_off_white_48"
                 app:backgroundTint="@color/colorAccent"
+                android:contentDescription="@string/wifi_state_disconnected"
                 android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -87,6 +90,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 app:srcCompat="@drawable/baseline_edit_white_48"
                 app:backgroundTint="@color/md_blue_600"
+                android:contentDescription="@string/outsource_sign"
                 android:visibility="gone"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

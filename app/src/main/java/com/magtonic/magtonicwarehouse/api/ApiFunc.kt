@@ -39,6 +39,9 @@ class ApiFunc {
     //3.Upload Receipt Array
     private val apiStrUploadReceiptArr = baseIP + "Ins_rva01"
 
+    //3.4 Upload Receipt Point Array
+    private val apiStrUploadReceiptPointArr = baseIP + "Ins_rva02"
+
     //3.5 Confirm Upload Receipt
     private val apiStrConfirmUploadReceiptArr = realIP
 
@@ -178,7 +181,7 @@ class ApiFunc {
     // post with only one para  "p_json"
     private fun postWithParaPJsonStr(url: String, jsonStr: String, callback: Callback) {
         Log.e(mTAG, "->postWithParaPJsonStr")
-        //Log.e(mTAG, "send jsonStr = $jsonStr")
+        Log.e(mTAG, "send jsonStr = $jsonStr")
         val body = FormBody.Builder()
             .add("p_json", jsonStr)
             .build()
@@ -361,6 +364,18 @@ class ApiFunc {
         //postWithParaPJsonStr(apiStrUploadReceiptArr, builder.toString(), callback)
 
         postWithParaPJsonStrandTimeOut(apiStrUploadReceiptArr, builder.toString(), callback)
+    }
+
+    fun uploadReceiptPointSingle(httpParaUploadReceiptPoint: HttpParaUploadReceiptPoint, callback: Callback) {
+        val gson = Gson()
+        val builder = StringBuilder()
+        builder.append("[")
+        builder.append(gson.toJson(httpParaUploadReceiptPoint))
+        Log.e(mTAG, "uploadReceiptSingle json = ${gson.toJson(httpParaUploadReceiptPoint)}")
+        builder.append("]")
+        //postWithParaPJsonStr(apiStrUploadReceiptArr, builder.toString(), callback)
+
+        postWithParaPJsonStrandTimeOut(apiStrUploadReceiptPointArr, builder.toString(), callback)
     }
 
     //storage

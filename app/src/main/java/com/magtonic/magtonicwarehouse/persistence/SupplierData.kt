@@ -28,7 +28,7 @@ class SupplierData (key: String, name: String, number: String){
     }
 
     fun getKey(): String {
-        return key as String
+        return key
     }
 
     fun setKey(key : String) {

@@ -4,5 +4,6 @@
 
     <item android:id="@+id/sign_draw_pen_or_eraser"
             android:icon="@drawable/eraser_white"
+            android:title="@string/clear"
             app:showAsAction="always"/>
 </menu>

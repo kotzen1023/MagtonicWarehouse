@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.viewpager.widget.PagerAdapter
 import com.magtonic.magtonicwarehouse.R
@@ -66,8 +67,8 @@ class PropertyDetailItemPagerAdapter(context: Context?, propertyList: ArrayList<
         val view = LayoutInflater.from(mContext).inflate(R.layout.list_pager_item, container, false)
 
         pagerListView = view.findViewById(R.id.pagerListView)
-        val leftNav: ImageView = view.findViewById(R.id.left_nav)
-        val rightNav: ImageView = view.findViewById(R.id.right_nav)
+        val leftNav: LinearLayout = view.findViewById(R.id.left_nav)
+        val rightNav: LinearLayout = view.findViewById(R.id.right_nav)
 
         if (position == 0) {
             if (propertyList.size > 1) {

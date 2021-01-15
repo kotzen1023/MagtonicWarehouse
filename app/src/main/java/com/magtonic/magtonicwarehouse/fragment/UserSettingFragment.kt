@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.isBluetoothPrinterEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isLogEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReceiptUploadAutoConfirm
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.timeOutSeconds
@@ -69,7 +70,9 @@ class UserSettingFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_user_setting, container, false)
         val receiptAutoConfirmUploaded = view.findViewById<CheckBox>(R.id.checkBoxReceiptAutoConfirmUploaded)
         val logEnable = view.findViewById<CheckBox>(R.id.checkBoxLogEnable)
+        val bluetoothPrinterEnable = view.findViewById<CheckBox>(R.id.checkBoxBluetoothPrinterEnable)
         val timeoutSpinner = view.findViewById<Spinner>(R.id.timeoutSpinner)
+
 
         val adapter: ArrayAdapter<String> = ArrayAdapter(userSettingContext as Context, R.layout.myspinner, timeoutSecondsNameList)
         timeoutSpinner.adapter = adapter
@@ -105,6 +108,7 @@ class UserSettingFragment : Fragment() {
 
         receiptAutoConfirmUploaded.isChecked = isReceiptUploadAutoConfirm
         logEnable.isChecked = isLogEnable
+        bluetoothPrinterEnable.isChecked = isBluetoothPrinterEnable
 
         receiptAutoConfirmUploaded.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -132,6 +136,18 @@ class UserSettingFragment : Fragment() {
 
         }
 
+        bluetoothPrinterEnable.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                val successIntent = Intent()
+                successIntent.action = Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_ON
+                userSettingContext!!.sendBroadcast(successIntent)
+            } else {
+                val successIntent = Intent()
+                successIntent.action = Constants.ACTION.ACTION_SETTING_BLUETOOTH_PRINTER_ENABLE_OFF
+                userSettingContext!!.sendBroadcast(successIntent)
+            }
+
+        }
 
         return view
     }

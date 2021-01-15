@@ -22,6 +22,7 @@ import android.widget.*
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.isBluetoothPrinterEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReceiptUploadAutoConfirm
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isWifiConnected
@@ -82,7 +83,7 @@ class ReceiptFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 
@@ -576,14 +577,19 @@ class ReceiptFragment : Fragment() {
                             receiptContext!!.sendBroadcast(hideIntent)
                         }
 
-                        when (printerStatus) {
-                            BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                                btnUpload!!.isEnabled = false
-                            }
+                        if (isBluetoothPrinterEnable) {
 
-                            BluetoothChatService.STATE_CONNECTED-> {
-                                btnUpload!!.isEnabled = isWifiConnected
+                            when (printerStatus) {
+                                BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                                    btnUpload!!.isEnabled = false
+                                }
+
+                                BluetoothChatService.STATE_CONNECTED -> {
+                                    btnUpload!!.isEnabled = isWifiConnected
+                                }
                             }
+                        } else {
+                            btnUpload!!.isEnabled = isWifiConnected
                         }
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_MODIFY_CHANGED, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_RECEIPT_MODIFY_CHANGED")
@@ -636,14 +642,19 @@ class ReceiptFragment : Fragment() {
                                     receiptContext!!.sendBroadcast(hideIntent)
                                 }
 
-                                when (printerStatus) {
-                                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                                        btnUpload!!.isEnabled  = false
-                                    }
+                                if (isBluetoothPrinterEnable) {
 
-                                    BluetoothChatService.STATE_CONNECTED-> {
-                                        btnUpload!!.isEnabled = isWifiConnected
+                                    when (printerStatus) {
+                                        BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                                            btnUpload!!.isEnabled = false
+                                        }
+
+                                        BluetoothChatService.STATE_CONNECTED -> {
+                                            btnUpload!!.isEnabled = isWifiConnected
+                                        }
                                     }
+                                } else {
+                                    btnUpload!!.isEnabled = isWifiConnected
                                 }
                             }
 
@@ -684,26 +695,33 @@ class ReceiptFragment : Fragment() {
                                 //hide upload confirm button
                                 btnConfirm!!.visibility = View.GONE
 
-                                when (printerStatus) {
-                                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING-> {
-                                        btnUpload!!.isEnabled = false
+                                if (isBluetoothPrinterEnable) {
 
-                                        if (printerStatus == BluetoothChatService.STATE_LISTEN || printerStatus == BluetoothChatService.STATE_CONNECTING) {
+                                    when (printerStatus) {
+                                        BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                                            btnUpload!!.isEnabled = false
 
-                                            progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodeBlue)
-                                            progressBar!!.visibility = View.VISIBLE
-                                        } else { //BluetoothChatService.STATE_NONE
-                                            progressBar!!.visibility = View.GONE
+                                            if (printerStatus == BluetoothChatService.STATE_LISTEN || printerStatus == BluetoothChatService.STATE_CONNECTING) {
+
+                                                progressBar!!.indeterminateTintList =
+                                                    ColorStateList.valueOf(colorCodeBlue)
+                                                progressBar!!.visibility = View.VISIBLE
+                                            } else { //BluetoothChatService.STATE_NONE
+                                                progressBar!!.visibility = View.GONE
+                                            }
+
                                         }
 
+                                        BluetoothChatService.STATE_CONNECTED -> {
+                                            progressBar!!.visibility = View.GONE
+                                            //btnUpload!!.isEnabled = true
+                                            //depends on wifi is connected or not
+                                            btnUpload!!.isEnabled = isWifiConnected
+                                        }
                                     }
-
-                                    BluetoothChatService.STATE_CONNECTED-> {
-                                        progressBar!!.visibility = View.GONE
-                                        //btnUpload!!.isEnabled = true
-                                        //depends on wifi is connected or not
-                                        btnUpload!!.isEnabled = isWifiConnected
-                                    }
+                                } else {
+                                    progressBar!!.visibility = View.GONE
+                                    btnUpload!!.isEnabled = isWifiConnected
                                 }
                             }
 
@@ -1128,14 +1146,19 @@ class ReceiptFragment : Fragment() {
                 btnConfirm!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
                 btnConfirm!!.visibility = View.VISIBLE
             } else { //initial, upload_failed
-                when (printerStatus) {
-                    BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
-                        btnUpload!!.isEnabled  = false
-                    }
+                if (isBluetoothPrinterEnable) {
+                    when (printerStatus) {
+                        BluetoothChatService.STATE_NONE, BluetoothChatService.STATE_LISTEN, BluetoothChatService.STATE_CONNECTING -> {
+                            btnUpload!!.isEnabled = false
+                            //btnUpload!!.isEnabled  = true
+                        }
 
-                    BluetoothChatService.STATE_CONNECTED -> {
-                        btnUpload!!.isEnabled = isWifiConnected
+                        BluetoothChatService.STATE_CONNECTED -> {
+                            btnUpload!!.isEnabled = isWifiConnected
+                        }
                     }
+                } else {
+                    btnUpload!!.isEnabled  = isWifiConnected
                 }
 
                 btnUpload!!.text = getString(R.string.receipt_upload)

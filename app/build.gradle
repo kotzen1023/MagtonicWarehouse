@@ -54,6 +54,7 @@ dependencies {
     implementation "com.google.android.material:material:$androidx_material_version"
     //implementation 'com.android.support:design:29.0.0'
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
+
     testImplementation "junit:junit:$junit_version"
     //implementation 'androidx.viewpager2:viewpager2:1.0.0-beta05'
     androidTestImplementation "androidx.test:runner:$test_runner_version"
@@ -82,7 +83,7 @@ dependencies {
     // Declare the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    //implementation 'com.google.firebase:firebase-analytics-ktx'
     //implementation "com.google.firebase:firebase-core:$firebase_core_version"
     //implementation "com.google.firebase:firebase-database:$firebase_database_version"
     implementation "androidx.room:room-runtime:$room_version"

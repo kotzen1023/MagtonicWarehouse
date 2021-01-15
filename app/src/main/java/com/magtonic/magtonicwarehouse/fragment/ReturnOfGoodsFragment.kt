@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Rect
 
 import android.os.Bundle
 import android.util.Log
@@ -131,6 +132,27 @@ class ReturnOfGoodsFragment : Fragment() {
             listViewReturnOfGoodsDetail!!.adapter = returnOfGoodsDetailItemAdapter
         }
 
+        linearLayoutReturnOfGoodsMain!!.viewTreeObserver.addOnGlobalLayoutListener {
+            val r = Rect()
+            linearLayoutReturnOfGoodsMain!!.getWindowVisibleDisplayFrame(r)
+            val screenHeight = linearLayoutReturnOfGoodsMain!!.rootView.height
+            val keypadHeight = screenHeight - r.bottom
+            //val temp = screenHeight * 0.15
+            //Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
+            MainActivity.isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
+
+
+
+            /*if (isKeyBoardShow) {
+                if (!barcodeInput!!.isFocused) {
+                    val hideIntent = Intent()
+                    hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                    outsourcedProcessContext!!.sendBroadcast(hideIntent)
+                }
+
+            }*/
+        }
+
         listViewReturnOfGoods!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
@@ -208,8 +230,8 @@ class ReturnOfGoodsFragment : Fragment() {
 
 
 
-                    listViewReturnOfGoods!!.visibility = View.VISIBLE
-                    listViewReturnOfGoodsDetail!!.visibility = View.GONE
+                    linearLayoutReturnOfGoods!!.visibility = View.VISIBLE
+                    linearLayoutReturnOfGoodsDetail!!.visibility = View.GONE
 
                     isReturnOfGoodsInDetail = 0
 
@@ -252,8 +274,8 @@ class ReturnOfGoodsFragment : Fragment() {
 
 
 
-                    listViewReturnOfGoods!!.visibility = View.VISIBLE
-                    listViewReturnOfGoodsDetail!!.visibility = View.GONE
+                    linearLayoutReturnOfGoods!!.visibility = View.VISIBLE
+                    linearLayoutReturnOfGoodsDetail!!.visibility = View.GONE
 
                     isReturnOfGoodsInDetail = 0
 
@@ -363,8 +385,8 @@ class ReturnOfGoodsFragment : Fragment() {
 
 
 
-                        listViewReturnOfGoods!!.visibility = View.VISIBLE
-                        listViewReturnOfGoodsDetail!!.visibility = View.GONE
+                        linearLayoutReturnOfGoods!!.visibility = View.VISIBLE
+                        linearLayoutReturnOfGoodsDetail!!.visibility = View.GONE
 
                         isReturnOfGoodsInDetail = 0
 
@@ -374,7 +396,7 @@ class ReturnOfGoodsFragment : Fragment() {
 
                         progressBar!!.visibility = View.GONE
 
-
+                        Log.e(mTAG, "returnOfGoodsListBySupplier.size = $returnOfGoodsListBySupplier.size")
 
                         if (returnOfGoodsListBySupplier.size == 1 ) {
                             if (returnOfGoodsListBySupplier[0].result == "1") {
@@ -398,6 +420,8 @@ class ReturnOfGoodsFragment : Fragment() {
                                 returnOfGoodsList.add(returnOfGoodsItem)
 
                             }
+                        } else {
+                            Log.e(mTAG, "unknown size")
                         }
 
 
