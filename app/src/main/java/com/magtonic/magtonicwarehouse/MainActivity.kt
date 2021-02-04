@@ -289,6 +289,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val supplier = Supplier(supplierData.getName(), supplierData.getNumber())
                 supplier.key = supplierData.getKey()
                 supplierList.add(supplier)
+
+                outsourcedSupplierNameList.add(supplierData.getName())
+                outsourcedSupplierHashMap[supplierData.getName()] = supplierData.getNumber()
             }
         }
 
@@ -381,19 +384,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         sendBroadcast(disableServiceIntent)
 
         val displayMetrics = DisplayMetrics()
+
         //
         //mContext!!.display!!.getMetrics(displayMetrics)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M)
         {
             windowManager.defaultDisplay.getMetrics(displayMetrics)
-        } else {
-            //mContext!!.display!!.getMetrics(displayMetrics)
+
+            screenHeight = displayMetrics.heightPixels
+            screenWidth = displayMetrics.widthPixels
+        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             mContext!!.display!!.getRealMetrics(displayMetrics)
+
+            screenHeight = displayMetrics.heightPixels
+            screenWidth = displayMetrics.widthPixels
+        } else { //Android 11
+            //mContext!!.display!!.getMetrics(displayMetrics)
+            screenHeight = windowManager.currentWindowMetrics.bounds.height()
+            screenWidth = windowManager.currentWindowMetrics.bounds.width()
+
         }
 
         //Log.e(mTAG, "h = ${windowManager.currentWindowMetrics.bounds.height()} , w = ${windowManager.currentWindowMetrics.bounds.width()}")
-        screenHeight = displayMetrics.heightPixels
-        screenWidth = displayMetrics.widthPixels
+        //screenHeight = displayMetrics.heightPixels
+        //screenWidth = displayMetrics.widthPixels
 
         Log.e(mTAG, "width = $screenWidth, height = $screenHeight")
 
@@ -782,6 +796,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Log.d(mTAG, "ACTION_HIDE_KEYBOARD")
 
                         imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+
+                        isKeyBoardShow = false
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_USER_INPUT_SEARCH, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_USER_INPUT_SEARCH")
 
@@ -791,7 +808,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             fabSign!!.visibility = View.GONE
                         }
 
-                        imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                        if (isKeyBoardShow) {
+                            imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                        }
 
                         val inputNo = intent.getStringExtra("INPUT_NO")
 
@@ -1334,10 +1353,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             }
                         }
 
-                        if (isBluetoothPrinterEnable) {
-                            title = getString(R.string.nav_receipt) + " - " + statusTitle
+                        title = if (isBluetoothPrinterEnable) {
+                            getString(R.string.nav_receipt) + " - " + statusTitle
                         } else {
-                            title = getString(R.string.nav_receipt)
+                            getString(R.string.nav_receipt)
                         }
 
                         menuItemBluetooth!!.isVisible = true
@@ -3205,9 +3224,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Log.d(mTAG, "write permission granted")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             if (perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED) {
-                                initView()
-                                initLog()
+                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE is permmited.")
+
+                            } else {
+                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE not permmited.")
                             }
+                            initView()
+                            initLog()
                         } else {
                             initView()
                             initLog()
@@ -3304,14 +3327,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toastHandle!!.cancel()
         }
 
-        val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
-        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
+            toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+            toast.show()
+
+            toastHandle = toast
+        } else { //Android 11
+            val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
+            toast.show()
+
+            toastHandle = toast
+        }
         /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
         textView.textSize = 30.0f*/
-        toast.show()
 
-        toastHandle = toast
+
+
     }
 
     private fun toastLong(message: String) {
@@ -3319,13 +3352,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
-        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
+            toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
+            toast.show()
+
+            toastHandle = toast
+        } else { //Android 11
+            val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+            toast.show()
+
+            toastHandle = toast
+        }
+
         /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
         textView.textSize = 30.0f*/
-        toast.show()
-        toastHandle = toast
+
     }
 
     private fun initView() {
@@ -4212,6 +4255,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //upload
     fun uploadReceipt() {
         Log.d(mTAG, "=== uploadReceipt start ===")
+
+        //for erp warnning error
+        if (itemReceipt!!.rjReceipt!!.ima36 == "") {
+            itemReceipt!!.rjReceipt!!.ima36 = " "
+        }
 
         //single
         if (itemReceipt != null) {

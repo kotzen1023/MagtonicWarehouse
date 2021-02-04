@@ -137,9 +137,12 @@ class ReturnOfGoodsFragment : Fragment() {
             linearLayoutReturnOfGoodsMain!!.getWindowVisibleDisplayFrame(r)
             val screenHeight = linearLayoutReturnOfGoodsMain!!.rootView.height
             val keypadHeight = screenHeight - r.bottom
-            //val temp = screenHeight * 0.15
-            //Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
-            MainActivity.isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
+            val temp = screenHeight * 0.15
+            Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
+
+            MainActivity.isKeyBoardShow = keypadHeight > screenHeight * 0.15
+
+            //MainActivity.isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
 
 
 
@@ -396,7 +399,7 @@ class ReturnOfGoodsFragment : Fragment() {
 
                         progressBar!!.visibility = View.GONE
 
-                        Log.e(mTAG, "returnOfGoodsListBySupplier.size = $returnOfGoodsListBySupplier.size")
+                        Log.e(mTAG, "returnOfGoodsListBySupplier.size = ${returnOfGoodsListBySupplier.size}")
 
                         if (returnOfGoodsListBySupplier.size == 1 ) {
                             if (returnOfGoodsListBySupplier[0].result == "1") {
@@ -421,7 +424,7 @@ class ReturnOfGoodsFragment : Fragment() {
 
                             }
                         } else {
-                            Log.e(mTAG, "unknown size")
+                            Log.e(mTAG, "size = 0")
                         }
 
 
