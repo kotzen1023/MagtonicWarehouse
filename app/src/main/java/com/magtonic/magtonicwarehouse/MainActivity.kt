@@ -4148,10 +4148,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Log.e(mTAG, "getReceiptPointCallback err msg = $e")
             isBarcodeScanning = false
             val errorArray = e.toString().split(": ")
-            Log.e(mTAG, "[1] = ${errorArray[1]}")
+
+            if (errorArray.size > 1) {
+                Log.e(mTAG, "[1] = ${errorArray[1]}")
+            }
+
+
             val failIntent = Intent()
 
-            if (errorArray[1] == "No route to host") {
+            if (errorArray.size > 1 && errorArray[1] == "No route to host" ) {
                 failIntent.action = Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST
             } else {
                 failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
