@@ -94,6 +94,7 @@ class ReceiptFragment : Fragment() {
         storageSpaceHashMap["T28861417"] = "廈興"
         storageSpaceHashMap["T80355469"] = "杉億"
         storageSpaceHashMap["T23082263"] = "迦賢"
+        storageSpaceHashMap["T22549100"] = "信旭"
 
         //val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
         //val currentTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())

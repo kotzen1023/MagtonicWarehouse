@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var currentSearchPlant: String = "T"
 
-
+    private var receipt_barcode: String = ""
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1016,42 +1016,73 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                     BluetoothChatService.STATE_CONNECTED -> {
                                         //var addString: String
+                                        var ret: Int = 0
 
-                                        val addString = when (itemReceipt!!.receiveLine.length) {
-                                            1 -> "00"
-                                            2 -> "0"
-                                            else -> ""
+                                        if ( receipt_barcode.length >= 16) {
+                                            val addString = when (itemReceipt!!.receiveLine.length) {
+                                                1 -> "00"
+                                                2 -> "0"
+                                                else -> ""
+                                            }
+
+
+                                            val printContent =
+                                                itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
+                                            //print x 2
+
+                                            ret = printLabel(
+                                                itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                                printContent,
+                                                itemReceipt!!.rjReceipt!!.pmn04,
+                                                itemReceipt!!.rjReceipt!!.pmn20,
+                                                itemReceipt!!.rjReceipt!!.pmnud02,
+                                                itemReceipt!!.rjReceipt!!.ima36,
+                                                itemReceipt!!.rjReceipt!!.rvb38
+                                            )
+                                            ret += printLabel(
+                                                itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                                printContent,
+                                                itemReceipt!!.rjReceipt!!.pmn04,
+                                                itemReceipt!!.rjReceipt!!.pmn20,
+                                                itemReceipt!!.rjReceipt!!.pmnud02,
+                                                itemReceipt!!.rjReceipt!!.ima36,
+                                                itemReceipt!!.rjReceipt!!.rvb38
+                                            )
+                                        } else if (receipt_barcode.length == 13) {
+                                            val addString = when (itemReceipt!!.receiveLine.length) {
+                                                1 -> "00"
+                                                2 -> "0"
+                                                else -> ""
+                                            }
+
+
+                                            val printContent =
+                                                itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
+                                            //print x 2
+
+                                            ret = printLabel(
+                                                //itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                                itemReceipt!!.rjReceipt!!.pmn01 + "-" + itemReceipt!!.rjReceipt!!.pmn02,
+                                                printContent,
+                                                itemReceipt!!.rjReceipt!!.pmn04,
+                                                itemReceipt!!.rjReceipt!!.pmn20,
+                                                itemReceipt!!.rjReceipt!!.pmnud02,
+                                                itemReceipt!!.rjReceipt!!.ima36,
+                                                itemReceipt!!.rjReceipt!!.rvb38
+                                            )
+                                            ret += printLabel(
+                                                //itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                                itemReceipt!!.rjReceipt!!.pmn01 + "-" + itemReceipt!!.rjReceipt!!.pmn02,
+                                                printContent,
+                                                itemReceipt!!.rjReceipt!!.pmn04,
+                                                itemReceipt!!.rjReceipt!!.pmn20,
+                                                itemReceipt!!.rjReceipt!!.pmnud02,
+                                                itemReceipt!!.rjReceipt!!.ima36,
+                                                itemReceipt!!.rjReceipt!!.rvb38
+                                            )
                                         }
 
-                                        /*if (itemReceipt!!.receiveLine.length == 1) {
-                                        addString = "00"
-                                    } else if (itemReceipt!!.receiveLine.length == 2) {
-                                        addString = "0"
-                                    } else {
-                                        addString = ""
-                                    }*/
-                                        val printContent =
-                                            itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
-                                        //print x 2
-                                        var ret: Int
-                                        ret = printLabel(
-                                            itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                            printContent,
-                                            itemReceipt!!.rjReceipt!!.pmn04,
-                                            itemReceipt!!.rjReceipt!!.pmn20,
-                                            itemReceipt!!.rjReceipt!!.pmnud02,
-                                            itemReceipt!!.rjReceipt!!.ima36,
-                                            itemReceipt!!.rjReceipt!!.rvb38
-                                        )
-                                        ret += printLabel(
-                                            itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                            printContent,
-                                            itemReceipt!!.rjReceipt!!.pmn04,
-                                            itemReceipt!!.rjReceipt!!.pmn20,
-                                            itemReceipt!!.rjReceipt!!.pmnud02,
-                                            itemReceipt!!.rjReceipt!!.ima36,
-                                            itemReceipt!!.rjReceipt!!.rvb38
-                                        )
+
 
                                         when (ret) {
                                             0 -> {
@@ -3999,6 +4030,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // to call api
             //acState = ReceiptACState.RECEIPT_GETTING_STATE
             //if (barcode.poBarcodeByScan.length == 16) {
+            receipt_barcode = barcode.poBarcodeByScan
             when {
                 barcode.poBarcodeByScan.length >= 16 -> {
                     val para = HttpReceiptGetPara()
@@ -4036,19 +4068,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onFailure(call: Call, e: IOException) {
             Log.e(mTAG, "getReceiptCallback err msg = $e")
             isBarcodeScanning = false
-            val errorArray = e.toString().split(": ")
-            Log.e(mTAG, "[1] = ${errorArray[1]}")
-            val failIntent = Intent()
 
-            if (errorArray[1] == "No route to host") {
-                failIntent.action = Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST
-            } else {
-                failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+            if (e.toString().isNotEmpty()) {
+                val errorArray = e.toString().split(": ")
+
+                val failIntent = Intent()
+
+                if (errorArray.size > 1) {
+                    Log.e(mTAG, "[1] = ${errorArray[1]}")
+
+
+
+                    if (errorArray[1] == "No route to host") {
+                        failIntent.action = Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST
+                    } else {
+                        failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+                    }
+                } else {
+                    failIntent.action = Constants.ACTION.ACTION_CONNECTION_TIMEOUT
+                }
+
+
+
+
+                runOnUiThread {
+                    sendBroadcast(failIntent)
+                }
             }
 
-            runOnUiThread {
-                sendBroadcast(failIntent)
-            }
+
 
         }
 
@@ -4271,13 +4319,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
             when {
-                barcode!!.poBarcodeByScan.length >= 16 -> {
+                //barcode!!.poBarcodeByScan.length >= 16 -> {
+                receipt_barcode.length >= 16 -> {
                     val para = HttpParaUploadReceipt.itemReceiptToHttpParaUploadReceipt(
                         itemReceipt as ItemReceipt, user as User
                     )
                     ApiFunc().uploadReceiptSingle(para, upLoadReceiptCallback)
                 }
-                barcode!!.poBarcodeByScan.length == 13 -> {
+                //barcode!!.poBarcodeByScan.length == 13 -> {
+                receipt_barcode.length == 13 -> {
                     Log.d(mTAG, "=== uploadReceiptPointSingle start ===")
                     val para = HttpParaUploadReceiptPoint.itemReceiptToHttpParaUploadReceiptPoint(
                         itemReceipt as ItemReceipt, user as User, barcode!!.poBarcodeByScan
@@ -6853,10 +6903,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. 收料畫面加入\"重新連線標籤機\"於右上功能列表。用於標籤機無紙時更換新紙時，再按此選項重新連接，便可再列印標籤。\n"
-        msg += "2. 新增可調整連線timeout時間，最長60秒。\n"
-        msg += "3. 固資查詢使用鎖定，只允許特定使用者。\n"
-        msg += "4. 新增可掃交貨指示單條碼。"
+        var msg = "1. 新增可掃交貨指示單條碼。\n"
+        msg += "2. [20210325]修正交貨指示單上傳後產生條碼。"
+
 
 
         textViewFixMsg.text = msg

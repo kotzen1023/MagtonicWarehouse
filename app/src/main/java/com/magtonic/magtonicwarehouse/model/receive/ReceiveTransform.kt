@@ -1,6 +1,6 @@
 package com.magtonic.magtonicwarehouse.model.receive
 
-
+import android.util.Log
 
 
 class ReceiveTransform {
@@ -54,6 +54,7 @@ class ReceiveTransform {
         }
 
         fun restoreToJsonStr(str: String): String {
+            Log.e("restoreToJsonStr = ", str)
             /*var str = str
 
             //return  "{dataList:"+str + "}";

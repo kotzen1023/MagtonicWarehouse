@@ -1,5 +1,6 @@
 package com.magtonic.magtonicwarehouse.model.ui
 
+import android.util.Log
 import com.google.gson.Gson
 import com.magtonic.magtonicwarehouse.model.receive.RJReceipt
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
@@ -41,6 +42,7 @@ class ItemReceipt {
         const val RESULT_CORRECT = "1"
 
         fun transRJReceiptStrToItemReceipt(RJReceiptStr: String, poNumSplit: String): ItemReceipt? {
+
             val gson = Gson()
             val itemReceipt = ItemReceipt()
             val rjReceipt: RJReceipt // = new RJReceipt();
