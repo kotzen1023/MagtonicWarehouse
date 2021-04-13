@@ -57,7 +57,7 @@ class Constants {
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_SUCCESS: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmSuccess"
             const val ACTION_RECEIPT_UPLOADED_CONFIRM_FAILED: String = "com.magtonic.MagtonicWarehoouse.ReceiptUploadedConfirmFailed"
 
-            const val ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH: String = "com.magtonic.MagtonicWarehoouse.ReceiptUnknownBarcodeLenght"
+            const val ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH: String = "com.magtonic.MagtonicWarehoouse.ReceiptUnknownBarcodeLength"
             //20200601
             const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_HISTORY : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedHistory"
             const val ACTION_RECEIPT_SHOW_CONFIRM_FAILED_MORE_DETAIL : String = "com.magtonic.MagtonicWarehoouse.ReceiptShowConfirmFailedMoreDetail"

@@ -4330,7 +4330,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 receipt_barcode.length == 13 -> {
                     Log.d(mTAG, "=== uploadReceiptPointSingle start ===")
                     val para = HttpParaUploadReceiptPoint.itemReceiptToHttpParaUploadReceiptPoint(
-                        itemReceipt as ItemReceipt, user as User, barcode!!.poBarcodeByScan
+                        //itemReceipt as ItemReceipt, user as User, barcode!!.poBarcodeByScan
+                        itemReceipt as ItemReceipt, user as User, receipt_barcode
                     )
 
                     ApiFunc().uploadReceiptPointSingle(para, upLoadReceiptPointCallback)
