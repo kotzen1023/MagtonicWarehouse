@@ -6816,26 +6816,52 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     BluetoothChatService.STATE_CONNECTED-> {
                         when(printStatus) {
                             PrintStatus.PRINT_SUCCESS -> {
-                                val addString = when (itemReceipt!!.receiveLine.length) {
-                                    0 -> "00"
-                                    1 -> "0"
-                                    else -> ""
+                                var ret: Int = 0
+                                if ( receipt_barcode.length >= 16) {
+                                    val addString = when (itemReceipt!!.receiveLine.length) {
+                                        0 -> "00"
+                                        1 -> "0"
+                                        else -> ""
+                                    }
+
+
+                                    val printContent: String =
+                                        itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
+
+                                    //print 1
+
+                                    ret = printLabel(
+                                        itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                        printContent,
+                                        itemReceipt!!.rjReceipt!!.pmn04,
+                                        itemReceipt!!.rjReceipt!!.pmn20,
+                                        itemReceipt!!.rjReceipt!!.pmnud02,
+                                        itemReceipt!!.rjReceipt!!.ima36,
+                                        itemReceipt!!.rjReceipt!!.rvb38
+                                    )
+                                } else if (receipt_barcode.length == 13) {
+                                    val addString = when (itemReceipt!!.receiveLine.length) {
+                                        1 -> "00"
+                                        2 -> "0"
+                                        else -> ""
+                                    }
+
+
+                                    val printContent =
+                                        itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
+
+
+                                    ret = printLabel(
+                                        //itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
+                                        itemReceipt!!.rjReceipt!!.pmn01 + "-" + itemReceipt!!.rjReceipt!!.pmn02,
+                                        printContent,
+                                        itemReceipt!!.rjReceipt!!.pmn04,
+                                        itemReceipt!!.rjReceipt!!.pmn20,
+                                        itemReceipt!!.rjReceipt!!.pmnud02,
+                                        itemReceipt!!.rjReceipt!!.ima36,
+                                        itemReceipt!!.rjReceipt!!.rvb38
+                                    )
                                 }
-
-
-                                val printContent: String = itemReceipt!!.receiveNum + addString + itemReceipt!!.receiveLine
-
-                                //print 1
-                                val ret: Int
-                                ret = printLabel(
-                                    itemReceipt!!.poNumSplit + "-" + itemReceipt!!.poLineInt,
-                                    printContent,
-                                    itemReceipt!!.rjReceipt!!.pmn04,
-                                    itemReceipt!!.rjReceipt!!.pmn20,
-                                    itemReceipt!!.rjReceipt!!.pmnud02,
-                                    itemReceipt!!.rjReceipt!!.ima36,
-                                    itemReceipt!!.rjReceipt!!.rvb38
-                                )
 
                                 when(ret) {
                                     0 -> {
@@ -6904,8 +6930,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. 新增可掃交貨指示單條碼。\n"
-        msg += "2. [20210325]修正交貨指示單上傳後產生條碼。"
+        var msg = "1. [20210325]修正交貨指示單上傳後產生條碼。。\n"
+        msg += "2. [20210413]修正交貨指示上傳欄位變成儲錯誤。"
 
 
 
