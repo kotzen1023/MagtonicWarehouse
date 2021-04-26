@@ -2,7 +2,11 @@ package com.magtonic.magtonicwarehouse.api
 
 import android.util.Log
 import com.google.gson.Gson
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.base_ip_address_webservice
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.iep_ip_address_webservice
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.real_ip_address_webservice
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.timeOutSeconds
+import com.magtonic.magtonicwarehouse.data.Constants
 
 import com.magtonic.magtonicwarehouse.model.send.*
 import okhttp3.*
@@ -19,12 +23,19 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class ApiFunc {
     private val mTAG = ApiFunc::class.java.name
     //val baseIP = "http://192.1.1.42:81/asmx/WebService.asmx/"
-    private val baseIP = "http://192.1.1.50/asmx/webservice.asmx/"
+    //private val baseIP = "http://192.1.1.50/asmx/webservice.asmx/"
+    //private val baseIP = Constants.WebServiceIpAddress.BASE_IP
+    private val baseIP = base_ip_address_webservice
     //private val testIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2_toptest"
-    private val realIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2"
-    private val iepIP = "http://192.1.1.121/webs.asmx/"
+    //private val realIP = "http://192.1.1.38/web/ws/r/aws_ttsrv2"
+    //private val realIP = Constants.WebServiceIpAddress.REAL_IP
+    private val realIP = real_ip_address_webservice
+    //private val iepIP = "http://192.1.1.121/webs.asmx/"
+    //private val iepIP = Constants.WebServiceIpAddress.IEP_IP
+    private val iepIP = iep_ip_address_webservice
     //private val apiTestSign = "http://192.1.16.152:8080/JerseyExample/rest/data/getdata"
-    private val outsideIP = "http://61.216.114.217/asmx/WebService.asmx/"
+    //private val outsideIP = "http://61.216.114.217/asmx/WebService.asmx/"
+    private val outsideIP = Constants.WebServiceIpAddress.OUTSIDE_IP
     //api http address string define
 
     //1.Login

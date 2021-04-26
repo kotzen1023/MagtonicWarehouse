@@ -7,16 +7,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isBluetoothPrinterEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isLogEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReceiptUploadAutoConfirm
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.timeOutSeconds
 import com.magtonic.magtonicwarehouse.R
+import com.magtonic.magtonicwarehouse.SignActivity
+import com.magtonic.magtonicwarehouse.WebserviceFtpActivity
 import com.magtonic.magtonicwarehouse.data.Constants
 
 class UserSettingFragment : Fragment() {
@@ -72,7 +71,7 @@ class UserSettingFragment : Fragment() {
         val logEnable = view.findViewById<CheckBox>(R.id.checkBoxLogEnable)
         val bluetoothPrinterEnable = view.findViewById<CheckBox>(R.id.checkBoxBluetoothPrinterEnable)
         val timeoutSpinner = view.findViewById<Spinner>(R.id.timeoutSpinner)
-
+        val btnWebserviceftp = view.findViewById<Button>(R.id.btnWebserviceftp)
 
         val adapter: ArrayAdapter<String> = ArrayAdapter(userSettingContext as Context, R.layout.myspinner, timeoutSecondsNameList)
         timeoutSpinner.adapter = adapter
@@ -147,6 +146,12 @@ class UserSettingFragment : Fragment() {
                 userSettingContext!!.sendBroadcast(successIntent)
             }
 
+        }
+
+        btnWebserviceftp.setOnClickListener {
+            val showIntent = Intent()
+            showIntent.action = Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG
+            userSettingContext!!.sendBroadcast(showIntent)
         }
 
         return view

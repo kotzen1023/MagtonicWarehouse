@@ -202,6 +202,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var db: SupplierDataDB? = null
         //for diable bluetooth
         @JvmStatic var isBluetoothPrinterEnable: Boolean = true
+        //for change ip
+        @JvmStatic var base_ip_address: String = ""
+        @JvmStatic var real_ip_address: String = ""
+        @JvmStatic var iep_ip_address: String = ""
+        @JvmStatic var ftp_ip_address: String = ""
+        @JvmStatic var base_ip_address_webservice: String = "http://$base_ip_address/asmx/webservice.asmx/"
+        @JvmStatic var real_ip_address_webservice: String = "http://$real_ip_address/web/ws/r/aws_ttsrv2"
+        @JvmStatic var iep_ip_address_webservice: String = "http://$iep_ip_address/webs.asmx/"
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -433,7 +441,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // guest read current plant
         currentPlant = pref!!.getString("CURRENT_PLANT", "T") as String
 
+        //ip setting
 
+        base_ip_address = pref!!.getString("BASE_IP_ADDRESS", "192.1.1.50") as String
+        real_ip_address = pref!!.getString("REAL_IP_ADDRESS", "192.1.1.38") as String
+        iep_ip_address = pref!!.getString("IEP_IP_ADDRESS", "192.1.1.121") as String
+        ftp_ip_address = pref!!.getString("FTP_IP_ADDRESS", "192.1.1.121") as String
+
+        base_ip_address_webservice = "http://$base_ip_address/asmx/webservice.asmx/"
+        real_ip_address_webservice = "http://$real_ip_address/web/ws/r/aws_ttsrv2"
+        iep_ip_address_webservice = "http://$iep_ip_address/webs.asmx/"
 
         //user = User.getUser(applicationContext)
         user = User()
@@ -2125,6 +2142,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //supplier.key = key
                         //Log.e(mTAG, "key = ${supplier.key}")
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION")
+
+                        base_ip_address_webservice = "http://$base_ip_address/asmx/webservice.asmx/"
+                        real_ip_address_webservice = "http://$real_ip_address/web/ws/r/aws_ttsrv2"
+                        iep_ip_address_webservice = "http://$iep_ip_address/webs.asmx/"
+
+                        editor = pref!!.edit()
+                        editor!!.putString("BASE_IP_ADDRESS", base_ip_address)
+                        editor!!.putString("REAL_IP_ADDRESS", real_ip_address)
+                        editor!!.putString("IEP_IP_ADDRESS", iep_ip_address)
+                        editor!!.putString("FTP_IP_ADDRESS", ftp_ip_address)
+                        editor!!.apply()
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG")
+
+                        showIPSettingPasswordDialog()
                     }
                 }
 
@@ -2452,6 +2486,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_ADD)
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_UPDATE)
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_DELETE)
+            //up setting
+            filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION)
+            filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG)
 
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
@@ -4025,6 +4062,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun getReceipt(barcode: ScanBarcode?) {
 
+        Log.e(mTAG, "base_ip_address_webservice = $base_ip_address_webservice, base_ip_address = $base_ip_address")
+
         if (barcode != null) {
             Log.e(mTAG, "getReceipt poBarcode = "+barcode.poBarcode+ ", poLine = "+barcode.poLine)
             // to call api
@@ -4050,6 +4089,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val unknownIntent = Intent()
                     unknownIntent.action = Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH
                     sendBroadcast(unknownIntent)
+                    isBarcodeScanning = false
                 }
             }
 
@@ -4340,6 +4380,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val unknownIntent = Intent()
                     unknownIntent.action = Constants.ACTION.ACTION_RECEIPT_UNKNOWN_BARCODE_LENGTH
                     sendBroadcast(unknownIntent)
+                    isBarcodeScanning = false
                 }
             }
 
@@ -6008,7 +6049,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val successIntent = Intent()
                             successIntent.action =
                                 Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
-                            successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
+                            successIntent.putExtra("SEND_ORDER", currentReturnOfGoodsOrder)
                             mContext!!.sendBroadcast(successIntent)
                         } else {
                             val failedIntent = Intent()
@@ -6392,7 +6433,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val successIntent = Intent()
                             successIntent.action =
                                 Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS
-                            successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
+                            successIntent.putExtra("SEND_ORDER", currentReturnOfGoodsOrder)
                             mContext!!.sendBroadcast(successIntent)
                         } else {
                             val failedIntent = Intent()
@@ -6930,9 +6971,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210325]修正交貨指示單上傳後產生條碼。。\n"
-        msg += "2. [20210413]修正交貨指示上傳欄位變成儲錯誤。"
-
+        var msg = "1. [20210325]修正交貨指示單上傳後產生條碼。\n"
+        msg += "2. [20210413]修正交貨指示上傳欄位變成儲錯誤。\n"
+        msg += "3. [20210420]修正倉退簽名目錄錯誤。"
 
 
         textViewFixMsg.text = msg
@@ -7056,6 +7097,69 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START)
                 }
+            } else {
+                toast(getString(R.string.password_mismatch))
+            }
+
+
+
+            alertDialogBuilder.dismiss()
+        }
+        alertDialogBuilder.show()
+    }
+
+    private fun showIPSettingPasswordDialog() {
+
+        Log.e(mTAG, "=== showIPSettingPasswordDialog start ===")
+
+
+
+        // get prompts.xml view
+        /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);*/
+        val promptView = View.inflate(this@MainActivity, R.layout.fragment_supplier_add_supplier_dialog, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(this@MainActivity).create()
+        alertDialogBuilder.setView(promptView)
+
+        //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
+        val textViewSupplierDialog = promptView.findViewById<TextView>(R.id.textViewSupplierDialog)
+
+        textViewSupplierDialog.setText(R.string.supplier_enter_password)
+
+        val editTextSupplierName = promptView.findViewById<EditText>(R.id.editTextSupplierName)
+        val editTextSupplierNumber = promptView.findViewById<EditText>(R.id.editTextSupplierNumber)
+        editTextSupplierName.hint = ""
+        editTextSupplierNumber.visibility = View.GONE
+
+
+
+        val btnCancel = promptView.findViewById<Button>(R.id.btnSupplierDialogCancel)
+        val btnConfirm = promptView.findViewById<Button>(R.id.btnSupplierDialogConfirm)
+        //val btnDelete = promptView.findViewById<Button>(R.id.btnSupplierDialogDelete)
+        //btnDelete.visibility = View.VISIBLE
+
+
+
+        alertDialogBuilder.setCancelable(false)
+
+        //btnDelete!!.setOnClickListener {
+        //    alertDialogBuilder.dismiss()
+        //}
+
+        btnCancel!!.setOnClickListener {
+            alertDialogBuilder.dismiss()
+        }
+        btnConfirm!!.setOnClickListener {
+
+            if (editTextSupplierName.text.toString() == "Magton!c") {
+
+                val intent = Intent(mContext, WebserviceFtpActivity::class.java)
+                startActivity(intent)
+
+
+
+
             } else {
                 toast(getString(R.string.password_mismatch))
             }

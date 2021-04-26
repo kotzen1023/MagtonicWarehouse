@@ -1,6 +1,31 @@
 package com.magtonic.magtonicwarehouse.data
 
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.base_ip_address
+
 class Constants {
+
+    class WebServiceIpAddress {
+        companion object {
+            const val BASE_IP : String = "http://192.1.1.50/asmx/webservice.asmx/"
+            const val REAL_IP : String = "http://192.1.1.38/web/ws/r/aws_ttsrv2"
+            const val IEP_IP : String = "http://192.1.1.121/webs.asmx/"
+            const val OUTSIDE_IP : String = "http://61.216.114.217/asmx/WebService.asmx/"
+        }
+    }
+
+    class FtpInfo {
+        companion object {
+            const val IP_ADDRESS : String = "192.1.1.121"
+            const val PORT : Int = 21
+            const val OUTSOURCED_USER : String = "iepftp"
+            const val OUTSOURCED_PASSWORD : String = "T69924056Ftp"
+            const val RETURN_OF_GOODS_USER : String = "rvupftp"
+            const val RETURN_OF_GOODS_PASSWORD : String = "T69924056Ftp"
+            const val SHIPMENT_USER : String = "ogapftp"
+            const val SHIPMENT_PASSWORD : String = "T69924056Ftp"
+        }
+    }
+
     class BluetoothState {
         companion object {
             const val MESSAGE_STATE_CHANGE = 1
@@ -195,9 +220,9 @@ class Constants {
             const val ACTION_RETURN_OF_GOODS_HIDE_FAB_BACK : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessHideFabBack"
             const val ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsGetDetailBySendOrder"
 
-            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadAction"
-            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadFailed"
-            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.OutsourcedProcessSignUploadSuccess"
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_ACTION : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessSignUploadAction"
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessSignUploadFailed"
+            const val ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS : String ="com.magtonic.MagtonicWarehoouse.ReturnOfGoodsProcessSignUploadSuccess"
 
             const val ACTION_RETURN_OF_GOODS_SHOW_SIGN_DIALOG_ACTION : String = "com.magtonic.MagtonicWarehoouse.ReturnOfGoodsShowSignDialogAction"
             //supplier manage
@@ -205,6 +230,10 @@ class Constants {
             const val ACTION_SUPPLIER_DATA_ADD : String ="com.magtonic.MagtonicWarehoouse.SupplierDataAdd"
             const val ACTION_SUPPLIER_DATA_UPDATE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataUpdate"
             const val ACTION_SUPPLIER_DATA_DELETE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataDelete"
+
+            //ip setting
+            const val ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION : String ="com.magtonic.MagtonicWarehoouse.WebserviceFtpIpAddressUpdateAction"
+            const val ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG : String ="com.magtonic.MagtonicWarehoouse.WebserviceFtpIpAddressShowPasswordDialog"
         }
 
     }

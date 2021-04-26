@@ -36,7 +36,8 @@
                 android:textSize="@dimen/text_size_25"
                 android:hint="@string/supplier_name"
                 android:gravity="center"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:inputType="textPassword"/>
 
         <EditText
                 android:id="@+id/editTextSupplierNumber"

@@ -228,4 +228,5 @@
     <string name="password_mismatch">密碼不符</string>
     <string name="supplier_add_empty_name_or_number">廠商名稱或統編為空</string>
     <string name="bluetooth_printer_enable">藍芽標籤機限制</string>
+    <string name="setting_set_webservice_ip">WebService IP設定</string>
 </resources>

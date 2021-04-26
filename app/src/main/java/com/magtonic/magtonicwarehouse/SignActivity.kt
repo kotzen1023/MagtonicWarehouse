@@ -16,6 +16,7 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.ftp_ip_address
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isEraser
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penColor
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.penWidth
@@ -392,6 +393,20 @@ class SignActivity : AppCompatActivity() {
                             progressBar!!.visibility = View.GONE
                             finish()
                         }
+                        intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED")
+
+                            progressBar!!.visibility = View.GONE
+                            toast(getString(R.string.outsourced_process_sign_upload_confirm_failed))
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS")
+
+
+
+                            progressBar!!.visibility = View.GONE
+                            finish()
+                        }
                     }
 
                 }
@@ -409,6 +424,9 @@ class SignActivity : AppCompatActivity() {
 
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+
+            filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_FAILED)
+            filter.addAction(Constants.ACTION.ACTION_RETURN_OF_GOODS_SIGN_UPLOAD_SUCCESS)
             signContext?.registerReceiver(mReceiver, filter)
             isRegister = true
             Log.d(mTAG, "registerReceiver mReceiver")
@@ -672,9 +690,28 @@ class SignActivity : AppCompatActivity() {
             if (path != "")
             {
                 progressBar!!.visibility = View.VISIBLE
-                val ftpUtils = FTPUtils(signContext as Context,"192.1.1.121", 21, "iepftp", "T69924056Ftp", uploadSignName, path)
+
+                when (sendFragment) {
+                    "OUTSOURCED_PROCESS" -> {
+                        val ftpUtils = FTPUtils(signContext as Context,
+                            ftp_ip_address, Constants.FtpInfo.PORT, Constants.FtpInfo.OUTSOURCED_USER, Constants.FtpInfo.OUTSOURCED_PASSWORD, uploadSignName, path)
+                        val coroutineFtp = Presenter(ftpUtils)
+                        coroutineFtp.execute()
+                    }
+                    "RETURN_OF_GOODS" -> {
+                        Log.e(mTAG, "->RETURN_OF_GOODS")
+                        val ftpUtils = FTPUtils(signContext as Context,
+                            ftp_ip_address, Constants.FtpInfo.PORT, Constants.FtpInfo.RETURN_OF_GOODS_USER, Constants.FtpInfo.RETURN_OF_GOODS_PASSWORD, uploadSignName, path)
+                        val coroutineFtp = Presenter(ftpUtils)
+                        coroutineFtp.execute()
+                    }
+                }
+
+                /*val ftpUtils = FTPUtils(signContext as Context,
+                    Constants.FtpInfo.IP_ADDRESS, Constants.FtpInfo.PORT, Constants.FtpInfo.OUTSOURCED_USER, Constants.FtpInfo.OUTSOURCED_PASSWORD, uploadSignName, path)
                 val coroutineFtp = Presenter(ftpUtils)
                 coroutineFtp.execute()
+                */
                 //val ftpTask = FtpTask()
                 //ftpTask.execute(ftpUtils)
             } else {

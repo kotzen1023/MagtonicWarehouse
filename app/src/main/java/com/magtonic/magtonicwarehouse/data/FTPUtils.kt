@@ -74,8 +74,12 @@ class FTPUtils(context: Context, ftpUrl: String, ftpPort: Int, userName: String,
                 //檢查遠端伺服器是否有相同的文件, 有的話表示上次沒傳成功, 需先砍掉
                 //val files = ftpClient!!.listFiles(File(filename).getPath())
                 //if (files.size == 1) ftpClient!!.deleteFile(File(filename).getPath())
-                ftpClient!!.storeFile(File(filename as String).path, bis)
+                ret = ftpClient!!.storeFile(File(filename as String).path, bis)
+
+                Log.e(mTAG, "ret = $ret")
+
                 bis.close()
+
                 val size = ftpClient!!.listFiles(File(filename as String).path)[0].size
 
                 Log.d(mTAG, "Upload file size = $size")
