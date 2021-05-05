@@ -2486,7 +2486,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_ADD)
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_UPDATE)
             filter.addAction(Constants.ACTION.ACTION_SUPPLIER_DATA_DELETE)
-            //up setting
+            //ip setting
             filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION)
             filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG)
 
