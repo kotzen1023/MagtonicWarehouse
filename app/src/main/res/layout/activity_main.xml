@@ -61,7 +61,7 @@
                 android:contentDescription="@string/receipt_print_again"
                 android:visibility="gone"/>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <!--com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabWifi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                 app:srcCompat="@drawable/baseline_signal_wifi_off_white_48"
                 app:backgroundTint="@color/colorAccent"
                 android:contentDescription="@string/wifi_state_disconnected"
-                android:visibility="gone"/>
+                android:visibility="gone"/-->
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabBack"

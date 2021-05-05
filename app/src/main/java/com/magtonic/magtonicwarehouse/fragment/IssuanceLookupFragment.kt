@@ -79,10 +79,10 @@ class IssuanceLookupFragment : Fragment() {
         linearLayoutIssuanceLookupMain = view.findViewById(R.id.linearLayoutIssuanceLookupMain)
         linearLayoutIssuanceLookup = view.findViewById(R.id.linearLayoutIssuanceLookup)
         linearLayoutIssuanceLookupHeader = view!!.findViewById(R.id.linearLayoutIssuanceLookupHeader);
-        listViewIssuanceLookup = view!!.findViewById(R.id.listViewIssuanceLookup)
+        listViewIssuanceLookup = view.findViewById(R.id.listViewIssuanceLookup)
 
         linearLayoutIssuanceLookupDetail = view.findViewById(R.id.linearLayoutIssuanceLookupDetail)
-        listViewIssuanceLookupDetail = view!!.findViewById(R.id.listViewIssuanceLookupDetail)
+        listViewIssuanceLookupDetail = view.findViewById(R.id.listViewIssuanceLookupDetail)
         //linearLayoutDetailHeader = view.findViewById(R.id.linearLayoutDetailHeader)
 
         //mageViewPrev = view.findViewById(R.id.imageViewPrev)

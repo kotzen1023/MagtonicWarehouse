@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     enum class CurrentFragment {
         RECEIPT_FRAGMENT, STORAGE_FRAGMENT, MATERIAL_ISSUING_FRAGMENT, HOME_FRAGMENT, PRINTER_FRAGMENT,
-        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, DRAW_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT,
+        LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT,
         SUPPLIER_FRAGMENT
     }
 
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var penColor: Int = Color.BLACK
         @JvmStatic var penWidth: Float = 10f
 
-        @JvmStatic var base64: String = ""
+        //@JvmStatic var base64: String = ""
         //OutsourcedProcess
         @JvmStatic var outsourcedProcessOrderList = ArrayList<RJOutSourced>()
         @JvmStatic var outsourcedProcessOrderListBySupplier = ArrayList<RJSupplier>()
@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var supplierList = ArrayList<Supplier>()
         @JvmStatic var supplierDataList = ArrayList<SupplierData>()
         @JvmStatic var db: SupplierDataDB? = null
-        //for diable bluetooth
+        //for disable bluetooth
         @JvmStatic var isBluetoothPrinterEnable: Boolean = true
         //for change ip
         @JvmStatic var base_ip_address: String = ""
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     var fabPrint: FloatingActionButton? = null
     var fabPrintAgain: FloatingActionButton? = null
-    var fabWifi: FloatingActionButton? = null
+    //var fabWifi: FloatingActionButton? = null
     var fabBack: FloatingActionButton? = null
     var fabSign: FloatingActionButton? = null
 
@@ -258,7 +258,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var currentSearchPlant: String = "T"
 
-    private var receipt_barcode: String = ""
+    private var receiptBarcode: String = ""
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -518,7 +518,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView!!.setNavigationItemSelectedListener(this)
 
         //fab wifi
-        fabWifi = findViewById(R.id.fabWifi)
+        //fabWifi = findViewById(R.id.fabWifi)
 
         fabPrint = findViewById(R.id.fabPrint)
         fabPrint!!.setOnClickListener {
@@ -1033,9 +1033,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                     BluetoothChatService.STATE_CONNECTED -> {
                                         //var addString: String
-                                        var ret: Int = 0
+                                        var ret = 0
 
-                                        if ( receipt_barcode.length >= 16) {
+                                        if ( receiptBarcode.length >= 16) {
                                             val addString = when (itemReceipt!!.receiveLine.length) {
                                                 1 -> "00"
                                                 2 -> "0"
@@ -1065,7 +1065,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                                 itemReceipt!!.rjReceipt!!.ima36,
                                                 itemReceipt!!.rjReceipt!!.rvb38
                                             )
-                                        } else if (receipt_barcode.length == 13) {
+                                        } else if (receiptBarcode.length == 13) {
                                             val addString = when (itemReceipt!!.receiveLine.length) {
                                                 1 -> "00"
                                                 2 -> "0"
@@ -1761,7 +1761,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_PAINT_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_PAINT_ACTION")
 
-                        isBarcodeScanning = false
+                        /*isBarcodeScanning = false
 
                         title = getString(R.string.nav_paint)
 
@@ -1791,7 +1791,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
 
                         currentFrag = CurrentFragment.DRAW_FRAGMENT
-
+                        */
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_OUTSOURCED_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HOME_GO_TO_OUTSOURCED_ACTION")
@@ -3395,17 +3395,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toastHandle!!.cancel()
         }
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+        toastHandle = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_SHORT)
             toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
             toast.show()
 
-            toastHandle = toast
+            toast
         } else { //Android 11
             val toast = Toast.makeText(this, message, Toast.LENGTH_SHORT)
             toast.show()
 
-            toastHandle = toast
+            toast
         }
         /*val group = toast.view as ViewGroup
         val textView = group.getChildAt(0) as TextView
@@ -3420,17 +3420,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (toastHandle != null)
             toastHandle!!.cancel()
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+        toastHandle = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             val toast = Toast.makeText(this, HtmlCompat.fromHtml("<h1>$message</h1>", HtmlCompat.FROM_HTML_MODE_COMPACT), Toast.LENGTH_LONG)
             toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL, 0, 0)
             toast.show()
 
-            toastHandle = toast
+            toast
         } else { //Android 11
             val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
             toast.show()
 
-            toastHandle = toast
+            toast
         }
 
         /*val group = toast.view as ViewGroup
@@ -4069,7 +4069,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // to call api
             //acState = ReceiptACState.RECEIPT_GETTING_STATE
             //if (barcode.poBarcodeByScan.length == 16) {
-            receipt_barcode = barcode.poBarcodeByScan
+            receiptBarcode = barcode.poBarcodeByScan
             when {
                 barcode.poBarcodeByScan.length >= 16 -> {
                     val para = HttpReceiptGetPara()
@@ -4360,18 +4360,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             when {
                 //barcode!!.poBarcodeByScan.length >= 16 -> {
-                receipt_barcode.length >= 16 -> {
+                receiptBarcode.length >= 16 -> {
                     val para = HttpParaUploadReceipt.itemReceiptToHttpParaUploadReceipt(
                         itemReceipt as ItemReceipt, user as User
                     )
                     ApiFunc().uploadReceiptSingle(para, upLoadReceiptCallback)
                 }
                 //barcode!!.poBarcodeByScan.length == 13 -> {
-                receipt_barcode.length == 13 -> {
+                receiptBarcode.length == 13 -> {
                     Log.d(mTAG, "=== uploadReceiptPointSingle start ===")
                     val para = HttpParaUploadReceiptPoint.itemReceiptToHttpParaUploadReceiptPoint(
                         //itemReceipt as ItemReceipt, user as User, barcode!!.poBarcodeByScan
-                        itemReceipt as ItemReceipt, user as User, receipt_barcode
+                        itemReceipt as ItemReceipt, user as User, receiptBarcode
                     )
 
                     ApiFunc().uploadReceiptPointSingle(para, upLoadReceiptPointCallback)
@@ -6857,8 +6857,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     BluetoothChatService.STATE_CONNECTED-> {
                         when(printStatus) {
                             PrintStatus.PRINT_SUCCESS -> {
-                                var ret: Int = 0
-                                if ( receipt_barcode.length >= 16) {
+                                var ret = 0
+                                if ( receiptBarcode.length >= 16) {
                                     val addString = when (itemReceipt!!.receiveLine.length) {
                                         0 -> "00"
                                         1 -> "0"
@@ -6880,7 +6880,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         itemReceipt!!.rjReceipt!!.ima36,
                                         itemReceipt!!.rjReceipt!!.rvb38
                                     )
-                                } else if (receipt_barcode.length == 13) {
+                                } else if (receiptBarcode.length == 13) {
                                     val addString = when (itemReceipt!!.receiveLine.length) {
                                         1 -> "00"
                                         2 -> "0"

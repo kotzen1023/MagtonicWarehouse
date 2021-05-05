@@ -2,7 +2,9 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
+
+//apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'com.google.gms.google-services'
 
@@ -61,7 +63,7 @@ dependencies {
     //androidTestImplementation 'com.android.support.test:runner:1.0.2'
     //androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_core_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_core_version"
-    //implementation 'com.pddstudio:encrypted-preferences:1.2.0'
+    
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     //implementation 'com.google.code.gson:gson:2.8.5'
     implementation "com.squareup.okio:okio:$okio_version"
@@ -77,8 +79,7 @@ dependencies {
     implementation 'commons-net:commons-net:3.6'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_android_version"
-    //annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
-    //implementation "androidx.percentlayout:percentlayout:$androidx_percentlayout_version"
+
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     // Declare the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
