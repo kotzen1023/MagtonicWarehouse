@@ -67,7 +67,7 @@ class IssuanceLookupFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 
@@ -78,7 +78,7 @@ class IssuanceLookupFragment : Fragment() {
         viewLine = view.findViewById(R.id.viewLineIssuanceLookup)
         linearLayoutIssuanceLookupMain = view.findViewById(R.id.linearLayoutIssuanceLookupMain)
         linearLayoutIssuanceLookup = view.findViewById(R.id.linearLayoutIssuanceLookup)
-        linearLayoutIssuanceLookupHeader = view!!.findViewById(R.id.linearLayoutIssuanceLookupHeader);
+        linearLayoutIssuanceLookupHeader = view!!.findViewById(R.id.linearLayoutIssuanceLookupHeader)
         listViewIssuanceLookup = view.findViewById(R.id.listViewIssuanceLookup)
 
         linearLayoutIssuanceLookupDetail = view.findViewById(R.id.linearLayoutIssuanceLookupDetail)

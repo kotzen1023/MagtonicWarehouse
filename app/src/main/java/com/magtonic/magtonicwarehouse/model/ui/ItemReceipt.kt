@@ -1,6 +1,5 @@
 package com.magtonic.magtonicwarehouse.model.ui
 
-import android.util.Log
 import com.google.gson.Gson
 import com.magtonic.magtonicwarehouse.model.receive.RJReceipt
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode

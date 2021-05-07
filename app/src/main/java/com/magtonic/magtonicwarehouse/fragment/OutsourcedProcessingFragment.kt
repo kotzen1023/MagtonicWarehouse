@@ -32,7 +32,7 @@ import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+
 
 
 class OutsourcedProcessingFragment : Fragment() {
@@ -100,7 +100,7 @@ class OutsourcedProcessingFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 

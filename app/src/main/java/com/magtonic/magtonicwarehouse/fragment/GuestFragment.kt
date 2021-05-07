@@ -57,8 +57,6 @@ class GuestFragment : Fragment() {
     private var poBarcode: String = ""
     private var poLine: String = ""
 
-    //private lateinit var homeViewModel: HomeViewModel
-
     companion object {
         private var handler: MyHandler? = null
         private var guestContext: Context? = null
@@ -151,7 +149,7 @@ class GuestFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 

@@ -1,12 +1,12 @@
 package com.magtonic.magtonicwarehouse
 
 import android.content.*
-import android.graphics.Color
+
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.base_ip_address
@@ -14,14 +14,16 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.ftp_ip_address
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.iep_ip_address
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.real_ip_address
 import com.magtonic.magtonicwarehouse.data.Constants
-import com.magtonic.magtonicwarehouse.model.sys.User
+
 
 class WebserviceFtpActivity : AppCompatActivity() {
     private val mTAG = WebserviceFtpActivity::class.java.name
 
+    /*
     var pref: SharedPreferences? = null
     var editor: SharedPreferences.Editor? = null
     private val fileName = "Preference"
+    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

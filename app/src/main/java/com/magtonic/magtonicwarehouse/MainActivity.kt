@@ -698,7 +698,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(2).isVisible = true //storage
                         navView!!.menu.getItem(3).isVisible = true //material
                         navView!!.menu.getItem(4).isVisible = true //outsourced
-                        navView!!.menu.getItem(5).isVisible = true //retunr of goods
+                        navView!!.menu.getItem(5).isVisible = true //return of goods
                         navView!!.menu.getItem(6).isVisible = user!!.userAccount == "0031" || user!!.userAccount == "0133"
                         navView!!.menu.getItem(7).isVisible = true //supplier
                         navView!!.menu.getItem(8).isVisible = false //login
@@ -958,7 +958,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         }
                                     }
                                 }
-                            } else { //isBluetoothPrinterEnable => diable
+                            } else { //isBluetoothPrinterEnable => disable
                                 when (itemReceipt!!.state) {
                                     ItemReceipt.ItemState.UPLOADED -> {
                                         Log.d(mTAG, "==>state UPLOADED")
@@ -1134,8 +1134,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                                     }
                                 }
-                            } else { //isBluetoothPrinterEnable => diable
-                                Log.d(mTAG, "isBluetoothPrinterEnable => diable: will not print tag")
+                            } else { //isBluetoothPrinterEnable => disable
+                                Log.d(mTAG, "isBluetoothPrinterEnable => disable: will not print tag")
                             }
 
                             //send to receiptfragment to change status
@@ -1151,7 +1151,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         if (isBluetoothPrinterEnable) {
                             fabPrintAgain!!.visibility = View.VISIBLE
                         } else {
-                            Log.d(mTAG, "isBluetoothPrinterEnable => diable: will not show print again button")
+                            Log.d(mTAG, "isBluetoothPrinterEnable => disable: will not show print again button")
                         }
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RECEIPT_UPLOAD_RETURN_PO_DIFF, ignoreCase = true)) {

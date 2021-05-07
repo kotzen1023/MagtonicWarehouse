@@ -65,7 +65,7 @@ class StorageFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 
@@ -448,7 +448,7 @@ class StorageFragment: Fragment() {
                         /*btnUpload!!.text = getString(R.string.btn_status_uploaded)
                         btnUpload!!.setTextColor(Color.BLACK)
                         btnUpload!!.setBackgroundColor(Color.rgb(0xf9, 0xa8, 0x25)) //md_yellow_800
-                        //diable button
+                        //disable button
                         btnUpload!!.isEnabled = false*/
                         showButtonStatusByState()
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_STORAGE_UPLOAD_RETURN_EXCEPTION, ignoreCase = true)) {

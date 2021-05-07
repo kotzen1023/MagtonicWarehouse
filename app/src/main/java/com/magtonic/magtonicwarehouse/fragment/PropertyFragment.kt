@@ -51,7 +51,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
     private var mReceiver: BroadcastReceiver? = null
     private var isRegister = false
 
-    private var propertyDetailItemAdapter: PropertyDetailItemAdapter? = null
+    //private var propertyDetailItemAdapter: PropertyDetailItemAdapter? = null
     private var propertyMoreDetailAdapter: PropertyMoreDetailItemAdapter? = null
     //private var listViewProperty: ListView? = null
     //private var listViewPropertyDetail: ListView? = null
@@ -81,7 +81,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Log.d(mTAG, "onCreateView")
 
         val view = inflater.inflate(R.layout.fragment_property, container, false)

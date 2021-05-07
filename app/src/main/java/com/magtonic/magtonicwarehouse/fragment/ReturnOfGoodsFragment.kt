@@ -78,7 +78,7 @@ class ReturnOfGoodsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         Log.d(mTAG, "onCreateView")
 
