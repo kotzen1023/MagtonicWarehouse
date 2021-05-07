@@ -36,6 +36,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.BuildConfig
 
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
