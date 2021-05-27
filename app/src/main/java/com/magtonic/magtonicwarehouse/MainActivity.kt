@@ -3249,6 +3249,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         Log.d(mTAG, "Permission callback called------- permissions.size = ${permissions.size}")
         when (requestCode) {
