@@ -21,6 +21,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isBluetoothPrinterEnable
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
@@ -38,7 +39,7 @@ import com.magtonic.magtonicwarehouse.model.ui.ItemReceipt
 import java.util.*
 
 
-class ReceiptFragment : Fragment() {
+class ReceiptFragment : Fragment(), LifecycleObserver {
     private val mTAG = ReceiptFragment::class.java.name
     private var receiptContext: Context? = null
 
@@ -317,7 +318,9 @@ class ReceiptFragment : Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     receiptContext?.sendBroadcast(searchIntent)
 
                     true
@@ -343,7 +346,9 @@ class ReceiptFragment : Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     receiptContext?.sendBroadcast(searchIntent)
 
                     true
@@ -951,10 +956,15 @@ class ReceiptFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {
