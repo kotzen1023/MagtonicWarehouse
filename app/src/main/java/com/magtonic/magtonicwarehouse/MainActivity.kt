@@ -6973,10 +6973,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210325]修正交貨指示單上傳後產生條碼。\n"
-        msg += "2. [20210413]修正交貨指示上傳欄位變成儲錯誤。\n"
-        msg += "3. [20210420]修正倉退簽名目錄錯誤。"
-
+        var msg = "1. [20210413]修正交貨指示上傳欄位變成儲錯誤。\n"
+        msg += "2. [20210420]修正倉退簽名目錄錯誤。\n"
+        msg += "3. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
 
         textViewFixMsg.text = msg
 

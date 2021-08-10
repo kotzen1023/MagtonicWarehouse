@@ -16,6 +16,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isWifiConnected
@@ -31,7 +32,7 @@ import com.magtonic.magtonicwarehouse.model.ui.ItemStorage
 import java.util.*
 import kotlin.collections.ArrayList
 
-class StorageFragment: Fragment() {
+class StorageFragment: Fragment(), LifecycleObserver {
     private val mTAG = StorageFragment::class.java.name
 
     private var storageContext: Context? = null
@@ -211,7 +212,9 @@ class StorageFragment: Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     storageContext?.sendBroadcast(searchIntent)
 
                     true
@@ -236,7 +239,9 @@ class StorageFragment: Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     storageContext?.sendBroadcast(searchIntent)
 
                     true
@@ -561,10 +566,15 @@ class StorageFragment: Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {

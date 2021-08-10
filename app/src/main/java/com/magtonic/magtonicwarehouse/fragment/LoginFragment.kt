@@ -18,6 +18,7 @@ import com.magtonic.magtonicwarehouse.R
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleObserver
 
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
@@ -26,7 +27,7 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.data.Constants
 
 
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(), LifecycleObserver {
     private val mTAG = LoginFragment::class.java.name
     private var loginContext: Context? = null
 
@@ -223,10 +224,15 @@ class LoginFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {

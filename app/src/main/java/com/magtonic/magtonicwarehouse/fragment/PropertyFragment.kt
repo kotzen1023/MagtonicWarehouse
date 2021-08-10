@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LifecycleObserver
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 
@@ -32,7 +33,7 @@ import com.magtonic.magtonicwarehouse.data.*
 import java.util.*
 
 
-class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
+class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener, LifecycleObserver {
     private val mTAG = PropertyFragment::class.java.name
     private var propertyContext: Context? = null
 
@@ -62,7 +63,7 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     companion object {
         @JvmStatic var currentPropertyPage: Int = 0
-        @JvmStatic val itemCanChange: Int = 12
+        //@JvmStatic val itemCanChange: Int = 12
     }
     //private var layoutBottom: LinearLayout? = null
     //private var btnClear: Button? = null
@@ -216,7 +217,8 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                     //hideSeekBarIntent.action = Constants.ACTION.ACTION_MATERIAL_SEEK_BAR_HIDE_ACTION
                     //materialIssuingContext!!.sendBroadcast(hideSeekBarIntent)
 
-                    barcodeInput!!.setText(barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    barcodeInput!!.setText(barcodeInput!!.text.toString()
+                        .uppercase(Locale.getDefault()))
 
                     progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                     progressBar!!.visibility = View.VISIBLE
@@ -264,7 +266,8 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
                     //hideSeekBarIntent.action = Constants.ACTION.ACTION_MATERIAL_SEEK_BAR_HIDE_ACTION
                     //materialIssuingContext!!.sendBroadcast(hideSeekBarIntent)
 
-                    barcodeInput!!.setText(barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    barcodeInput!!.setText(barcodeInput!!.text.toString()
+                        .uppercase(Locale.getDefault()))
 
                     progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                     progressBar!!.visibility = View.VISIBLE
@@ -665,10 +668,15 @@ class PropertyFragment : Fragment(), ViewPager.OnPageChangeListener {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {

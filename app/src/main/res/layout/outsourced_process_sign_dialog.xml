@@ -7,9 +7,9 @@
     <TextView
             android:id="@+id/textViewOutsourcedProcessDialogMsg"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="@dimen/text_size_30"
+            android:layout_height="60dp"
+
+            android:textSize="@dimen/text_size_25"
             android:text="@string/outsourced_process_dialog_msg"
             android:gravity="center"/>
 
@@ -78,9 +78,8 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_weight="1">
+            android:layout_height="60dp"
+            android:orientation="horizontal">
 
         <Button
                 android:id="@+id/btnDialogCancel"

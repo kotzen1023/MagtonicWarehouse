@@ -20,6 +20,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.currentPlant
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.guestListA
@@ -33,7 +34,7 @@ import com.magtonic.magtonicwarehouse.data.GuestDetailItemAdapter
 import java.util.*
 
 
-class GuestFragment : Fragment() {
+class GuestFragment : Fragment(), LifecycleObserver {
     private val mTAG = GuestFragment::class.java.name
 
     private var progressBar: ProgressBar? = null
@@ -590,10 +591,15 @@ class GuestFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {

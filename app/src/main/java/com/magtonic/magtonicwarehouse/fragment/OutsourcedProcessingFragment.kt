@@ -20,6 +20,7 @@ import android.widget.*
 import android.widget.AdapterView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isOutSourcedInDetail
@@ -35,7 +36,7 @@ import kotlin.collections.ArrayList
 
 
 
-class OutsourcedProcessingFragment : Fragment() {
+class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
     private val mTAG = OutsourcedProcessingFragment::class.java.name
     private var outsourcedProcessContext: Context? = null
 
@@ -332,7 +333,9 @@ class OutsourcedProcessingFragment : Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     outsourcedProcessContext?.sendBroadcast(searchIntent)
 
                     //val hideIntent = Intent()
@@ -384,7 +387,9 @@ class OutsourcedProcessingFragment : Fragment() {
 
                     val searchIntent = Intent()
                     searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                    searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    searchIntent.putExtra("INPUT_NO",
+                        barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                    )
                     outsourcedProcessContext?.sendBroadcast(searchIntent)
 
                     //val hideIntent = Intent()
@@ -741,10 +746,15 @@ class OutsourcedProcessingFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
+    }*/
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activity?.lifecycle?.addObserver(this)
     }
 
     private fun toast(message: String) {
@@ -856,7 +866,16 @@ class OutsourcedProcessingFragment : Fragment() {
         }
         alertDialogBuilder.show()
 
+        /*alertDialogBuilder.window?.decorView?.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+            val displayRectangle = Rect()
+            val window = alertDialogBuilder.window
+            v.getWindowVisibleDisplayFrame(displayRectangle)
+            val maxHeight = displayRectangle.height() * 0.5f // 60%
 
+            if (v.height > maxHeight) {
+                window?.setLayout(window.attributes.width, maxHeight.toInt())
+            }
+        }*/
     }
 
     private fun showSupplierDialog() {
@@ -953,7 +972,9 @@ class OutsourcedProcessingFragment : Fragment() {
 
                 val searchIntent = Intent()
                 searchIntent.action = Constants.ACTION.ACTION_USER_INPUT_SEARCH
-                searchIntent.putExtra("INPUT_NO", barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                searchIntent.putExtra("INPUT_NO",
+                    barcodeInput!!.text.toString().uppercase(Locale.getDefault())
+                )
                 outsourcedProcessContext?.sendBroadcast(searchIntent)
             }
 
