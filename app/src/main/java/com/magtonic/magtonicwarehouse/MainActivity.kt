@@ -6051,7 +6051,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val successIntent = Intent()
                             successIntent.action =
                                 Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS
-                            successIntent.putExtra("SEND_ORDER", currentReturnOfGoodsOrder)
+                            successIntent.putExtra("SEND_ORDER", currentOutSourcedSendOrder)
                             mContext!!.sendBroadcast(successIntent)
                         } else {
                             val failedIntent = Intent()
@@ -6973,9 +6973,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210413]修正交貨指示上傳欄位變成儲錯誤。\n"
-        msg += "2. [20210420]修正倉退簽名目錄錯誤。\n"
-        msg += "3. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
+        var msg = "1. [20210420]修正倉退簽名目錄錯誤。\n"
+        msg += "2. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
+        msg += "3. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
 
         textViewFixMsg.text = msg
 
