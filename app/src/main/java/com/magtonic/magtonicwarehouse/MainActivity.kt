@@ -21,6 +21,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -211,6 +212,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var base_ip_address_webservice: String = "http://$base_ip_address/asmx/webservice.asmx/"
         @JvmStatic var real_ip_address_webservice: String = "http://$real_ip_address/web/ws/r/aws_ttsrv2"
         @JvmStatic var iep_ip_address_webservice: String = "http://$iep_ip_address/webs.asmx/"
+        //for resultLauncher
+        @JvmStatic var currentRequestCode: Int = 0
+
     }
     private var mBluetoothAdapter: BluetoothAdapter? = null
     var mChatService: BluetoothChatService? = null
@@ -260,6 +264,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var currentSearchPlant: String = "T"
 
     private var receiptBarcode: String = ""
+
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1313,8 +1319,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                             Log.e(mTAG, "bluetoothPrintFunc == null")
                                         }
                                     } else {
-                                        val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                                        startActivityForResult(enableIntent, requestEnableBt)
+                                        currentRequestCode = requestEnableBt
+                                        openSomeActivityForResult()
+                                        //val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                        //startActivityForResult(enableIntent, requestEnableBt)
                                     }
                                 } else {
                                     Log.e(mTAG, "mBluetoothAdapter = null")
@@ -1326,8 +1334,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             if (mBluetoothAdapter != null) {
                                 //if (!mBluetoothAdapter!!.isEnabled()) {
                                 if (!mBluetoothAdapter!!.isEnabled) {
-                                    val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                                    startActivityForResult(enableIntent, requestEnableBt)
+                                    currentRequestCode = requestEnableBt
+                                    openSomeActivityForResult()
+                                    //val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                    //startActivityForResult(enableIntent, requestEnableBt)
                                     // Otherwise, setup the chat session
                                 } else {
                                     Log.d(mTAG, "===>mBluetoothAdapter is enabled")
@@ -2628,9 +2638,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.main_set_bluetooth_printer -> {
                 Log.e(mTAG, "main_set_bluetooth_printer")
-                val intent = Intent(this, DeviceListActivity::class.java)
-                intent.putExtra("SET_DEV", setPrinterDev)
-                startActivityForResult(intent, setPrinterDev)
+                currentRequestCode = setPrinterDev
+                openSomeActivityForResult()
+                //val intent = Intent(this, DeviceListActivity::class.java)
+                //intent.putExtra("SET_DEV", setPrinterDev)
+                //startActivityForResult(intent, setPrinterDev)
             }
 
             R.id.main_receipt_setting-> {
@@ -3557,8 +3569,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             //check if bluetooth is enabled
             if (!mBluetoothAdapter!!.isEnabled) {
-                val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                startActivityForResult(enableIntent, requestEnableBt)
+                currentRequestCode = requestEnableBt
+                openSomeActivityForResult()
+                //val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                //startActivityForResult(enableIntent, requestEnableBt)
                 // Otherwise, setup the chat session
             } else {
                 Log.d(mTAG, "===>mBluetoothAdapter is enabled")
@@ -3755,7 +3769,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mChatService = BluetoothChatService(mContext as Context, blHandler)
     }
 
-    @SuppressLint("CommitPrefEdits")
+    /*@SuppressLint("CommitPrefEdits")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e(mTAG, "onActivityResult = request code = $requestCode, resultCode = $resultCode")
@@ -3814,8 +3828,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         } else{
                             Log.e(mTAG, "mChatService = null")
                             if (!mBluetoothAdapter!!.isEnabled) {
-                                val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                                startActivityForResult(enableIntent, requestEnableBt)
+                                currentRequestCode = requestEnableBt
+                                openSomeActivityForResult()
+                                //val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                //startActivityForResult(enableIntent, requestEnableBt)
                                 // Otherwise, setup the chat session
                             } else {
                                 Log.d(mTAG, "===>mBluetoothAdapter is enabled")
@@ -3896,7 +3912,170 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     toast(getString(R.string.bt_not_enabled_leaving))
                 }
         }
+    }*/
+
+
+    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+        when (currentRequestCode) {
+            requestConnectDeviceSecure -> {
+                Log.e(mTAG, "requestConnectDeviceSecure")
+                // When DeviceListActivity returns with a device to connect
+                if (result.resultCode == Activity.RESULT_OK) {
+                    //connectDevice(data, true)
+                    Log.d(mTAG, "requestConnectDeviceSecure RESULT_OK")
+                }
+            }
+
+            setPrinterDev -> {
+                Log.e(mTAG, "setPrinterDev")
+                if (result.resultCode == Activity.RESULT_OK) {
+                    Log.e(mTAG, "RESULT_OK")
+                    //if (data?.getExtras() != null) {
+                    val data: Intent? = result.data
+                    if (data?.extras != null) {
+                        Log.e(mTAG, "data.getExtras() = " + data.extras.toString())
+                        printerAddress = data.getStringExtra("PrinterAddress") as String
+                        //PrinterAddres = data.getExtras()
+                        //        .getString("PrinterAddress");
+                        Log.e(mTAG, "PrinterAddress = $printerAddress")
+                        //SaveBluetoothDev(1)
+
+                        //save printer address
+                        editor = pref!!.edit()
+                        editor!!.putString("PRINTER_ADDRESS", printerAddress)
+                        editor!!.apply()
+
+                        //connect
+                        if (mChatService != null) {
+                            mChatService!!.stop()
+                            Thread.sleep(500)
+
+                            //connect printer
+                            if (printerAddress == "") {
+                                toast(getString(R.string.set_printer_first))
+                            } else {
+                                if (mBluetoothAdapter != null) {
+                                    val device = mBluetoothAdapter!!.getRemoteDevice(printerAddress)
+                                    mChatService!!.connect(device, true)
+                                    //set printer
+                                    bluetoothPrintFunc = BluetoothPrinterFuncs(mChatService as BluetoothChatService)
+                                    if (bluetoothPrintFunc != null) {
+                                        Log.e(mTAG, "Bluetooth Printer ready.")
+                                    } else {
+                                        Log.e(mTAG, "bluetoothPrintFunc == null")
+                                    }
+                                } else {
+                                    Log.e(mTAG, "mBluetoothAdapter = null")
+                                }
+                            }
+                        } else{
+                            Log.e(mTAG, "mChatService = null")
+                            if (!mBluetoothAdapter!!.isEnabled) {
+                                currentRequestCode = requestEnableBt
+                                openSomeActivityForResult()
+                                //val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                                //startActivityForResult(enableIntent, requestEnableBt)
+                                // Otherwise, setup the chat session
+                            } else {
+                                Log.d(mTAG, "===>mBluetoothAdapter is enabled")
+                                setupChat()
+                                if (mChatService != null) {
+                                    // Only if the state is STATE_NONE, do we know that we haven't started already
+                                    if (mChatService!!.getState() == BluetoothChatService.STATE_NONE) {
+                                        Log.d(mTAG, "--->mChatService start")
+                                        // Start the Bluetooth chat services
+                                        mChatService!!.start()
+                                    }
+
+
+
+                                    //connect printer
+                                    if (printerAddress == "") {
+                                        toast(getString(R.string.set_printer_first))
+                                    } else {
+                                        val device = mBluetoothAdapter!!.getRemoteDevice(printerAddress)
+                                        mChatService!!.connect(device, true)
+                                        //set printer
+                                        bluetoothPrintFunc = BluetoothPrinterFuncs(mChatService as BluetoothChatService)
+                                        if (bluetoothPrintFunc != null) {
+                                            Log.e(mTAG, "Bluetooth Printer ready.")
+                                        } else {
+                                            Log.e(mTAG, "bluetoothPrintFunc == null")
+                                        }
+                                    }
+
+                                } else {
+                                    Log.e(mTAG, "mChatService = null")
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+            requestEnableBt ->
+                // When the request to enable Bluetooth returns
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // Bluetooth is now enabled, so set up a chat session
+                    setupChat()
+
+                    if (mChatService != null) {
+                        // Only if the state is STATE_NONE, do we know that we haven't started already
+                        if (mChatService!!.getState() == BluetoothChatService.STATE_NONE) {
+                            // Start the Bluetooth chat services
+                            Log.d(mTAG, "--->mChatService start")
+                            mChatService!!.start()
+                        }
+
+
+
+                        //connect printer
+                        if (printerAddress == "") {
+                            toast(getString(R.string.set_printer_first))
+                        } else {
+                            val device = mBluetoothAdapter!!.getRemoteDevice(printerAddress)
+                            mChatService!!.connect(device, true)
+                            //set printer
+                            bluetoothPrintFunc = BluetoothPrinterFuncs(mChatService as BluetoothChatService)
+                            if (bluetoothPrintFunc != null) {
+                                Log.e(mTAG, "Bluetooth Printer ready.")
+                            } else {
+                                Log.e(mTAG, "bluetoothPrintFunc == null")
+                            }
+                        }
+
+                    } else {
+                        Log.e(mTAG, "mChatService = null")
+                    }
+
+
+                } else {
+                    // User did not enable Bluetooth or an error occurred
+                    Log.d(mTAG, "BT not enabled")
+                    toast(getString(R.string.bt_not_enabled_leaving))
+                }
+        }
+
+        /*if (result.resultCode == Activity.RESULT_OK) {
+            // There are no request codes
+            val data: Intent? = result.data
+
+        }*/
     }
+
+    fun openSomeActivityForResult() {
+        if (currentRequestCode == requestEnableBt) {
+            val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            resultLauncher.launch(intent)
+        } else if (currentRequestCode == setPrinterDev) {
+            val intent = Intent(this, DeviceListActivity::class.java)
+            intent.putExtra("SET_DEV", setPrinterDev)
+            resultLauncher.launch(intent)
+        }
+
+    }
+
 
     fun checkServerErrorString(res: String): Boolean {
         var ret = false
@@ -3932,7 +4111,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     //val  rjUser: RJUser = Gson().fromJson<Any>(res, RJUser::class.javaObjectType) as RJUser
                     Log.e(mTAG, "res = $res")
 
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
 
                         val rjUser = Gson().fromJson<Any>(res, RJUser::class.java) as RJUser
 
@@ -3966,6 +4145,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val failIntent = Intent()
+                        failIntent.action = Constants.ACTION.ACTION_LOGIN_FAILED
+                        sendBroadcast(failIntent)
                     }
 
                 }// try

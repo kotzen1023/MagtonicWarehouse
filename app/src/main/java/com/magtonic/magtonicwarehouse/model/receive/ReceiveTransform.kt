@@ -61,7 +61,13 @@ class ReceiveTransform {
             str = str.substring(1, str.length - 1)
             return str*/
             //val jsonStr = str.substring(1, str.length - 1)
-            return str.substring(1, str.length - 1)
+
+            return try {
+                str.substring(1, str.length - 1)
+            } catch (e: StringIndexOutOfBoundsException) {
+                e.printStackTrace()
+                "Error"
+            }
 
         }
 
