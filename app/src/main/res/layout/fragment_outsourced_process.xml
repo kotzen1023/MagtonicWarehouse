@@ -14,7 +14,7 @@
 
         <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="180dp"
                 android:orientation="vertical">
 
             <LinearLayout
@@ -45,6 +45,26 @@
                         android:lines="1"
                         android:layout_weight="1"
                         />
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                <Spinner
+                        android:id="@+id/storageSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                <!--Spinner
+                        android:id="@+id/warehouseSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" /-->
+
             </LinearLayout>
 
 

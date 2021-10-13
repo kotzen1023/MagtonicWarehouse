@@ -14,8 +14,8 @@ import android.widget.*
 
 import com.magtonic.magtonicwarehouse.R
 
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.itemCanEdit
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.itemClick
+import com.magtonic.magtonicwarehouse.ui.MaterialIssuingFragment.Companion.itemCanEdit
+import com.magtonic.magtonicwarehouse.ui.MaterialIssuingFragment.Companion.itemClick
 import java.lang.NumberFormatException
 
 import java.util.ArrayList

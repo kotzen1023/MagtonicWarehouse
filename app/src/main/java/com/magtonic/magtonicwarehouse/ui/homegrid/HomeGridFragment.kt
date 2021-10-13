@@ -1,4 +1,4 @@
-package com.magtonic.magtonicwarehouse.fragment
+package com.magtonic.magtonicwarehouse.ui.homegrid
 
 import android.app.AlertDialog
 import android.content.Context

@@ -71,6 +71,7 @@ class SignActivity : AppCompatActivity() {
     private var sendOrder: String = ""
     private var title: String = ""
     private var sendFragment: String = ""
+    private var warehouse: String = ""
     private var type: String = ""
     private var date: String = ""
 
@@ -84,6 +85,7 @@ class SignActivity : AppCompatActivity() {
         sendOrder = intent.getStringExtra("SEND_ORDER") as String
         title = intent.getStringExtra("TITLE") as String
         sendFragment = intent.getStringExtra("SEND_FRAGMENT") as String
+        warehouse = intent.getStringExtra("WAREHOUSE") as String
 
         if (intent.getStringExtra("TYPE") != null) {
             type = intent.getStringExtra("TYPE") as String
@@ -98,6 +100,7 @@ class SignActivity : AppCompatActivity() {
         Log.e(mTAG, "sendOrder = $sendOrder")
         Log.e(mTAG, "title = $title")
         Log.e(mTAG, "sendFragment = $sendFragment")
+        Log.e(mTAG, "warehouse = $warehouse")
 
         signContext = applicationContext
 
@@ -131,7 +134,7 @@ class SignActivity : AppCompatActivity() {
         }
 
         btnSave!!.setOnClickListener {
-            showLogoutConfirmDialog()
+            showSignUploadDialog()
         }
 
         btnPrev!!.setOnClickListener {
@@ -290,20 +293,26 @@ class SignActivity : AppCompatActivity() {
                                 "OUTSOURCED_PROCESS" -> {
                                     for (rjOutSourceProcessed in MainActivity.outsourcedProcessOrderList) {
 
-                                        //val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
-                                        //    rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
-                                        //outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
-                                        val insidePromptView = View.inflate(this@SignActivity, R.layout.fragment_outsourced_process_sign_show_detail_item, null)
+                                        if (rjOutSourceProcessed.data9 == warehouse) {
+                                            val insidePromptView = View.inflate(
+                                                this@SignActivity,
+                                                R.layout.fragment_outsourced_process_sign_show_detail_item,
+                                                null
+                                            )
 
-                                        val itemHeader = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
-                                        val itemContent = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
-                                        val itemQuantity = insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
+                                            val itemHeader =
+                                                insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemHeader)
+                                            val itemContent =
+                                                insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemContent)
+                                            val itemQuantity =
+                                                insidePromptView.findViewById<TextView>(R.id.outSourcedProcessSignShowDetailItemQuantity)
 
-                                        itemHeader.text = rjOutSourceProcessed.data3
-                                        itemContent.text = rjOutSourceProcessed.data6
-                                        itemQuantity.text = rjOutSourceProcessed.data4
+                                            itemHeader.text = rjOutSourceProcessed.data3
+                                            itemContent.text = rjOutSourceProcessed.data6
+                                            itemQuantity.text = rjOutSourceProcessed.data4
 
-                                        linearLayoutSignDetailList!!.addView(insidePromptView)
+                                            linearLayoutSignDetailList!!.addView(insidePromptView)
+                                        }
                                     }
                                 }
                                 "RETURN_OF_GOODS" -> {
@@ -640,7 +649,7 @@ class SignActivity : AppCompatActivity() {
         return ret
     }*/
 
-    private fun showLogoutConfirmDialog() {
+    private fun showSignUploadDialog() {
 
         // get prompts.xml view
         /*LayoutInflater layoutInflater = LayoutInflater.from(Nfc_read_app.this);
@@ -672,7 +681,7 @@ class SignActivity : AppCompatActivity() {
             /*val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
             val currentDateAndTime: String = sdf.format(Date())
             uploadSignName = "$currentDateAndTime.jpg"*/
-            uploadSignName = "$sendOrder.jpg"
+            //uploadSignName = "$sendOrder.jpg"
 
             val scaledWidth = 320.0 //stick height to 512
             //val scaledHeight = 512.0 //stick height to 512
@@ -685,7 +694,19 @@ class SignActivity : AppCompatActivity() {
             val scaledImage = Bitmap.createScaledBitmap(paintBoard!!.bitmap, scaledWidth.toInt(), scaledHeight.toInt(), false)
 
             //saveBitmap(drawContext as Context, paintBoard!!.bitmap, CompressFormat.JPEG,"image/jpeg", fileName)
+
+
+            when (sendFragment) {
+                "OUTSOURCED_PROCESS" -> {
+                    uploadSignName = "$sendOrder$warehouse.jpg"
+                }
+                "RETURN_OF_GOODS" -> {
+                    uploadSignName = "$sendOrder.jpg"
+                }
+            }
             val path = saveBitmap(this@SignActivity as Context, scaledImage,  uploadSignName)
+
+            Log.e(mTAG, "===>$path")
 
             if (path != "")
             {
@@ -693,6 +714,7 @@ class SignActivity : AppCompatActivity() {
 
                 when (sendFragment) {
                     "OUTSOURCED_PROCESS" -> {
+                        Log.e(mTAG, "->OUTSOURCED_PROCESS")
                         val ftpUtils = FTPUtils(signContext as Context,
                             ftp_ip_address, Constants.FtpInfo.PORT, Constants.FtpInfo.OUTSOURCED_USER, Constants.FtpInfo.OUTSOURCED_PASSWORD, uploadSignName, path)
                         val coroutineFtp = Presenter(ftpUtils)

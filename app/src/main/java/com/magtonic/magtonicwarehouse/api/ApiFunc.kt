@@ -83,9 +83,13 @@ class ApiFunc {
 
     private val apiStrGetGuestNotLeaveYetMulti = iepIP + "webs_app_car004"
 
-    private val apiStrOutsourcedProcessDetail = iepIP + "webs_app_sfpp01"
+    //private val apiStrOutsourcedProcessDetail = iepIP + "webs_app_sfpp01"
 
-    private val apiStrOutsourcedProcessBySupplierNo = iepIP + "webs_app_sfpp02"
+    private val apiStrOutsourcedProcessDetail = iepIP + "webs_app_sfpp05"
+
+    //private val apiStrOutsourcedProcessBySupplierNo = iepIP + "webs_app_sfpp02"
+
+    private val apiStrOutsourcedProcessBySupplierNo = iepIP + "webs_app_sfpp06"
 
     private val apiStrOutsourcedProcessSignConfirm = iepIP + "webs_app_sfpp03"
 

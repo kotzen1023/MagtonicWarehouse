@@ -234,4 +234,6 @@
     <string name="supplier_add_empty_name_or_number">Empty name or number</string>
     <string name="bluetooth_printer_enable">Bluetooth Printer restriction</string>
     <string name="setting_set_webservice_ip">Webservice IP config</string>
+    <string name="please_select">Select</string>
+    <string name="warehouse_empty_warnning">Please select warehouse</string>
 </resources>

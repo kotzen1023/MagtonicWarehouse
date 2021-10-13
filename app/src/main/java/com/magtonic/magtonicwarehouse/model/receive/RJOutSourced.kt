@@ -10,4 +10,6 @@ class RJOutSourced : RJBase() {
     var data6 = "" //品名
     var data7 = "" //規格
     var data8 = "" //過帳否
+    var data9 = "" //倉庫代號
+    var data10 = "" //倉庫名稱
 }

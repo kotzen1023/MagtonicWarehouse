@@ -1,4 +1,4 @@
-package com.magtonic.magtonicwarehouse.fragment
+package com.magtonic.magtonicwarehouse.ui
 
 
 import android.app.AlertDialog
@@ -88,6 +88,15 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
     //private val outsourcedSupplierHashMap = HashMap<String, String>()
     //private val outsourcedSupplierNameList = ArrayList<String>()
     var currentSelectedSupplier: Int = 0
+
+    private val storageList = ArrayList<String>()
+    private val storageWarehouseList = ArrayList<String>()
+
+    private var storageFilter = ""
+    //private var warehouseFilter = ""
+
+    var outsourcedProcessDetailFilterList = ArrayList<OutsourcedProcessDetailItem>()
+    private var currentWarehouse: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,6 +198,75 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
             outsourcedProcessContext?.sendBroadcast(moreDetailIntent)
         }
 
+
+        val storageSpinner = view.findViewById<Spinner>(R.id.storageSpinner)
+        val storageAdapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, storageWarehouseList)
+        storageSpinner.adapter = storageAdapter
+
+        storageSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.e(mTAG, "position = $position")
+                storageFilter = if (position == 0) {
+                    ""
+                } else {
+                    storageList[position]
+                }
+                currentWarehouse = storageFilter
+                if (storageFilter != "") {
+                    outsourcedProcessDetailFilterList.clear()
+                    for (data in outsourcedProcessDetailList) {
+                        if (data.getData9() == storageFilter) {
+                            outsourcedProcessDetailFilterList.add(data)
+                        }
+                    }
+
+                    outsourcedProcessDetailItemAdapter = OutsourcedProcessDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_detail_item, outsourcedProcessDetailFilterList)
+                    listViewDetail!!.adapter = outsourcedProcessDetailItemAdapter
+                } else {
+                    outsourcedProcessDetailItemAdapter = OutsourcedProcessDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_detail_item, outsourcedProcessDetailList)
+                    listViewDetail!!.adapter = outsourcedProcessDetailItemAdapter
+                }
+
+
+            }
+
+        }
+
+        /*val warehouseSpinner = view.findViewById<Spinner>(R.id.warehouseSpinner)
+        val warehouseAdapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, warehouseList)
+        warehouseSpinner.adapter = warehouseAdapter
+
+        warehouseSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.e(mTAG, "position = $position")
+                warehouseFilter = if (position == 0) {
+                    ""
+                } else {
+                    warehouseList[position]
+                }
+
+                if (storageFilter != "" && warehouseFilter != "") {
+                    outsourcedProcessDetailFilterList.clear()
+                    for (data in outsourcedProcessDetailList) {
+                        if (data.getData9() == storageFilter && data.getData10() == warehouseFilter ) {
+                            outsourcedProcessDetailFilterList.add(data)
+                        }
+                    }
+
+                    outsourcedProcessDetailItemAdapter = OutsourcedProcessDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_detail_item, outsourcedProcessDetailFilterList)
+                    listViewDetail!!.adapter = outsourcedProcessDetailItemAdapter
+                }
+            }
+
+        }*/
         //listViewLower = view.findViewById(R.id.listViewOutsourcedProcessLower)
         //val header = layoutInflater.inflate(R.layout.fragment_outsourced_process_lower_header, null) as View
         //listViewLower!!.addHeaderView(header)
@@ -509,7 +587,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
                         progressBar!!.visibility = View.GONE
 
-
+                        storageList.clear()
+                        storageWarehouseList.clear()
+                        storageAdapter.notifyDataSetChanged()
 
                         for (rjOutSourceProcessedBySupplier in outsourcedProcessOrderListBySupplier) {
                             var found = false
@@ -566,7 +646,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         for (rjOutSourceProcessed in outsourcedProcessOrderList) {
 
                             val outsourcedProcessDetailItem = OutsourcedProcessDetailItem(rjOutSourceProcessed.data1, rjOutSourceProcessed.data2, rjOutSourceProcessed.data3, rjOutSourceProcessed.data4,
-                                rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8)
+                                rjOutSourceProcessed.data5, rjOutSourceProcessed.data6, rjOutSourceProcessed.data7, rjOutSourceProcessed.data8, rjOutSourceProcessed.data9, rjOutSourceProcessed.data10)
                             outsourcedProcessDetailList.add(outsourcedProcessDetailItem)
                         }
 
@@ -584,7 +664,44 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         if (outsourcedProcessDetailItemAdapter != null) {
                             outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
                         }
+                        //find storage and warehouse
+                        if (outsourcedProcessDetailList.size > 0) {
+                            storageList.clear()
+                            storageWarehouseList.clear()
+                            storageList.add(getString(R.string.please_select))
+                            storageWarehouseList.add(getString(R.string.please_select))
 
+                            for (rjOutSourceProcessed in outsourcedProcessOrderList) {
+                                var foundStorage = false
+                                //var foundWarehouse = false
+                                for (storage in storageList) {
+                                    if (rjOutSourceProcessed.data9 == storage) {
+                                        foundStorage = true
+                                        break
+                                    }
+                                }
+
+                                if (!foundStorage) {
+                                    storageList.add(rjOutSourceProcessed.data9)
+                                    val combineString = rjOutSourceProcessed.data9+" - "+rjOutSourceProcessed.data10
+                                    storageWarehouseList.add(combineString)
+                                }
+
+
+
+                            }
+
+                            for (storage in storageList) {
+                                Log.e(mTAG, "[$storage]")
+                            }
+
+                            for (storageWarehouse in storageWarehouseList) {
+                                Log.e(mTAG, "[$storageWarehouse]")
+                            }
+
+                            storageAdapter.notifyDataSetChanged()
+                            //warehouseAdapter.notifyDataSetChanged()
+                        }
 
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_FRAGMENT_MORE_DETAIL_REFRESH, ignoreCase = true)) {
@@ -602,29 +719,127 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             outsourcedProcessContext!!.sendBroadcast(hideIntent)
                         }
 
+
                         outsourcedProcessMoreDetailList.clear()
 
-                        if (idx != null) {
-                            val item0 = OutsourcedProcessMoreDetailItem("發料單號", sendOrder as String)
-                            outsourcedProcessMoreDetailList.add(item0)
-                            val item1 = OutsourcedProcessMoreDetailItem("項次", outsourcedProcessDetailList[idx].getData1())
-                            outsourcedProcessMoreDetailList.add(item1)
-                            val item2 = OutsourcedProcessMoreDetailItem("工單編號", outsourcedProcessDetailList[idx].getData2())
-                            outsourcedProcessMoreDetailList.add(item2)
-                            val item3 = OutsourcedProcessMoreDetailItem("料件編號", outsourcedProcessDetailList[idx].getData3())
-                            outsourcedProcessMoreDetailList.add(item3)
-                            val item4 = OutsourcedProcessMoreDetailItem("發料數量", outsourcedProcessDetailList[idx].getData4())
-                            outsourcedProcessMoreDetailList.add(item4)
-                            val item5 = OutsourcedProcessMoreDetailItem("發料單位", outsourcedProcessDetailList[idx].getData5())
-                            outsourcedProcessMoreDetailList.add(item5)
-                            val item6 = OutsourcedProcessMoreDetailItem("品名", outsourcedProcessDetailList[idx].getData6())
-                            outsourcedProcessMoreDetailList.add(item6)
-                            val item7 = OutsourcedProcessMoreDetailItem("規格", outsourcedProcessDetailList[idx].getData7())
-                            outsourcedProcessMoreDetailList.add(item7)
-                            val item8 = OutsourcedProcessMoreDetailItem("過帳否", outsourcedProcessDetailList[idx].getData8())
-                            outsourcedProcessMoreDetailList.add(item8)
-                        }
+                        if (storageFilter == "") {
 
+                            if (idx != null) {
+                                val item0 =
+                                    OutsourcedProcessMoreDetailItem("發料單號", sendOrder as String)
+                                outsourcedProcessMoreDetailList.add(item0)
+                                val item1 = OutsourcedProcessMoreDetailItem(
+                                    "項次",
+                                    outsourcedProcessDetailList[idx].getData1()
+                                )
+                                outsourcedProcessMoreDetailList.add(item1)
+                                val item2 = OutsourcedProcessMoreDetailItem(
+                                    "工單編號",
+                                    outsourcedProcessDetailList[idx].getData2()
+                                )
+                                outsourcedProcessMoreDetailList.add(item2)
+                                val item3 = OutsourcedProcessMoreDetailItem(
+                                    "料件編號",
+                                    outsourcedProcessDetailList[idx].getData3()
+                                )
+                                outsourcedProcessMoreDetailList.add(item3)
+                                val item4 = OutsourcedProcessMoreDetailItem(
+                                    "發料數量",
+                                    outsourcedProcessDetailList[idx].getData4()
+                                )
+                                outsourcedProcessMoreDetailList.add(item4)
+                                val item5 = OutsourcedProcessMoreDetailItem(
+                                    "發料單位",
+                                    outsourcedProcessDetailList[idx].getData5()
+                                )
+                                outsourcedProcessMoreDetailList.add(item5)
+                                val item6 = OutsourcedProcessMoreDetailItem(
+                                    "品名",
+                                    outsourcedProcessDetailList[idx].getData6()
+                                )
+                                outsourcedProcessMoreDetailList.add(item6)
+                                val item7 = OutsourcedProcessMoreDetailItem(
+                                    "規格",
+                                    outsourcedProcessDetailList[idx].getData7()
+                                )
+                                outsourcedProcessMoreDetailList.add(item7)
+                                val item8 = OutsourcedProcessMoreDetailItem(
+                                    "過帳否",
+                                    outsourcedProcessDetailList[idx].getData8()
+                                )
+                                outsourcedProcessMoreDetailList.add(item8)
+                                val item9 = OutsourcedProcessMoreDetailItem(
+                                    "儲位",
+                                    outsourcedProcessDetailList[idx].getData9()
+                                )
+                                outsourcedProcessMoreDetailList.add(item9)
+                                val item10 = OutsourcedProcessMoreDetailItem(
+                                    "倉庫",
+                                    outsourcedProcessDetailList[idx].getData10()
+                                )
+                                outsourcedProcessMoreDetailList.add(item10)
+                            }
+
+
+
+
+                        } else {
+                            if (idx != null) {
+                                val item0 =
+                                    OutsourcedProcessMoreDetailItem("發料單號", sendOrder as String)
+                                outsourcedProcessMoreDetailList.add(item0)
+                                val item1 = OutsourcedProcessMoreDetailItem(
+                                    "項次",
+                                    outsourcedProcessDetailFilterList[idx].getData1()
+                                )
+                                outsourcedProcessMoreDetailList.add(item1)
+                                val item2 = OutsourcedProcessMoreDetailItem(
+                                    "工單編號",
+                                    outsourcedProcessDetailFilterList[idx].getData2()
+                                )
+                                outsourcedProcessMoreDetailList.add(item2)
+                                val item3 = OutsourcedProcessMoreDetailItem(
+                                    "料件編號",
+                                    outsourcedProcessDetailFilterList[idx].getData3()
+                                )
+                                outsourcedProcessMoreDetailList.add(item3)
+                                val item4 = OutsourcedProcessMoreDetailItem(
+                                    "發料數量",
+                                    outsourcedProcessDetailFilterList[idx].getData4()
+                                )
+                                outsourcedProcessMoreDetailList.add(item4)
+                                val item5 = OutsourcedProcessMoreDetailItem(
+                                    "發料單位",
+                                    outsourcedProcessDetailFilterList[idx].getData5()
+                                )
+                                outsourcedProcessMoreDetailList.add(item5)
+                                val item6 = OutsourcedProcessMoreDetailItem(
+                                    "品名",
+                                    outsourcedProcessDetailFilterList[idx].getData6()
+                                )
+                                outsourcedProcessMoreDetailList.add(item6)
+                                val item7 = OutsourcedProcessMoreDetailItem(
+                                    "規格",
+                                    outsourcedProcessDetailFilterList[idx].getData7()
+                                )
+                                outsourcedProcessMoreDetailList.add(item7)
+                                val item8 = OutsourcedProcessMoreDetailItem(
+                                    "過帳否",
+                                    outsourcedProcessDetailFilterList[idx].getData8()
+                                )
+                                outsourcedProcessMoreDetailList.add(item8)
+                                val item9 = OutsourcedProcessMoreDetailItem(
+                                    "儲位",
+                                    outsourcedProcessDetailFilterList[idx].getData9()
+                                )
+                                outsourcedProcessMoreDetailList.add(item9)
+                                val item10 = OutsourcedProcessMoreDetailItem(
+                                    "倉庫",
+                                    outsourcedProcessDetailFilterList[idx].getData10()
+                                )
+                                outsourcedProcessMoreDetailList.add(item10)
+                            }
+                        }
                         linearLayoutDetailHeader!!.visibility = View.INVISIBLE
 
                         //viewLine!!.visibility = View.VISIBLE
@@ -636,7 +851,6 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         if (outsourcedProcessMoreDetailAdapter != null) {
                             outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
                         }
-
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST")
 
@@ -817,11 +1031,18 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         }
         btnConfirm!!.setOnClickListener {
 
-            val intent = Intent(outsourcedProcessContext, SignActivity::class.java)
-            intent.putExtra("SEND_ORDER", currentSendOrder)
-            intent.putExtra("TITLE", getString(R.string.nav_outsourced))
-            intent.putExtra("SEND_FRAGMENT", "OUTSOURCED_PROCESS")
-            startActivity(intent)
+            if (currentWarehouse == "") {
+                toast(getString(R.string.warehouse_empty_warnning))
+            } else {
+                val intent = Intent(outsourcedProcessContext, SignActivity::class.java)
+                intent.putExtra("SEND_ORDER", currentSendOrder)
+                intent.putExtra("TITLE", getString(R.string.nav_outsourced))
+                intent.putExtra("WAREHOUSE", currentWarehouse)
+                intent.putExtra("SEND_FRAGMENT", "OUTSOURCED_PROCESS")
+                startActivity(intent)
+            }
+
+
             /*
             val oldString: String = textViewShouldContent.text.toString()
             val newString: String = textViewActualContent.text.toString()

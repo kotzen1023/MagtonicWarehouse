@@ -1,4 +1,4 @@
-package com.magtonic.magtonicwarehouse.fragment
+package com.magtonic.magtonicwarehouse.ui
 
 
 import android.content.BroadcastReceiver

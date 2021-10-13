@@ -3,21 +3,16 @@ package com.magtonic.magtonicwarehouse.data
 //import android.support.v4.view.PagerAdapter
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.viewpager.widget.PagerAdapter
 import com.magtonic.magtonicwarehouse.MainActivity
-import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.R
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.itemCanEdit
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.itemClick
 import com.magtonic.magtonicwarehouse.model.receive.RJMaterial
 
 class MaterialDetailAdapter(context: Context?, materialList: ArrayList<RJMaterial>, modifyList: ArrayList<Boolean>) : PagerAdapter() {

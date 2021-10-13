@@ -1,4 +1,4 @@
-package com.magtonic.magtonicwarehouse.fragment
+package com.magtonic.magtonicwarehouse.ui
 
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
@@ -389,8 +389,12 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
                                     //found position index
                                     if (pagerAdapter!!.materialDetailItemAdapterList[i].count > 0) {
 
-                                        pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getTextView()!!.visibility = View.VISIBLE
-                                        pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getLinearLayout()!!.visibility = View.GONE
+                                        pagerAdapter!!.materialDetailItemAdapterList[i].getItem(
+                                            itemCanEdit
+                                        )!!.getTextView()!!.visibility = View.VISIBLE
+                                        pagerAdapter!!.materialDetailItemAdapterList[i].getItem(
+                                            itemCanEdit
+                                        )!!.getLinearLayout()!!.visibility = View.GONE
                                     }
                                 }
                             }
@@ -749,7 +753,9 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
                 if (pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getTextView() != null) {
                     pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getTextView()!!.visibility =
                         View.VISIBLE
-                    pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getEditText()!!.setText(pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getContent())
+                    pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getEditText()!!.setText(pagerAdapter!!.materialDetailItemAdapterList[i].getItem(
+                        itemCanEdit
+                    )!!.getContent())
                     pagerAdapter!!.materialDetailItemAdapterList[i].getItem(itemCanEdit)!!.getLinearLayout()!!.visibility =
                         View.GONE
                 }

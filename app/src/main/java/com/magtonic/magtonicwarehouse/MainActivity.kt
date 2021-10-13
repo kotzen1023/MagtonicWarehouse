@@ -2,7 +2,6 @@ package com.magtonic.magtonicwarehouse
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.content.*
@@ -57,9 +56,8 @@ import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.ME
 import com.magtonic.magtonicwarehouse.data.ReceiptConfirmFailLog
 import com.magtonic.magtonicwarehouse.data.Supplier
 import com.magtonic.magtonicwarehouse.data.SupplierController
-import com.magtonic.magtonicwarehouse.fragment.*
-import com.magtonic.magtonicwarehouse.fragment.MaterialIssuingFragment.Companion.currentMaterialPage
-import com.magtonic.magtonicwarehouse.fragment.PropertyFragment.Companion.currentPropertyPage
+import com.magtonic.magtonicwarehouse.ui.MaterialIssuingFragment.Companion.currentMaterialPage
+import com.magtonic.magtonicwarehouse.ui.PropertyFragment.Companion.currentPropertyPage
 import com.magtonic.magtonicwarehouse.model.receive.*
 import com.magtonic.magtonicwarehouse.model.send.*
 import com.magtonic.magtonicwarehouse.model.sys.ScanBarcode
@@ -67,6 +65,7 @@ import com.magtonic.magtonicwarehouse.model.sys.User
 import com.magtonic.magtonicwarehouse.model.ui.*
 import com.magtonic.magtonicwarehouse.persistence.SupplierData
 import com.magtonic.magtonicwarehouse.persistence.SupplierDataDB
+import com.magtonic.magtonicwarehouse.ui.*
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -80,7 +79,8 @@ import java.util.*
 import java.util.concurrent.Executor
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-
+import com.magtonic.magtonicwarehouse.databinding.ActivityMainBinding
+import com.magtonic.magtonicwarehouse.ui.homegrid.HomeGridFragment
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private var receiptBarcode: String = ""
 
-
+    //private lateinit var binding: ActivityMainBinding
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -275,6 +275,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d(mTAG, "onCreate")
 
         mContext = applicationContext
+
+        //binding = ActivityMainBinding.inflate(layoutInflater)
+        //setContentView(binding.root)
 
         //val database = Firebase.database
         val database = Firebase.database
@@ -3921,7 +3924,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             requestConnectDeviceSecure -> {
                 Log.e(mTAG, "requestConnectDeviceSecure")
                 // When DeviceListActivity returns with a device to connect
-                if (result.resultCode == Activity.RESULT_OK) {
+                if (result.resultCode == RESULT_OK) {
                     //connectDevice(data, true)
                     Log.d(mTAG, "requestConnectDeviceSecure RESULT_OK")
                 }
@@ -3929,7 +3932,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             setPrinterDev -> {
                 Log.e(mTAG, "setPrinterDev")
-                if (result.resultCode == Activity.RESULT_OK) {
+                if (result.resultCode == RESULT_OK) {
                     Log.e(mTAG, "RESULT_OK")
                     //if (data?.getExtras() != null) {
                     val data: Intent? = result.data
@@ -4016,7 +4019,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             requestEnableBt ->
                 // When the request to enable Bluetooth returns
-                if (result.resultCode == Activity.RESULT_OK) {
+                if (result.resultCode == RESULT_OK) {
                     // Bluetooth is now enabled, so set up a chat session
                     setupChat()
 
@@ -4333,7 +4336,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
 
                         val retItemReceipt =
                             ItemReceipt.transRJReceiptStrToItemReceipt(res, barcode!!.poBarcode)
@@ -4390,6 +4393,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val serverErrorIntent = Intent()
+                        serverErrorIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(serverErrorIntent)
                     }
 
 
@@ -4449,7 +4456,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
                         val retItemReceipt = ItemReceipt.transRJReceiptStrToItemReceiptPoint(
                             res,
                             barcode!!.poBarcodeByScan
@@ -4507,6 +4514,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString true
                         toast(getString(R.string.toast_server_error))
+
+                        val serverErrorIntent = Intent()
+                        serverErrorIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(serverErrorIntent)
                     }
 
 
@@ -4633,7 +4644,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {   // trans to list data
                     //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
                     Log.e(mTAG, "res = $res")
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
                         //==== receive single record start ====
                         val rjReceiptUpload: RJReceiptUpload =
                             Gson().fromJson(res, RJReceiptUpload::class.java) as RJReceiptUpload
@@ -4699,6 +4710,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
                 } catch (e: Exception) {
@@ -4751,7 +4766,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {   // trans to list data
                     //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
                     Log.e(mTAG, "res = $res")
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
 
                         //==== receive single record start ====
                         val rjReceiptUpload: RJReceiptUpload =
@@ -4833,6 +4848,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -4922,7 +4941,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Log.e(mTAG, "===>confirmUploadReceiptCallback : onResponse start")
                 try {
 
-                    if (!checkServerErrorString(resXmlString)) {
+                    if (resXmlString != "Error" && !checkServerErrorString(resXmlString)) {
 
                         //Log.e(mTAG, "resXmlString = $resXmlString")
                         //var res = ReceiveTransform.restoreToJsonStr2(resString)
@@ -5008,6 +5027,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { // checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -5101,7 +5124,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     Log.e(mTAG, "=== receiptStorageList end ===")
                     */
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
 
                         //single
                         val retItemStorage = ItemStorage.transRJStorageStrToItemStorage(res)
@@ -5186,12 +5209,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Log.e(mTAG, "===>Exception ")
+
+                    val exceptionIntent = Intent()
+                    exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    sendBroadcast(exceptionIntent)
 
                     runOnUiThread {
 
@@ -5265,7 +5296,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {   // trans to list data
                     //val jsonStr = ReceiveTransform.addToJsonArrayStr(response.body()!!.string())
                     Log.e(mTAG, "res = $res")
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
                         //==== receive single record start ====
                         val rjStorageUpload: RJStorageUpload =
                             Gson().fromJson(res, RJStorageUpload::class.java) as RJStorageUpload
@@ -5293,6 +5324,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
                     /*
@@ -5707,7 +5742,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             runOnUiThread {
                 try {
 
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
 
                         val retItemGuest = ItemGuest.transRJGuestStrToItemGuest(res)
 
@@ -5748,6 +5783,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -5966,6 +6005,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6068,6 +6111,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6177,6 +6224,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else { //checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6223,7 +6274,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
                         //==== receive single record start ====
                         val rjOutSourcedConfirm: RJOutSourcedConfirm = Gson().fromJson(
                             res,
@@ -6246,6 +6297,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6350,6 +6405,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6455,6 +6514,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6557,6 +6620,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -6607,7 +6674,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
             runOnUiThread {
                 try {
-                    if (!checkServerErrorString(res)) {
+                    if (res != "Error" && !checkServerErrorString(res)) {
                         //==== receive single record start ====
                         val rjReturnOfGoodsConfirm: RJReturnOfGoodsConfirm = Gson().fromJson(
                             res,
@@ -6630,6 +6697,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     } else {//checkServerErrorString = true
                         toast(getString(R.string.toast_server_error))
+
+                        val exceptionIntent = Intent()
+                        exceptionIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(exceptionIntent)
                     }
 
 
@@ -7159,6 +7230,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var msg = "1. [20210420]修正倉退簽名目錄錯誤。\n"
         msg += "2. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
         msg += "3. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
+        msg += "4. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
 
         textViewFixMsg.text = msg
 
