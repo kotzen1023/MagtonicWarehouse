@@ -25,6 +25,7 @@ import com.magtonic.magtonicwarehouse.data.FTPUtils
 import com.magtonic.magtonicwarehouse.data.FileUtils
 import com.magtonic.magtonicwarehouse.data.PaintBoard
 import kotlinx.coroutines.*
+import org.xmlpull.v1.XmlPullParserException
 
 
 import java.io.IOException
@@ -85,7 +86,11 @@ class SignActivity : AppCompatActivity() {
         sendOrder = intent.getStringExtra("SEND_ORDER") as String
         title = intent.getStringExtra("TITLE") as String
         sendFragment = intent.getStringExtra("SEND_FRAGMENT") as String
-        warehouse = intent.getStringExtra("WAREHOUSE") as String
+        try {
+            warehouse = intent.getStringExtra("WAREHOUSE") as String
+        } catch (ep: NullPointerException) {
+            ep.printStackTrace()
+        }
 
         if (intent.getStringExtra("TYPE") != null) {
             type = intent.getStringExtra("TYPE") as String

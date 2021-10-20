@@ -7227,10 +7227,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210420]修正倉退簽名目錄錯誤。\n"
-        msg += "2. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
-        msg += "3. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
-        msg += "4. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
+        var msg = "1. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
+        msg += "2. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
+        msg += "3. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
+        msg += "4. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
 
         textViewFixMsg.text = msg
 

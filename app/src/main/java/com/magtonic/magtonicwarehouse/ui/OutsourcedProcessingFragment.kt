@@ -210,6 +210,13 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 Log.e(mTAG, "position = $position")
+
+                outsourcedProcessDetailFilterList.clear()
+                //if (outsourcedProcessDetailItemAdapter != null) {
+                //    outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
+                //}
+
+
                 storageFilter = if (position == 0) {
                     ""
                 } else {
@@ -217,7 +224,8 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                 }
                 currentWarehouse = storageFilter
                 if (storageFilter != "") {
-                    outsourcedProcessDetailFilterList.clear()
+
+
                     for (data in outsourcedProcessDetailList) {
                         if (data.getData9() == storageFilter) {
                             outsourcedProcessDetailFilterList.add(data)
@@ -862,6 +870,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         listViewMoreDetail!!.visibility = View.GONE
 
                         isOutSourcedInDetail = 0
+
+                        storageWarehouseList.clear()
+                        storageAdapter.notifyDataSetChanged()
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_BACK_TO_DETAIL_LIST")
 
@@ -876,7 +887,13 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SHOW_SIGN_DIALOG_ACTION")
 
-                        showSignDialog()
+                        if (currentWarehouse == "") {
+                            toast(getString(R.string.please_select))
+                        } else {
+                            showSignDialog()
+                        }
+
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS")
 
@@ -1184,6 +1201,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                 if (outsourcedProcessMoreDetailAdapter != null) {
                     outsourcedProcessMoreDetailAdapter?.notifyDataSetChanged()
                 }
+
+                outsourcedProcessDetailFilterList.clear()
+
 
                 listViewBySupplier!!.visibility = View.VISIBLE
                 listViewDetail!!.visibility = View.GONE
