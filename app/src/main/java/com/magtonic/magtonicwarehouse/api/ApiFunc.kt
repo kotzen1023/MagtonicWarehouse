@@ -166,11 +166,11 @@ class ApiFunc {
     }
 
     fun getOutSourcedProcessDetail(getPara: HttpOutsourcedProcessGetPara, callback: Callback) {
-        postWithParaPJsonStr(apiStrOutsourcedProcessDetail, Gson().toJson(getPara), callback)
+        postWithParaPJsonStrandTimeOutOutSource(apiStrOutsourcedProcessDetail, Gson().toJson(getPara), callback)
     }
 
     fun getOutSourcedProcessBySupplierNo(getPara: HttpOutsourcedProcessGetPara, callback: Callback) {
-        postWithParaPJsonStr(apiStrOutsourcedProcessBySupplierNo, Gson().toJson(getPara), callback)
+        postWithParaPJsonStrandTimeOutOutSource(apiStrOutsourcedProcessBySupplierNo, Gson().toJson(getPara), callback)
     }
 
     fun confirmOutSourcedProcessSign(getPara: HttpOutsourcedProcessSignConfirmGetPara, callback: Callback) {
@@ -262,6 +262,51 @@ class ApiFunc {
 
             e.printStackTrace()
         }
+
+    }
+
+    private fun postWithParaPJsonStrandTimeOutOutSource(url: String, jsonStr: String, callback: Callback) {
+        Log.e(mTAG, "->postWithParaPJsonStrandTimeOutOutSource")
+
+
+        val body = FormBody.Builder()
+            .add("p_json", jsonStr)
+            .build()
+
+        val request = Request.Builder()
+            .url(url)
+            .post(body)
+            .addHeader(ContentType.title, ContentType.xxxForm)
+            .build()
+
+
+
+        val client = OkHttpClient().newBuilder()
+            //.connectTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.readTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            //.writeTimeout(5000, TimeUnit.MILLISECONDS) //5 secs
+            .connectTimeout(10, TimeUnit.SECONDS) //5 secs
+            .readTimeout(10, TimeUnit.SECONDS) //5 secs
+            .writeTimeout(10, TimeUnit.SECONDS) //5 secs
+            .retryOnConnectionFailure(false)
+            .build()
+
+
+        try {
+            val response = client.newCall(request).enqueue(callback)
+
+
+
+            Log.d("pPara_pjson_timeout", "response = $response")
+
+            client.dispatcher.executorService.shutdown()
+            client.connectionPool.evictAll()
+            client.cache?.close()
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
 
     }
 

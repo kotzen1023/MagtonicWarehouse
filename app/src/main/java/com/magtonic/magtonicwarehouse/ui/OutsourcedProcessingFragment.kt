@@ -67,9 +67,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
     //var outsourcedProcessTopList = ArrayList<OutsourcedProcessTopItem>()
     //var outsourcedProcessLowerList = ArrayList<OutsourcedProcessLowerPartItem>()
-    var outsourcedProcessDetailList = ArrayList<OutsourcedProcessDetailItem>()
-    var outsourcedProcessMoreDetailList = ArrayList<OutsourcedProcessMoreDetailItem>()
-    var outsourcedProcessListBySupplier = ArrayList<OutsourcedProcessSupplierItem>()
+    private var outsourcedProcessDetailList = ArrayList<OutsourcedProcessDetailItem>()
+    private var outsourcedProcessMoreDetailList = ArrayList<OutsourcedProcessMoreDetailItem>()
+    private var outsourcedProcessListBySupplier = ArrayList<OutsourcedProcessSupplierItem>()
 
     //private var listViewTop: ListView?= null
     //private var listViewLower: ListView?= null
@@ -114,7 +114,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
         Log.d(mTAG, "onCreateView")
 
-
+        outsourcedProcessOrderListBySupplier.clear()
 
         val view = inflater.inflate(R.layout.fragment_outsourced_process, container, false)
 
@@ -384,6 +384,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
             when(actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     Log.e(mTAG, "IME_ACTION_DONE")
+                    outsourcedProcessOrderListBySupplier.clear()
 
                     linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
                     linearLayoutDetailHeader!!.visibility = View.GONE
@@ -438,6 +439,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
                 EditorInfo.IME_ACTION_NEXT -> {
                     Log.e(mTAG, "IME_ACTION_NEXT")
+                    outsourcedProcessOrderListBySupplier.clear()
 
                     linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
                     linearLayoutDetailHeader!!.visibility = View.GONE
@@ -1172,7 +1174,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         }
         btnConfirm!!.setOnClickListener {
 
-            if (outsourcedSupplierNameList.size > 0) {
+            outsourcedProcessOrderListBySupplier.clear()
+
+            //if (outsourcedSupplierNameList.size > 0) {
                 textViewSupplier!!.visibility = View.VISIBLE
                 textViewSupplier!!.text = outsourcedSupplierNameList[currentSelectedSupplier]
 
@@ -1217,7 +1221,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                     barcodeInput!!.text.toString().uppercase(Locale.getDefault())
                 )
                 outsourcedProcessContext?.sendBroadcast(searchIntent)
-            }
+            //}
 
 
 
