@@ -80,6 +80,8 @@ import java.util.concurrent.Executor
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import com.magtonic.magtonicwarehouse.databinding.ActivityMainBinding
+import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
+import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedDataDB
 import com.magtonic.magtonicwarehouse.ui.homegrid.HomeGridFragment
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -202,6 +204,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var supplierList = ArrayList<Supplier>()
         @JvmStatic var supplierDataList = ArrayList<SupplierData>()
         @JvmStatic var db: SupplierDataDB? = null
+        @JvmStatic var dbOustsourcedSigned: OutsourcedSignedDataDB? = null
+        @JvmStatic var outsourcedSignedList = ArrayList<OutsourcedSignedData>()
         //for disable bluetooth
         @JvmStatic var isBluetoothPrinterEnable: Boolean = true
         //for change ip
@@ -299,8 +303,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .build()
 
         supplierDataList = db!!.supplierDataDao().getAll() as ArrayList<SupplierData>
-
         Log.e(mTAG, "supplierDataList = ${supplierDataList.size}")
+        //load outsourcedSignedDB
+        dbOustsourcedSigned = Room.databaseBuilder(mContext as Context, OutsourcedSignedDataDB::class.java, OutsourcedSignedDataDB.DATABASE_NAME)
+            .allowMainThreadQueries()
+            .addMigrations(migration12)
+            .build()
+
+        outsourcedSignedList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
+        Log.e(mTAG, "outsourcedSignedList = ${outsourcedSignedList.size}")
+
 
         if (supplierDataList.size > 0) {
             for (supplierData in supplierDataList) {
@@ -2485,8 +2497,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //outsourced process
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_ACTION)
-            //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_FAILED)
-            //filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SIGN_UPLOAD_SUCCESS)
+
 
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_SHOW_FAB_BACK)
             filter.addAction(Constants.ACTION.ACTION_OUTSOURCED_PROCESS_HIDE_FAB_BACK)

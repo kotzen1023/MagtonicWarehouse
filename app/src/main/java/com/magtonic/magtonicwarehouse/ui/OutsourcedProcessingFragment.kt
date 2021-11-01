@@ -22,6 +22,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbOustsourcedSigned
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isOutSourcedInDetail
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedProcessOrderList
@@ -31,6 +32,8 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.outsourcedSupplierN
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
+import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -618,9 +621,19 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                                 val outsourcedProcessSupplierItem = OutsourcedProcessSupplierItem(rjOutSourceProcessedBySupplier.data1, rjOutSourceProcessedBySupplier.data2, rjOutSourceProcessedBySupplier.data3)
                                 outsourcedProcessListBySupplier.add(outsourcedProcessSupplierItem)
                             }
+
                             /*
                             val outsourcedProcessSupplierItem = OutsourcedProcessSupplierItem(rjOutSourceProcessedBySupplier.data1, rjOutSourceProcessedBySupplier.data2, rjOutSourceProcessedBySupplier.data3)
                             outsourcedProcessListBySupplier.add(outsourcedProcessSupplierItem)*/
+                        }
+
+                        for (i in 0 until outsourcedProcessListBySupplier.size) {
+                            val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
+                            if (outsourcedSignedData != null) {
+                                if (outsourcedSignedData.getSendOrder() == outsourcedProcessListBySupplier[i].getData2()) {
+                                    outsourcedProcessListBySupplier[i].setIsSigned(true)
+                                }
+                            }
                         }
 
                         if (outsourcedProcessListBySupplier.size > 0) {
@@ -915,6 +928,30 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         }
 
                         listViewBySupplier!!.invalidateViews()
+
+                        //add to sqlite
+                        var outsourcedSignedData: OutsourcedSignedData? = null
+                        if (dbOustsourcedSigned != null) {
+
+                            outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(currentSendOrder)
+                            //val c  = Calendar.getInstance(Locale.getDefault())
+                            //val dateTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                            //val dateTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                            //val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            //val dateString = date.format(c.time)
+                            //val dateTimeString = dateTime.format(c.time)
+                            val timeStamp= System.currentTimeMillis()
+                            if (outsourcedSignedData != null) {
+                                outsourcedSignedData.setSendOrder(currentSendOrder)
+                                outsourcedSignedData.setWareHouse(currentWarehouse)
+                                outsourcedSignedData.setTimeStamp(timeStamp)
+                                dbOustsourcedSigned!!.outsourcedSignedDataDao().update(outsourcedSignedData)
+                            } else {
+                                outsourcedSignedData = OutsourcedSignedData(currentSendOrder, currentWarehouse, timeStamp)
+                                dbOustsourcedSigned!!.outsourcedSignedDataDao().insert(outsourcedSignedData)
+                            }
+
+                        }
 
                         val backIntent = Intent()
                         backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST
