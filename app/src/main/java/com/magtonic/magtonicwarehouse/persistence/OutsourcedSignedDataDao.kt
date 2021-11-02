@@ -10,8 +10,11 @@ interface OutsourcedSignedDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(outsourcedSignedData: OutsourcedSignedData)
 
+    @Query("SELECT * FROM " + OutsourcedSignedData.TABLE_NAME + " WHERE sendOrderWareHouse LIKE :sendOrderWareHouse")
+    fun getOutsourcedSignedBySendOrderWareHouse(sendOrderWareHouse: String): OutsourcedSignedData
+
     @Query("SELECT * FROM " + OutsourcedSignedData.TABLE_NAME + " WHERE sendOrder LIKE :sendOrder")
-    fun getOutsourcedSignedBySendOrder(sendOrder: String): OutsourcedSignedData
+    fun getOutsourcedSignedBySendOrder(sendOrder: String): List<OutsourcedSignedData>
 
     @Update
     fun update(sutsourcedSignedData: OutsourcedSignedData)

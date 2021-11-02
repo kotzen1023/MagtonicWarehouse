@@ -6,7 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = OutsourcedSignedData.TABLE_NAME)
-class OutsourcedSignedData(sendOrder: String, wareHouse: String, timeStamp: Long) {
+class OutsourcedSignedData(sendOrderWareHouse: String, sendOrder: String, wareHouse: String, timeStamp: Long) {
     companion object {
         const val TABLE_NAME = "outsourcedSignedList"
     }
@@ -14,6 +14,9 @@ class OutsourcedSignedData(sendOrder: String, wareHouse: String, timeStamp: Long
     @NonNull
     @PrimaryKey(autoGenerate = false)
     private var id: Int = 0
+
+    @ColumnInfo(name = "sendOrderWareHouse") //發料單號+倉庫代號
+    private var sendOrderWareHouse: String? = ""
 
     @ColumnInfo(name = "sendOrder") //發料單號
     private var sendOrder: String? = ""
@@ -25,6 +28,7 @@ class OutsourcedSignedData(sendOrder: String, wareHouse: String, timeStamp: Long
     private var timeStamp: Long? = null
 
     init {
+        this.sendOrderWareHouse = sendOrderWareHouse
         this.sendOrder = sendOrder
         this.wareHouse = wareHouse
         this.timeStamp = timeStamp
@@ -36,6 +40,14 @@ class OutsourcedSignedData(sendOrder: String, wareHouse: String, timeStamp: Long
 
     fun setId(id : Int) {
         this.id = id
+    }
+
+    fun getSendOrderWareHouse(): String {
+        return sendOrderWareHouse as String
+    }
+
+    fun setSendOrderWareHouse(sendOrderWareHouse: String) {
+        this.sendOrderWareHouse = sendOrderWareHouse
     }
 
     fun getSendOrder(): String {

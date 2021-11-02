@@ -19,6 +19,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.widget.AdapterView
 import androidx.core.text.HtmlCompat
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
@@ -36,6 +37,10 @@ import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import android.widget.TextView
+
+
+
 
 
 
@@ -92,6 +97,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
     //private val outsourcedSupplierNameList = ArrayList<String>()
     var currentSelectedSupplier: Int = 0
 
+    private var storageSpinner: Spinner? = null
     private val storageList = ArrayList<String>()
     private val storageWarehouseList = ArrayList<String>()
 
@@ -100,6 +106,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
     var outsourcedProcessDetailFilterList = ArrayList<OutsourcedProcessDetailItem>()
     private var currentWarehouse: String = ""
+    companion object {
+        @JvmStatic var matchSendOrderAndWarehouse: Boolean = false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -202,13 +211,13 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         }
 
 
-        val storageSpinner = view.findViewById<Spinner>(R.id.storageSpinner)
+        storageSpinner = view.findViewById<Spinner>(R.id.storageSpinner)
         val storageAdapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, storageWarehouseList)
-        storageSpinner.adapter = storageAdapter
+        storageSpinner?.adapter = storageAdapter
 
         storageSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
-
+                Log.e(mTAG, "onNothingSelected")
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -227,13 +236,15 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                 }
                 currentWarehouse = storageFilter
                 if (storageFilter != "") {
-
+                    //val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(currentSendOrder) as ArrayList<OutsourcedSignedData>
 
                     for (data in outsourcedProcessDetailList) {
                         if (data.getData9() == storageFilter) {
                             outsourcedProcessDetailFilterList.add(data)
                         }
                     }
+
+
 
                     outsourcedProcessDetailItemAdapter = OutsourcedProcessDetailItemAdapter(outsourcedProcessContext, R.layout.fragment_outsourced_process_detail_item, outsourcedProcessDetailFilterList)
                     listViewDetail!!.adapter = outsourcedProcessDetailItemAdapter
@@ -627,10 +638,17 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             outsourcedProcessListBySupplier.add(outsourcedProcessSupplierItem)*/
                         }
 
+
                         for (i in 0 until outsourcedProcessListBySupplier.size) {
-                            val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
-                            if (outsourcedSignedData != null) {
-                                if (outsourcedSignedData.getSendOrder() == outsourcedProcessListBySupplier[i].getData2()) {
+                            //val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
+                            //var outsourcedSignedDataList: ArrayList<OutsourcedSignedData> ?= null
+                            val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2()) as ArrayList<OutsourcedSignedData>
+
+                            Log.e(mTAG,"====>Same SendOrder but different warehouse list size = ${outsourcedSignedDataList.size}")
+
+                            for (j in 0 until outsourcedSignedDataList.size) {
+                                if (outsourcedSignedDataList[j].getSendOrder() == outsourcedProcessListBySupplier[i].getData2()) {
+                                    Log.e(mTAG, "sendOrder+warehouse: ${outsourcedSignedDataList[j].getSendOrderWareHouse()}")
                                     outsourcedProcessListBySupplier[i].setIsSigned(true)
                                 }
                             }
@@ -722,7 +740,11 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                                 Log.e(mTAG, "[$storageWarehouse]")
                             }
 
+
+
                             storageAdapter.notifyDataSetChanged()
+
+
                             //warehouseAdapter.notifyDataSetChanged()
                         }
 
@@ -932,8 +954,8 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         //add to sqlite
                         var outsourcedSignedData: OutsourcedSignedData? = null
                         if (dbOustsourcedSigned != null) {
-
-                            outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(currentSendOrder)
+                            val combine = currentSendOrder + currentWarehouse
+                            outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrderWareHouse(combine)
                             //val c  = Calendar.getInstance(Locale.getDefault())
                             //val dateTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
                             //val dateTime = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -942,12 +964,15 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             //val dateTimeString = dateTime.format(c.time)
                             val timeStamp= System.currentTimeMillis()
                             if (outsourcedSignedData != null) {
+                                //val combine = currentSendOrder + currentWarehouse
+                                outsourcedSignedData.setSendOrderWareHouse(combine)
                                 outsourcedSignedData.setSendOrder(currentSendOrder)
                                 outsourcedSignedData.setWareHouse(currentWarehouse)
                                 outsourcedSignedData.setTimeStamp(timeStamp)
                                 dbOustsourcedSigned!!.outsourcedSignedDataDao().update(outsourcedSignedData)
                             } else {
-                                outsourcedSignedData = OutsourcedSignedData(currentSendOrder, currentWarehouse, timeStamp)
+                                //val combine = currentSendOrder + currentWarehouse
+                                outsourcedSignedData = OutsourcedSignedData(combine, currentSendOrder, currentWarehouse, timeStamp)
                                 dbOustsourcedSigned!!.outsourcedSignedDataDao().insert(outsourcedSignedData)
                             }
 
