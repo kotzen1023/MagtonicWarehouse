@@ -12,7 +12,7 @@ class OutsourcedSignedData(sendOrderWareHouse: String, sendOrder: String, wareHo
     }
 
     @NonNull
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
     private var id: Int = 0
 
     @ColumnInfo(name = "sendOrderWareHouse") //發料單號+倉庫代號

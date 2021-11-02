@@ -164,7 +164,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         listViewBySupplier!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
-            if (!outsourcedProcessListBySupplier[position].getIsSigned()) {
+            //if (!outsourcedProcessListBySupplier[position].getIsSigned()) {
                 currentSelectSendOrder = position
 
                 currentSendOrder = outsourcedProcessListBySupplier[position].getData2()
@@ -184,9 +184,9 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                 searchIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_GET_DETAIL_BY_SEND_ORDER
                 searchIntent.putExtra("SEND_ORDER", outsourcedProcessListBySupplier[position].getData2())
                 outsourcedProcessContext?.sendBroadcast(searchIntent)
-            } else {
-                toast(getString(R.string.outsourced_process_sign_is_signed_already))
-            }
+            //} else {
+            //    toast(getString(R.string.outsourced_process_sign_is_signed_already))
+            //}
 
 
         }
@@ -646,12 +646,15 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
                             Log.e(mTAG,"====>Same SendOrder but different warehouse list size = ${outsourcedSignedDataList.size}")
 
+                            var signedCount = 0
                             for (j in 0 until outsourcedSignedDataList.size) {
                                 if (outsourcedSignedDataList[j].getSendOrder() == outsourcedProcessListBySupplier[i].getData2()) {
                                     Log.e(mTAG, "sendOrder+warehouse: ${outsourcedSignedDataList[j].getSendOrderWareHouse()}")
                                     outsourcedProcessListBySupplier[i].setIsSigned(true)
+                                    signedCount += 1
                                 }
                             }
+                            outsourcedProcessListBySupplier[i].serSignedNum(signedCount)
                         }
 
                         if (outsourcedProcessListBySupplier.size > 0) {
@@ -680,9 +683,10 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
                             outsourcedProcessContext!!.sendBroadcast(hideIntent)
                         }
-                        
-                        
-                        
+
+                        //find signed warehouse
+                        val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(currentSendOrder) as ArrayList<OutsourcedSignedData>
+                        Log.e(mTAG, "get outsourcedSignedDataList = ${outsourcedSignedDataList.size}")
 
                         for (rjOutSourceProcessed in outsourcedProcessOrderList) {
 
@@ -724,7 +728,14 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
                                 if (!foundStorage) {
                                     storageList.add(rjOutSourceProcessed.data9)
-                                    val combineString = rjOutSourceProcessed.data9+" - "+rjOutSourceProcessed.data10
+                                    var combineString = rjOutSourceProcessed.data9+" - "+rjOutSourceProcessed.data10
+                                    if (outsourcedSignedDataList.size > 0) {
+                                        for (i in 0 until outsourcedSignedDataList.size) {
+                                            if (outsourcedSignedDataList[i].getWareHouse() == rjOutSourceProcessed.data9) {
+                                                combineString = getString(R.string.outsourced_signed)+"-"+combineString
+                                            }
+                                        }
+                                    }
                                     storageWarehouseList.add(combineString)
                                 }
 
@@ -962,8 +973,10 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             //val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                             //val dateString = date.format(c.time)
                             //val dateTimeString = dateTime.format(c.time)
+                            //Log.e(mTAG, "outsourcedSignedData: ${outsourcedSignedData.getSendOrderWareHouse()}, ${outsourcedSignedData.getSendOrder()}, ${outsourcedSignedData.getWareHouse()}")
                             val timeStamp= System.currentTimeMillis()
                             if (outsourcedSignedData != null) {
+                                Log.e(mTAG, "update signed!")
                                 //val combine = currentSendOrder + currentWarehouse
                                 outsourcedSignedData.setSendOrderWareHouse(combine)
                                 outsourcedSignedData.setSendOrder(currentSendOrder)
@@ -971,9 +984,16 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                                 outsourcedSignedData.setTimeStamp(timeStamp)
                                 dbOustsourcedSigned!!.outsourcedSignedDataDao().update(outsourcedSignedData)
                             } else {
+                                Log.e(mTAG, "add new signed!")
                                 //val combine = currentSendOrder + currentWarehouse
                                 outsourcedSignedData = OutsourcedSignedData(combine, currentSendOrder, currentWarehouse, timeStamp)
                                 dbOustsourcedSigned!!.outsourcedSignedDataDao().insert(outsourcedSignedData)
+
+                                val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
+                                Log.e(mTAG, "==>outsourcedSignedDataList = ${outsourcedSignedDataList.size}")
+                                //for (i in 0 until outsourcedSignedDataList.size) {
+                                //    Log.e(mTAG, "outsourcedSignedDataList[$i] = ${outsourcedSignedDataList[i].getSendOrderWareHouse()}")
+                                //}
                             }
 
                         }

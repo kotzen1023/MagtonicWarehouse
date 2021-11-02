@@ -13,6 +13,7 @@ class OutsourcedProcessDetailItem(data1: String, data2: String, data3: String, d
     private var data8: String = ""
     private var data9: String = ""
     private var data10: String = ""
+    private var isSigned: Boolean = false
 
     init {
         this.data1 = data1
@@ -25,6 +26,7 @@ class OutsourcedProcessDetailItem(data1: String, data2: String, data3: String, d
         this.data8 = data8
         this.data9 = data9
         this.data10 = data10
+        isSigned = false
     }
 
     fun getData1(): String {
@@ -65,5 +67,13 @@ class OutsourcedProcessDetailItem(data1: String, data2: String, data3: String, d
 
     fun getData10(): String {
         return data10
+    }
+
+    fun getIsSigned(): Boolean {
+        return isSigned
+    }
+
+    fun setIsSigned(isSigned: Boolean) {
+        this.isSigned = isSigned
     }
 }

@@ -231,4 +231,5 @@
     <string name="setting_set_webservice_ip">WebService IP設定</string>
     <string name="please_select">請選擇倉庫</string>
     <string name="warehouse_empty_warnning">請選擇倉庫</string>
+    <string name="outsourced_signed">已簽</string>
 </resources>

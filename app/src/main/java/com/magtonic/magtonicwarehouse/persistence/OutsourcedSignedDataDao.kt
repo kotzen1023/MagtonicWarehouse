@@ -7,6 +7,7 @@ interface OutsourcedSignedDataDao {
 
     fun getAll(): List<OutsourcedSignedData>
 
+    //@Insert(onConflict = OnConflictStrategy.REPLACE)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(outsourcedSignedData: OutsourcedSignedData)
 
@@ -17,7 +18,7 @@ interface OutsourcedSignedDataDao {
     fun getOutsourcedSignedBySendOrder(sendOrder: String): List<OutsourcedSignedData>
 
     @Update
-    fun update(sutsourcedSignedData: OutsourcedSignedData)
+    fun update(outsourcedSignedData: OutsourcedSignedData)
 
     @Query("DELETE FROM " + OutsourcedSignedData.TABLE_NAME + " WHERE 1")
     fun clearTable()

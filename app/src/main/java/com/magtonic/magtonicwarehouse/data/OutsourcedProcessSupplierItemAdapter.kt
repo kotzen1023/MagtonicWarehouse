@@ -53,16 +53,22 @@ class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, ob
         //holder.checkbox = (CheckBox) view.findViewById(R.id.checkBoxInRow);
 
 
-        val outsourcedProcessOrderDetailItem = items[position]
+        val outsourcedProcessOrderItem = items[position]
         //if (receiptDetailItem != null) {
-        if (outsourcedProcessOrderDetailItem.getIsSigned()) {
+        if (outsourcedProcessOrderItem.getIsSigned()) {
             //holder.itemSigned.visibility = View.VISIBLE
             view.setBackgroundColor(Color.YELLOW)
         } else
             view.setBackgroundColor(Color.TRANSPARENT)
 
-        holder.itemHeader.text = outsourcedProcessOrderDetailItem.getData2()
-        holder.itemContent.text = outsourcedProcessOrderDetailItem.getData3()
+        if (outsourcedProcessOrderItem.getSignedNum() > 0) {
+            holder.itemSigned.visibility = View.VISIBLE
+            holder.itemHeader.text = outsourcedProcessOrderItem.getSignedNum().toString()
+        } else {
+            holder.itemSigned.visibility = View.GONE
+        }
+        holder.itemHeader.text = outsourcedProcessOrderItem.getData2()
+        holder.itemContent.text = outsourcedProcessOrderItem.getData3()
 
 
 
@@ -72,7 +78,7 @@ class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, ob
     }
 
     class ViewHolder (view: View) {
-        //var itemSigned: ImageView = view.findViewById(R.id.outSourcedProcessIsSigned)
+        var itemSigned: TextView = view.findViewById(R.id.textViewSignedNumber)
         var itemHeader: TextView = view.findViewById(R.id.outSourcedProcessSendMaterialHeader)
         var itemContent: TextView = view.findViewById(R.id.outSourcedProcessWorkOrderContent)
     }

@@ -62,6 +62,12 @@ class OutsourcedProcessDetailItemAdapter (context: Context?, resource: Int, obje
 
 
         val outsourcedProcessOrderDetailItem = items[position]
+
+        if (outsourcedProcessOrderDetailItem.getIsSigned()) {
+            //holder.itemSigned.visibility = View.VISIBLE
+            view.setBackgroundColor(Color.YELLOW)
+        } else
+            view.setBackgroundColor(Color.TRANSPARENT)
         //if (receiptDetailItem != null) {
         val workOrderSize = outsourcedProcessOrderDetailItem.getData2().length
         //val partNpSize = outsourcedProcessOrderDetailItem.getData3().length

@@ -17,12 +17,22 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-            <ImageView
+            <!--ImageView
                     android:id="@+id/outSourcedProcessIsSigned"
                     android:layout_width="24dp"
                     android:layout_height="match_parent"
                     android:scaleType="fitCenter"
                     android:src="@drawable/baseline_check_box_black_48"
+                    android:visibility="gone"/-->
+            <TextView
+                    android:id="@+id/textViewSignedNumber"
+                    android:layout_width="24dp"
+                    android:textStyle="bold"
+                    android:text="4"
+                    android:textColor="@color/md_red_400"
+                    android:textSize="@dimen/text_size_20"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
                     android:visibility="gone"/>
 
             <TextView android:text="header"
