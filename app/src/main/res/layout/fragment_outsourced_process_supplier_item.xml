@@ -28,7 +28,7 @@
                     android:id="@+id/textViewSignedNumber"
                     android:layout_width="24dp"
                     android:textStyle="bold"
-                    android:text="4"
+                    android:text=""
                     android:textColor="@color/md_red_400"
                     android:textSize="@dimen/text_size_20"
                     android:layout_height="match_parent"

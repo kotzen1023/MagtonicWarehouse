@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var supplierDataList = ArrayList<SupplierData>()
         @JvmStatic var db: SupplierDataDB? = null
         @JvmStatic var dbOustsourcedSigned: OutsourcedSignedDataDB? = null
-        @JvmStatic var outsourcedSignedList = ArrayList<OutsourcedSignedData>()
+        //@JvmStatic var outsourcedSignedList = ArrayList<OutsourcedSignedData>()
         //for disable bluetooth
         @JvmStatic var isBluetoothPrinterEnable: Boolean = true
         //for change ip
@@ -310,8 +310,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addMigrations(migration12)
             .build()
 
-        outsourcedSignedList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
-        Log.e(mTAG, "outsourcedSignedList = ${outsourcedSignedList.size}")
+        //outsourcedSignedList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
+        //Log.e(mTAG, "outsourcedSignedList = ${outsourcedSignedList.size}")
 
 
         if (supplierDataList.size > 0) {
@@ -7238,10 +7238,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210804]修正委外發料對話方塊出現確定、取消按鈕消失的情形。\n"
-        msg += "2. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
-        msg += "3. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
-        msg += "4. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
+        var msg = "1. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
+        msg += "2. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
+        msg += "3. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
+        msg += "4. [20211102]修正委外發料簽名，紀錄已簽過之發料單號與倉庫別(本機)\n"
 
         textViewFixMsg.text = msg
 

@@ -43,7 +43,7 @@ class OutsourcedProcessSupplierItem(data1: String, data2: String, data3: String)
         return signedNumber
     }
 
-    fun serSignedNum(signedNumber: Int) {
+    fun setSignedNum(signedNumber: Int) {
         this.signedNumber = signedNumber
     }
 }

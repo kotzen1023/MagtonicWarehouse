@@ -654,7 +654,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                                     signedCount += 1
                                 }
                             }
-                            outsourcedProcessListBySupplier[i].serSignedNum(signedCount)
+                            outsourcedProcessListBySupplier[i].setSignedNum(signedCount)
                         }
 
                         if (outsourcedProcessListBySupplier.size > 0) {
@@ -952,15 +952,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                         Log.d(mTAG, "sendOrder = $sendOrder")
 
 
-                        for (i in 0 until outsourcedProcessListBySupplier.size) {
-                            Log.e(mTAG, outsourcedProcessListBySupplier[i].getData1())
-                            if (outsourcedProcessListBySupplier[i].getData2() == sendOrder) {
-                                outsourcedProcessListBySupplier[i].setIsSigned(true)
-                            }
-                            Log.e(mTAG, "outsourcedProcessListBySupplier[$i] = ${outsourcedProcessListBySupplier[i].getIsSigned()}")
-                        }
 
-                        listViewBySupplier!!.invalidateViews()
 
                         //add to sqlite
                         var outsourcedSignedData: OutsourcedSignedData? = null
@@ -997,6 +989,36 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                             }
 
                         }
+
+                        //update from sqlite and update view
+                        for (i in 0 until outsourcedProcessListBySupplier.size) {
+                            //val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
+                            //var outsourcedSignedDataList: ArrayList<OutsourcedSignedData> ?= null
+                            val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2()) as ArrayList<OutsourcedSignedData>
+
+                            Log.e(mTAG,"====>Same SendOrder but different warehouse list size = ${outsourcedSignedDataList.size}")
+
+                            var signedCount = 0
+                            for (j in 0 until outsourcedSignedDataList.size) {
+                                if (outsourcedSignedDataList[j].getSendOrder() == outsourcedProcessListBySupplier[i].getData2()) {
+                                    Log.e(mTAG, "sendOrder+warehouse: ${outsourcedSignedDataList[j].getSendOrderWareHouse()}")
+                                    outsourcedProcessListBySupplier[i].setIsSigned(true)
+                                    signedCount += 1
+                                }
+                            }
+                            outsourcedProcessListBySupplier[i].setSignedNum(signedCount)
+                            Log.e(mTAG, "outsourcedProcessListBySupplier[$i] = ${outsourcedProcessListBySupplier[i].getIsSigned()}")
+                        }
+                        //update view
+                        /*for (i in 0 until outsourcedProcessListBySupplier.size) {
+                            Log.e(mTAG, outsourcedProcessListBySupplier[i].getData1())
+                            if (outsourcedProcessListBySupplier[i].getData2() == sendOrder) {
+                                outsourcedProcessListBySupplier[i].setIsSigned(true)
+                            }
+                            Log.e(mTAG, "outsourcedProcessListBySupplier[$i] = ${outsourcedProcessListBySupplier[i].getIsSigned()}")
+                        }*/
+
+                        listViewBySupplier!!.invalidateViews()
 
                         val backIntent = Intent()
                         backIntent.action = Constants.ACTION.ACTION_OUTSOURCED_PROCESS_BACK_TO_SUPPLIER_LIST

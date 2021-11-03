@@ -63,7 +63,7 @@ class OutsourcedProcessSupplierItemAdapter (context: Context?, resource: Int, ob
 
         if (outsourcedProcessOrderItem.getSignedNum() > 0) {
             holder.itemSigned.visibility = View.VISIBLE
-            holder.itemHeader.text = outsourcedProcessOrderItem.getSignedNum().toString()
+            holder.itemSigned.text = outsourcedProcessOrderItem.getSignedNum().toString()
         } else {
             holder.itemSigned.visibility = View.GONE
         }
