@@ -4,6 +4,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
+
     <TextView
             android:id="@+id/textViewOutsourcedSupplierDialogMsg"
             android:layout_width="match_parent"
@@ -12,7 +14,17 @@
             android:text="@string/outsourced_process_dialog_select_supplier"
             android:gravity="center"/>
 
-
+    <EditText
+            android:id="@+id/editTextOutsourcedSupplierDialogUserInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_30"
+            android:hint="@string/outsourced_process_dialog_user_input"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:minLines="1"
+            android:lines="1"
+            android:gravity="center"/>
 
     <Spinner
             android:id="@+id/spinnerSupplier"

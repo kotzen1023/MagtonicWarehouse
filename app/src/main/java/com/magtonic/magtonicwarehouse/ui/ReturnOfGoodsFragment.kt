@@ -10,6 +10,8 @@ import android.graphics.Color
 import android.graphics.Rect
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -693,12 +695,58 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
 
         //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
         //val textViewMsg = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessDialogMsg)
-        //val textViewOutsourcedProcessSendOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessSendOrderHeader)
+        val editTextFilter = promptView.findViewById<EditText>(R.id.editTextOutsourcedSupplierDialogUserInput)
         val spinnerSupplier = promptView.findViewById<Spinner>(R.id.spinnerSupplier)
         //val textViewOutsourcedProcessWorkOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderHeader)
         //val textViewOutsourcedProcessWorkOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderContent)
         val btnCancel = promptView.findViewById<Button>(R.id.btnOutSourcedDialogCancel)
         val btnConfirm = promptView.findViewById<Button>(R.id.btnOutSourcedDialogConfirm)
+
+        var found = false
+        val outsourcedSupplierNameFilterList = ArrayList<String>()
+
+        val mTextWatcher: TextWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                //Log.e(mTAG, "afterTextChanged")
+            }
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int,
+                after: Int
+            ) {
+                //Log.e(mTAG, "beforeTextChanged")
+            }
+
+            override fun onTextChanged(
+                s: CharSequence, start: Int, before: Int,
+                count: Int
+            ) {
+                Log.e(mTAG, "onTextChanged")
+                Log.e(mTAG, "editTextFilter.text = ${editTextFilter.text}")
+
+                outsourcedSupplierNameFilterList.clear()
+
+                for (i in 0 until MainActivity.outsourcedSupplierNameList.size) {
+                    if (MainActivity.outsourcedSupplierNameList[i].contains(editTextFilter.text)) {
+                        outsourcedSupplierNameFilterList.add(MainActivity.outsourcedSupplierNameList[i])
+                        found = true
+                    }
+                }
+
+                if (found) {
+                    val adapter: ArrayAdapter<String> = ArrayAdapter(returnOfGoodsContext as Context, R.layout.myspinner, outsourcedSupplierNameFilterList)
+                    spinnerSupplier.adapter = adapter
+                } else {
+                    val adapter: ArrayAdapter<String> = ArrayAdapter(returnOfGoodsContext as Context, R.layout.myspinner,
+                        MainActivity.outsourcedSupplierNameList
+                    )
+                    spinnerSupplier.adapter = adapter
+                }
+
+
+            }
+        }
+        editTextFilter.addTextChangedListener(mTextWatcher)
+
         val adapter: ArrayAdapter<String> = ArrayAdapter(returnOfGoodsContext as Context, R.layout.myspinner,
             MainActivity.outsourcedSupplierNameList
         )
@@ -712,9 +760,19 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                barcodeInput!!.setText(MainActivity.outsourcedSupplierHashMap[MainActivity.outsourcedSupplierNameList[position]])
+                if (found) {
+                    Log.e(mTAG, "found = $found, name = ${outsourcedSupplierNameFilterList[position]}")
+                    barcodeInput!!.setText(MainActivity.outsourcedSupplierHashMap[outsourcedSupplierNameFilterList[position]])
 
-                currentSelectedSupplier = position
+                    for (i in 0 until MainActivity.outsourcedSupplierNameList.size) {
+                        if (MainActivity.outsourcedSupplierNameList[i] == outsourcedSupplierNameFilterList[position]) {
+                            currentSelectedSupplier = i
+                        }
+                    }
+                } else {
+                    barcodeInput!!.setText(MainActivity.outsourcedSupplierHashMap[MainActivity.outsourcedSupplierNameList[position]])
+                    currentSelectedSupplier = position
+                }
 
             }
 

@@ -53,6 +53,7 @@ import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.ME
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_STATE_CHANGE
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_TOAST
 import com.magtonic.magtonicwarehouse.data.Constants.BluetoothState.Companion.MESSAGE_WRITE
+import com.magtonic.magtonicwarehouse.data.FileUtils
 import com.magtonic.magtonicwarehouse.data.ReceiptConfirmFailLog
 import com.magtonic.magtonicwarehouse.data.Supplier
 import com.magtonic.magtonicwarehouse.data.SupplierController
@@ -79,8 +80,6 @@ import java.util.*
 import java.util.concurrent.Executor
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import com.magtonic.magtonicwarehouse.databinding.ActivityMainBinding
-import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
 import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedDataDB
 import com.magtonic.magtonicwarehouse.ui.homegrid.HomeGridFragment
 
@@ -270,6 +269,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var receiptBarcode: String = ""
 
     //private lateinit var binding: ActivityMainBinding
+    private val fileUtils: FileUtils = FileUtils()
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -304,6 +304,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         supplierDataList = db!!.supplierDataDao().getAll() as ArrayList<SupplierData>
         Log.e(mTAG, "supplierDataList = ${supplierDataList.size}")
+
+        //if supplierDataList.size > 0, write xml in Download, or read xml file from Download
+        if (supplierDataList.size > 0) {
+            //write to xml file
+            fileUtils.writeXmlFile(supplierDataList)
+        } else {
+            supplierDataList = fileUtils.readXmlFromFile(mContext)
+        }
+
+
+
         //load outsourcedSignedDB
         dbOustsourcedSigned = Room.databaseBuilder(mContext as Context, OutsourcedSignedDataDB::class.java, OutsourcedSignedDataDB.DATABASE_NAME)
             .allowMainThreadQueries()
@@ -7238,10 +7249,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210812]修正委外發料簽名，簽名過後沒有反白成黃色的情形。\n"
-        msg += "2. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
-        msg += "3. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
-        msg += "4. [20211102]修正委外發料簽名，紀錄已簽過之發料單號與倉庫別(本機)\n"
+        var msg = "1. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
+        msg += "2. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
+        msg += "3. [20211102]修正委外發料簽名，紀錄已簽過之發料單號與倉庫別(本機)\n"
+        msg += "4. [20211105]修正委外發料與倉退簽名，可輸入關鍵字過濾\n"
 
         textViewFixMsg.text = msg
 

@@ -7,18 +7,38 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.magtonic.magtonicwarehouse.persistence.SupplierData
 import org.apache.commons.io.IOUtils
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import java.io.*
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerException
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import android.util.Xml
+
+import org.xmlpull.v1.XmlPullParser
+
+
+
+
+
+
 
 
 class FileUtils {
@@ -270,5 +290,136 @@ class FileUtils {
             }
         }
         return ret
+    }
+
+    fun writeXmlFile(list: ArrayList<SupplierData>) {
+        Log.e(mTAG, "=== writeXmlFile start ===")
+        //val downloadFolder = ctx.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+        val downloadFolder = "/storage/emulated/0/Download"
+        Log.e(mTAG, "downloadFolder= $downloadFolder")
+        try {
+            val dFact: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
+            val build: DocumentBuilder = dFact.newDocumentBuilder()
+            val doc: Document = build.newDocument()
+            val root: Element = doc.createElement("suppliers")
+            doc.appendChild(root)
+            //val Details: Element = doc.createElement("Details")
+            //root.appendChild(Details)
+            for (dtl in list) {
+                val data: Element = doc.createElement("data")
+                root.appendChild(data)
+
+                val key: Element = doc.createElement("key")
+                key.appendChild(doc.createTextNode(java.lang.String.valueOf(dtl.getKey())))
+                data.appendChild(key)
+
+                val name: Element = doc.createElement("name")
+                name.appendChild(doc.createTextNode(java.lang.String.valueOf(dtl.getName())))
+                data.appendChild(name)
+
+                val uniNumber: Element = doc.createElement("uniNumber")
+                uniNumber.appendChild(doc.createTextNode(java.lang.String.valueOf(dtl.getNumber())))
+                data.appendChild(uniNumber)
+            }
+
+            // Save the document to the disk file
+            val tranFactory: TransformerFactory = TransformerFactory.newInstance()
+            val aTransformer: Transformer = tranFactory.newTransformer()
+
+            // format the XML nicely
+            aTransformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1")
+            aTransformer.setOutputProperty(
+                "{http://xml.apache.org/xslt}indent-amount", "4"
+            )
+            aTransformer.setOutputProperty(OutputKeys.INDENT, "yes")
+            val source = DOMSource(doc)
+            try {
+                // location and name of XML file you can change as per need
+                val fos = FileWriter("$downloadFolder/suppliers.xml")
+                val result = StreamResult(fos)
+                aTransformer.transform(source, result)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        } catch (ex: TransformerException) {
+            println("Error outputting document")
+        } catch (ex: ParserConfigurationException) {
+            println("Error building document")
+        }
+        Log.e(mTAG, "=== writeXmlFile end ===")
+    }
+
+    fun readXmlFromFile(ctx: Context?): ArrayList<SupplierData> {
+        Log.e(mTAG, "=== readXmlFromFile start ===")
+        val downloadFolder = "/storage/emulated/0/Download"
+        val xmlFile = "$downloadFolder/suppliers.xml"
+        val dataList= ArrayList<SupplierData>()
+        dataList.clear()
+        try {
+            //val fileInputStream = ctx!!.openFileInput(xmlFile)
+            val fileInputStream = FileInputStream(File(xmlFile))
+            //val len = fileInputStream.available()
+            //val buffer = ByteArray(len)
+            //fileInputStream.read(buffer)
+
+            val parser = Xml.newPullParser()
+            parser.setInput(fileInputStream, "UTF-8")
+
+            var eventType = parser.eventType
+
+            var key = ""
+            var name = ""
+            var uniNumber = ""
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                //Log.e(mTAG, "parser.name = ${parser.name}")
+                when (eventType) {
+
+                    XmlPullParser.START_DOCUMENT-> {
+
+                        Log.e(mTAG, "START_DOCUMENT")
+                    }
+
+                    XmlPullParser.START_TAG ->{
+
+                        when(parser.name) {
+                            "data" -> {
+
+                            }
+                            "key" -> {
+                                key = parser.nextText()
+                            }
+                            "name" -> {
+                                name = parser.nextText()
+                            }
+                            "uniNumber" -> {
+                                uniNumber = parser.nextText()
+                            }
+                        }
+
+                    }
+
+                    XmlPullParser.END_TAG->{
+                        if (parser.name.equals("data")) {
+                            val supplierData = SupplierData(key, name, uniNumber)
+                            dataList.add(supplierData)
+                        }
+                    }
+                    //else-> {
+                    //    Log.e(mTAG, "Unknown tag")
+                    //}
+                }
+                eventType = parser.next()
+            }
+
+            Log.e(mTAG, "dataList size = ${dataList.size}")
+
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+
+
+        Log.e(mTAG, "=== readXmlFromFile end ===")
+        return dataList
     }
 }

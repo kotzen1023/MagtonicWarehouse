@@ -22,7 +22,6 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
-import com.magtonic.magtonicwarehouse.MainActivity
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbOustsourcedSigned
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isOutSourcedInDetail
@@ -38,10 +37,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
+import android.text.Editable
 
+import android.text.TextWatcher
+import androidx.core.content.ContextCompat.getSystemService
 
+import com.magtonic.magtonicwarehouse.MainActivity
 
-
+import android.os.IBinder
+import androidx.core.content.ContextCompat
 
 
 class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
@@ -106,9 +111,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
     var outsourcedProcessDetailFilterList = ArrayList<OutsourcedProcessDetailItem>()
     private var currentWarehouse: String = ""
-    companion object {
-        @JvmStatic var matchSendOrderAndWarehouse: Boolean = false
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1235,11 +1238,56 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         //final EditText editFileName = (EditText) promptView.findViewById(R.id.editFileName);
         //val textViewMsg = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessDialogMsg)
         //val textViewOutsourcedProcessSendOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessSendOrderHeader)
+        val editTextFilter = promptView.findViewById<EditText>(R.id.editTextOutsourcedSupplierDialogUserInput)
         val spinnerSupplier = promptView.findViewById<Spinner>(R.id.spinnerSupplier)
         //val textViewOutsourcedProcessWorkOrderHeader = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderHeader)
         //val textViewOutsourcedProcessWorkOrderContent = promptView.findViewById<TextView>(R.id.textViewOutsourcedProcessWorkOrderContent)
         val btnCancel = promptView.findViewById<Button>(R.id.btnOutSourcedDialogCancel)
         val btnConfirm = promptView.findViewById<Button>(R.id.btnOutSourcedDialogConfirm)
+
+        var found = false
+        val outsourcedSupplierNameFilterList = ArrayList<String>()
+
+        val mTextWatcher: TextWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                //Log.e(mTAG, "afterTextChanged")
+            }
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int,
+                after: Int
+            ) {
+                //Log.e(mTAG, "beforeTextChanged")
+            }
+
+            override fun onTextChanged(
+                s: CharSequence, start: Int, before: Int,
+                count: Int
+            ) {
+                Log.e(mTAG, "onTextChanged")
+                Log.e(mTAG, "editTextFilter.text = ${editTextFilter.text}")
+
+                outsourcedSupplierNameFilterList.clear()
+
+                for (i in 0 until outsourcedSupplierNameList.size) {
+                    if (outsourcedSupplierNameList[i].contains(editTextFilter.text)) {
+                        outsourcedSupplierNameFilterList.add(outsourcedSupplierNameList[i])
+                        found = true
+                    }
+                }
+
+                if (found) {
+                    val adapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameFilterList)
+                    spinnerSupplier.adapter = adapter
+                } else {
+                    val adapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameList)
+                    spinnerSupplier.adapter = adapter
+                }
+
+
+            }
+        }
+        editTextFilter.addTextChangedListener(mTextWatcher)
+
         val adapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, outsourcedSupplierNameList)
         spinnerSupplier.adapter = adapter
 
@@ -1251,23 +1299,24 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                barcodeInput!!.setText(outsourcedSupplierHashMap[outsourcedSupplierNameList[position]])
+                if (found) {
+                    Log.e(mTAG, "found = $found, name = ${outsourcedSupplierNameFilterList[position]}")
+                    barcodeInput!!.setText(outsourcedSupplierHashMap[outsourcedSupplierNameFilterList[position]])
 
-                currentSelectedSupplier = position
+                    for (i in 0 until outsourcedSupplierNameList.size) {
+                        if (outsourcedSupplierNameList[i] == outsourcedSupplierNameFilterList[position]) {
+                            currentSelectedSupplier = i
+                        }
+                    }
+                } else {
+                    barcodeInput!!.setText(outsourcedSupplierHashMap[outsourcedSupplierNameList[position]])
+                    currentSelectedSupplier = position
+                }
 
             }
 
         }
-        //Log.e(mTAG, "send No. = $currentSendOrder")
 
-        //textViewOutsourcedProcessSendOrderContent.text = currentSendOrder
-        //textViewOutsourcedProcessWorkOrderContent.text = outsourcedProcessListBySupplier[currentSelectSendOrder].getData3()
-        //textViewShouldContent.text = outsourcedProcessLowerList[position].getContentStatic()
-        //textViewActualContent.inputType = (InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
-        //textViewActualContent.setText(outsourcedProcessLowerList[position].getContentDynamic())
-
-        //btnCancel.text = getString(R.string.cancel)
-        //btnConfirm.text = getString(R.string.confirm)
 
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)
@@ -1282,6 +1331,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
             //if (outsourcedSupplierNameList.size > 0) {
                 textViewSupplier!!.visibility = View.VISIBLE
+
                 textViewSupplier!!.text = outsourcedSupplierNameList[currentSelectedSupplier]
 
                 linearLayoutSupplierHeader!!.visibility = View.INVISIBLE
@@ -1291,10 +1341,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
                 progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                 progressBar!!.visibility = View.VISIBLE
 
-                /*outsourcedProcessDetailList.clear()
-                if (outsourcedProcessOrderDetailItemAdapter != null) {
-                    outsourcedProcessOrderDetailItemAdapter?.notifyDataSetChanged()
-                }*/
+
                 outsourcedProcessListBySupplier.clear()
                 if (outsourcedProcessSupplierItemAdapter != null) {
                     outsourcedProcessSupplierItemAdapter?.notifyDataSetChanged()
@@ -1336,4 +1383,6 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
 
     }
+
+
 }

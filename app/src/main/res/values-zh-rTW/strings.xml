@@ -232,4 +232,5 @@
     <string name="please_select">請選擇倉庫</string>
     <string name="warehouse_empty_warnning">請選擇倉庫</string>
     <string name="outsourced_signed">已簽</string>
+    <string name="outsourced_process_dialog_user_input">請輸入關鍵字</string>
 </resources>
