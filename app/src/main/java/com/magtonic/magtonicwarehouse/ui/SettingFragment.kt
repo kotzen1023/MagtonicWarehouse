@@ -177,9 +177,9 @@ class SettingFragment: Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
-    }
+    }*/
 }

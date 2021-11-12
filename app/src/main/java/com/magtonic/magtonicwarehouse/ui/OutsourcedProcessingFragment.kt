@@ -19,7 +19,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.widget.AdapterView
 import androidx.core.text.HtmlCompat
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbOustsourcedSigned
@@ -33,20 +32,13 @@ import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
 import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import android.widget.TextView
-import android.widget.TextView.OnEditorActionListener
 import android.text.Editable
-
 import android.text.TextWatcher
-import androidx.core.content.ContextCompat.getSystemService
-
 import com.magtonic.magtonicwarehouse.MainActivity
 
-import android.os.IBinder
-import androidx.core.content.ContextCompat
 
 
 class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
@@ -214,7 +206,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
         }
 
 
-        storageSpinner = view.findViewById<Spinner>(R.id.storageSpinner)
+        storageSpinner = view.findViewById(R.id.storageSpinner)
         val storageAdapter: ArrayAdapter<String> = ArrayAdapter(outsourcedProcessContext as Context, R.layout.myspinner, storageWarehouseList)
         storageSpinner?.adapter = storageAdapter
 
@@ -958,7 +950,7 @@ class OutsourcedProcessingFragment : Fragment(), LifecycleObserver {
 
 
                         //add to sqlite
-                        var outsourcedSignedData: OutsourcedSignedData? = null
+                        var outsourcedSignedData: OutsourcedSignedData
                         if (dbOustsourcedSigned != null) {
                             val combine = currentSendOrder + currentWarehouse
                             outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrderWareHouse(combine)

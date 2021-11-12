@@ -1,9 +1,6 @@
 package com.magtonic.magtonicwarehouse.bluetoothchat
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothServerSocket
-import android.bluetooth.BluetoothSocket
+import android.bluetooth.*
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -68,7 +65,9 @@ class BluetoothChatService(context: Context, handler: Handler) {
      */
     init {
         mContext = context
-        mAdapter = BluetoothAdapter.getDefaultAdapter()
+        //mAdapter = BluetoothAdapter.getDefaultAdapter()
+        val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        mAdapter = bluetoothManager.adapter
         mState = STATE_NONE
         mNewState = mState
         mHandler = handler

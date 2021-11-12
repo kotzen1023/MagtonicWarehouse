@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -82,6 +83,10 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedDataDB
 import com.magtonic.magtonicwarehouse.ui.homegrid.HomeGridFragment
+import android.view.ViewGroup
+
+
+
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -106,7 +111,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     enum class CurrentFragment {
         RECEIPT_FRAGMENT, STORAGE_FRAGMENT, MATERIAL_ISSUING_FRAGMENT, HOME_FRAGMENT, PRINTER_FRAGMENT,
         LOGIN_FRAGMENT, PROPERTY_FRAGMENT, USER_SETTING_FRAGMENT, GUEST_FRAGMENT, OUTSOURCED_FRAGMENT, ISSUANCE_LOOKUP_FRAGMENT, RETURN_OF_GOODS_FRAGMENT,
-        SUPPLIER_FRAGMENT
+        SUPPLIER_FRAGMENT, POSITION_FRAGMENT
     }
 
     //for printer
@@ -271,6 +276,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //private lateinit var binding: ActivityMainBinding
     private val fileUtils: FileUtils = FileUtils()
 
+    private var rootView: View ?= null
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -280,6 +288,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mContext = applicationContext
 
+
+        rootView = (window.decorView.findViewById<View>(android.R.id.content) as ViewGroup).getChildAt(0)
         //binding = ActivityMainBinding.inflate(layoutInflater)
         //setContentView(binding.root)
 
@@ -310,10 +320,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //write to xml file
             fileUtils.writeXmlFile(supplierDataList)
         } else {
-            supplierDataList = fileUtils.readXmlFromFile(mContext)
+            supplierDataList = fileUtils.readXmlFromFile()
         }
-
-
 
         //load outsourcedSignedDB
         dbOustsourcedSigned = Room.databaseBuilder(mContext as Context, OutsourcedSignedDataDB::class.java, OutsourcedSignedDataDB.DATABASE_NAME)
@@ -321,6 +329,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addMigrations(migration12)
             .build()
 
+        //clear data older than 7 days
+        val currentTimeStamp= System.currentTimeMillis()
+        val timeStampOlderThan7day = currentTimeStamp - 86400*7
+        Log.e(mTAG, "currentTimeStamp=$currentTimeStamp, timeStampOlderThan7day=$timeStampOlderThan7day")
+        val ret = dbOustsourcedSigned!!.outsourcedSignedDataDao().clearOlderThan7days(timeStampOlderThan7day)
+        Log.e(mTAG, "ret = $ret")
         //outsourcedSignedList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
         //Log.e(mTAG, "outsourcedSignedList = ${outsourcedSignedList.size}")
 
@@ -540,7 +554,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Log.d(mTAG, "onDrawerOpened")
 
                 if (isKeyBoardShow) {
-                    imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                    showOrHideKeyboard(false)
                 }
             }
         }
@@ -742,7 +756,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         navView!!.menu.getItem(13).isVisible = true //logout
 
                         //hide keyboard
-                        imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                        showOrHideKeyboard(false)
 
                         //save
                         editor = pref!!.edit()
@@ -845,7 +859,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_HIDE_KEYBOARD, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_HIDE_KEYBOARD")
 
-                        imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                        showOrHideKeyboard(false)
 
                         isKeyBoardShow = false
 
@@ -859,7 +873,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
 
                         if (isKeyBoardShow) {
-                            imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                            showOrHideKeyboard(false)
+                            //?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
                         }
 
                         val inputNo = intent.getStringExtra("INPUT_NO")
@@ -915,7 +930,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         CurrentFragment.RETURN_OF_GOODS_FRAGMENT -> {
                                             getReturnOfGoodsOrder(inputNo)
                                         }
-
+                                        CurrentFragment.POSITION_FRAGMENT -> {
+                                            getPosition(inputNo)
+                                        }
                                         else -> {
                                             Log.e(mTAG, "Unknown fragment")
                                         }
@@ -1942,6 +1959,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         //hide print again button
                         fabPrintAgain!!.hide()
 
+                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_HOME_GO_TO_POSITION_ACTION, ignoreCase = true)) {
+                        Log.d(mTAG, "ACTION_HOME_GO_TO_POSITION_ACTION")
+
+                        isBarcodeScanning = false
+
+                        title = getString(R.string.wip_find_position)
+
+                        menuItemBluetooth!!.isVisible = false
+                        menuItemKeyboard!!.isVisible = false
+                        menuItemReceiptSetting!!.isVisible = false
+                        menuItemShowReceiptConfirmFailed!!.isVisible = false
+                        menuItemReconnectPrinter!!.isVisible = false
+                        menuItemPrintAgain!!.isVisible = false
+                        menuItemEraser!!.isVisible = false
+                        menuItemEraser!!.setIcon(R.drawable.eraser_white)
+                        isEraser = false
+                        menuItemOutSourcedSupplier!!.isVisible = false
+
+                        //start with receipt fragment
+                        var fragment: Fragment? = null
+                        val fragmentClass = PositionFragment::class.java
+
+                        try {
+                            fragment = fragmentClass.newInstance()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+
+                        val fragmentManager = supportFragmentManager
+                        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+                        fragmentManager.beginTransaction().replace(R.id.flContent, fragment!!).commitAllowingStateLoss()
+
+                        currentFrag = CurrentFragment.POSITION_FRAGMENT
+
+
+                        //hide print again button
+                        fabPrintAgain!!.hide()
+
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_SETTING_RECEIPT_AUTO_CONFIRM_UPLOADED_ON")
 
@@ -2525,6 +2580,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //ip setting
             filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION)
             filter.addAction(Constants.ACTION.ACTION_WEBSERVICE_FTP_IP_ADDRESS_SHOW_PASSWORD_DIALOG)
+            //position
+            filter.addAction(Constants.ACTION.ACTION_HOME_GO_TO_POSITION_ACTION)
 
             filter.addAction("android.net.wifi.STATE_CHANGE")
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
@@ -2588,7 +2645,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-
+        Log.i(mTAG, "onBackPressed")
+        //Log.e(mTAG, "isOutSourcedInDetail = $isOutSourcedInDetail")
+        //Log.e(mTAG, "isPropertyInDetail = $isPropertyInDetail")
+        //Log.e(mTAG, "isIssuanceLookupDetail = $isIssuanceLookupDetail")
+        //Log.e(mTAG, "isReturnOfGoodsInDetail = $isReturnOfGoodsInDetail")
         if (isOutSourcedInDetail == 1 || isPropertyInDetail == 1 || isIssuanceLookupDetail == 1 || isReturnOfGoodsInDetail == 1) { //if in outsourced detail
 
             fabBack!!.visibility = View.GONE
@@ -2659,7 +2720,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.main_hide_or_show_keyboard -> {
-                imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+                if (isKeyBoardShow) {
+                    showOrHideKeyboard(false)
+                } else {
+                    showOrHideKeyboard(true)
+                }
             }
             R.id.main_set_bluetooth_printer -> {
                 Log.e(mTAG, "main_set_bluetooth_printer")
@@ -2764,7 +2829,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val view = currentFocus
 
         if (view != null) {
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+            showOrHideKeyboard(false)
         }
 
         navView!!.menu.getItem(0).isChecked = false //home
@@ -3194,10 +3259,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val writePermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        var manageExternalPermission = 0
+        /*var manageExternalPermission = 0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             manageExternalPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-        }
+        }*/
 
 
 
@@ -3208,6 +3273,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val bluetoothAdminPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN)
 
         val bluetoothPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH)
+
+        var bluetoothConnect = 0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            bluetoothConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+        }
 
         val accessNetworkStatePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE)
 
@@ -3226,11 +3296,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (manageExternalPermission != PackageManager.PERMISSION_GRANTED) {
+                Log.e(mTAG, "add Manifest.permission.MANAGE_EXTERNAL_STORAGE")
                 listPermissionsNeeded.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
             }
-        }
+        }*/
 
         if (networkPermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.INTERNET)
@@ -3246,6 +3317,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (bluetoothPermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.BLUETOOTH)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (bluetoothConnect != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
         }
 
         if (accessNetworkStatePermission != PackageManager.PERMISSION_GRANTED) {
@@ -3297,14 +3374,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // Initialize the map with both permissions
                 perms[Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
-                }
+                }*/
 
                 perms[Manifest.permission.INTERNET] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.ACCESS_COARSE_LOCATION] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.BLUETOOTH_ADMIN] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.BLUETOOTH] = PackageManager.PERMISSION_GRANTED
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    perms[Manifest.permission.BLUETOOTH_CONNECT] = PackageManager.PERMISSION_GRANTED
+                }
                 perms[Manifest.permission.ACCESS_NETWORK_STATE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.ACCESS_WIFI_STATE] = PackageManager.PERMISSION_GRANTED
                 perms[Manifest.permission.CHANGE_WIFI_STATE] = PackageManager.PERMISSION_GRANTED
@@ -3324,18 +3404,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         && perms[Manifest.permission.ACCESS_COARSE_LOCATION] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.BLUETOOTH_ADMIN] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.BLUETOOTH] == PackageManager.PERMISSION_GRANTED
+                        && perms[Manifest.permission.BLUETOOTH_CONNECT] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.ACCESS_NETWORK_STATE] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.ACCESS_WIFI_STATE] == PackageManager.PERMISSION_GRANTED
                         && perms[Manifest.permission.CHANGE_WIFI_STATE] == PackageManager.PERMISSION_GRANTED
                     ) {
                         Log.d(mTAG, "write permission granted")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            if (perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED) {
-                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE is permmited.")
+                            if (perms[Manifest.permission.BLUETOOTH_CONNECT] == PackageManager.PERMISSION_GRANTED) {
+                                Log.e(mTAG, "BLUETOOTH_CONNECT is permitted.")
 
                             } else {
-                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE not permmited.")
+                                Log.e(mTAG, "BLUETOOTH_CONNECT not permitted.")
                             }
+
+                            /*if (perms[Manifest.permission.MANAGE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED) {
+                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE is permitted.")
+
+                            } else {
+                                Log.e(mTAG, "MANAGE_EXTERNAL_STORAGE not permitted.")
+                            }*/
                             initView()
                             initLog()
                         } else {
@@ -3361,11 +3449,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE
                             )
                             ||
-                            ActivityCompat.shouldShowRequestPermissionRationale(
+                            /*ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 Manifest.permission.MANAGE_EXTERNAL_STORAGE
                             )
-                            ||
+                            ||*/
                             ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 Manifest.permission.INTERNET
@@ -3381,6 +3469,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             || ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 Manifest.permission.BLUETOOTH
+                            )
+                            || ActivityCompat.shouldShowRequestPermissionRationale(
+                                this,
+                                Manifest.permission.BLUETOOTH_CONNECT
                             )
                             || ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
@@ -3585,7 +3677,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         //init bluetooth
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        //mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        mBluetoothAdapter = bluetoothManager.adapter
         if (mBluetoothAdapter == null) {
 
             toastLong("Bluetooth is not available")
@@ -6740,6 +6834,112 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }//onResponse
     }
 
+    fun getPosition(input: String) {
+    //fun getPosition(barcode: ScanBarcode?) {
+        if (barcode != null) {
+            Log.e(mTAG, "input = $input")
+            val para = HttpGetPositionPara()
+            para.data1 = input
+            ///para.pmn02 = barcode.poLine
+
+            ApiFunc().getPosition(para, getPositionCallback)
+
+        }
+
+
+    }//getPosition
+
+
+    private var getPositionCallback: Callback = object : Callback {
+
+        override fun onFailure(call: Call, e: IOException) {
+            isBarcodeScanning = false
+            runOnUiThread(netErrRunnable)
+
+        }
+
+        @Throws(IOException::class)
+        override fun onResponse(call: Call, response: Response) {
+            Log.e(mTAG, "onResponse : "+response.body.toString())
+            val res = ReceiveTransform.restoreToJsonStr(response.body!!.string())
+            //1.get response ,2 error or right , 3 update ui ,4. restore acState 5. update fragment detail
+            runOnUiThread {
+                try {
+                    Log.e(mTAG, "res = $res")
+                    if (res != "Error" && !checkServerErrorString(res)) {
+
+
+                        val rjPosition =
+                            Gson().fromJson(res, RJPosition::class.java) as RJPosition
+                        /*
+                        val rjReceiptUpload: RJReceiptUpload =
+                            Gson().fromJson(res, RJReceiptUpload::class.java) as RJReceiptUpload
+                         */
+
+                        if (rjPosition != null) {
+                            if (rjPosition.result != ItemPosition.RESULT_CORRECT) {
+                                Log.e(
+                                    mTAG,
+                                    "result = " + rjPosition.result + " result2 = " + rjPosition.result2
+                                )
+                                //can't receive the item
+                                //val mess = retItemReceipt.poNumScanTotal + " " + retItemReceipt.rjReceipt?.result2
+                                val mess = rjPosition.result2
+                                toastLong(mess)
+
+
+                                val positionNoIntent = Intent()
+                                positionNoIntent.action =
+                                    Constants.ACTION.ACTION_POSITION_NOT_EXIST
+                                sendBroadcast(positionNoIntent)
+                            }// result  = 0
+                            else {
+                                Log.e(mTAG, "2")
+                                val refreshIntent = Intent()
+                                refreshIntent.action =
+                                    Constants.ACTION.ACTION_POSITION_FRAGMENT_REFRESH
+                                refreshIntent.putExtra("data1", rjPosition.data1)
+                                mContext!!.sendBroadcast(refreshIntent)
+
+                            }//result = 1
+                        } else {
+                            Log.e(mTAG, "retItemReceipt = null")
+
+                            toast(getString(R.string.this_position_not_exist))
+
+                            val receiptNoIntent = Intent()
+                            receiptNoIntent.action = Constants.ACTION.ACTION_POSITION_NOT_EXIST
+                            sendBroadcast(receiptNoIntent)
+                        }
+                    } else {
+                        toast(getString(R.string.toast_server_error))
+
+                        val failIntent = Intent()
+                        failIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                        sendBroadcast(failIntent)
+                    }
+
+
+                } catch (ex: Exception) {
+
+                    Log.e(mTAG, "Server error")
+
+                    val serverErrorIntent = Intent()
+                    serverErrorIntent.action = Constants.ACTION.ACTION_SERVER_ERROR
+                    sendBroadcast(serverErrorIntent)
+                    //system error
+                    runOnUiThread {
+
+                        toast(getString(R.string.toast_server_error))
+                    }
+                }
+                isBarcodeScanning = false
+            }
+
+
+        }//onResponse
+    }
+
     internal var netErrRunnable: Runnable = Runnable {
 
         isBarcodeScanning = false
@@ -7577,5 +7777,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return item
     }
 
+    fun showOrHideKeyboard(show: Boolean) {
 
+        if (!show) { //hide
+            //imm?.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0)
+            imm?.hideSoftInputFromWindow(rootView!!.windowToken, 0)
+        } else { // show
+            //imm?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
+            imm?.hideSoftInputFromWindow(rootView!!.windowToken, 0)
+        }
+
+        /*if (isKeyBoardShow) {
+            Log.e(mTAG, "showOrHideKeyboard: isKeyBoardShow = $isKeyBoardShow, must hide")
+            imm?.showSoftInput(rootView, 1)
+        } else {
+            Log.e(mTAG, "showOrHideKeyboard: isKeyBoardShow = $isKeyBoardShow, must show")
+            imm?.showSoftInput(rootView, 0)
+        }*/
+    }
 }

@@ -274,7 +274,7 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
                     hideSeekBarIntent.action = Constants.ACTION.ACTION_SEEK_BAR_HIDE_ACTION
                     materialIssuingContext!!.sendBroadcast(hideSeekBarIntent)
 
-                    barcodeInput!!.setText(barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    barcodeInput!!.setText(barcodeInput!!.text.toString().uppercase(Locale.getDefault()))
 
                     progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                     progressBar!!.visibility = View.VISIBLE
@@ -323,7 +323,8 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
                     hideSeekBarIntent.action = Constants.ACTION.ACTION_SEEK_BAR_HIDE_ACTION
                     materialIssuingContext!!.sendBroadcast(hideSeekBarIntent)
 
-                    barcodeInput!!.setText(barcodeInput!!.text.toString().toUpperCase(Locale.getDefault()))
+                    barcodeInput!!.setText(barcodeInput!!.text.toString()
+                        .uppercase(Locale.getDefault()))
 
                     progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                     progressBar!!.visibility = View.VISIBLE
@@ -693,11 +694,11 @@ class MaterialIssuingFragment : Fragment(), ViewPager.OnPageChangeListener{
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
-    }
+    }*/
 
     fun toast(message: String) {
 

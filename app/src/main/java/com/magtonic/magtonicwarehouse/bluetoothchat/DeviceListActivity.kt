@@ -3,6 +3,7 @@ package com.magtonic.magtonicwarehouse.bluetoothchat
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -76,15 +77,10 @@ class DeviceListActivity: Activity() {
         // Set result CANCELED in case the user backs out
         setResult(RESULT_CANCELED)
 
-        // Initialize the button to perform device discovery
-        /*val lastbundle = this.intent.extras
 
-        if (lastbundle != null) {
-            setDev = lastbundle.getInt("setDev")
-        }*/
         setDev = intent.getIntExtra("setDev", 5)
 
-        //setDev = lastbundle.getInt("setDev");
+
         scanButton = findViewById(R.id.button_scan)
         scanButton!!.setOnClickListener { 
 
@@ -137,7 +133,9 @@ class DeviceListActivity: Activity() {
         this.registerReceiver(mReceiver, filter)
 
         // Get the local Bluetooth adapter
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter()
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        mBtAdapter = bluetoothManager.adapter
+        //mBtAdapter = BluetoothAdapter.getDefaultAdapter()
 
         if (mBtAdapter != null) {
             // Get a set of currently paired devices

@@ -233,4 +233,6 @@
     <string name="warehouse_empty_warnning">請選擇倉庫</string>
     <string name="outsourced_signed">已簽</string>
     <string name="outsourced_process_dialog_user_input">請輸入關鍵字</string>
+    <string name="wip_find_position">定位</string>
+    <string name="this_position_not_exist">無此儲位</string>
 </resources>

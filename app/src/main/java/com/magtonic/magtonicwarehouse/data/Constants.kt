@@ -1,6 +1,6 @@
 package com.magtonic.magtonicwarehouse.data
 
-import com.magtonic.magtonicwarehouse.MainActivity.Companion.base_ip_address
+
 
 class Constants {
 
@@ -138,6 +138,7 @@ class Constants {
             const val ACTION_HOME_GO_TO_OUTSOURCED_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToOutsourcedAction"
             const val ACTION_HOME_GO_TO_RETURN_OF_GOODS_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToReturnOfGoodsAction"
             const val ACTION_HOME_GO_TO_SUPPLIER_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToSupplierAction"
+            const val ACTION_HOME_GO_TO_POSITION_ACTION: String = "com.magtonic.MagtonicWarehoouse.HomeGoToPositionAction"
             //property
             const val ACTION_PROPERTY_FRAGMENT_REFRESH : String ="com.magtonic.MagtonicWarehoouse.PropertyFragmentRefresh"
             const val ACTION_PROPERTY_MORE_DETAIL_REFRESH : String = "com.magtonic.MagtonicWarehoouse.PropertyMoreDetailRefresh"
@@ -230,6 +231,11 @@ class Constants {
             const val ACTION_SUPPLIER_DATA_ADD : String ="com.magtonic.MagtonicWarehoouse.SupplierDataAdd"
             const val ACTION_SUPPLIER_DATA_UPDATE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataUpdate"
             const val ACTION_SUPPLIER_DATA_DELETE : String ="com.magtonic.MagtonicWarehoouse.SupplierDataDelete"
+
+            //get position
+            const val ACTION_POSITION_SCAN_BARCODE : String = "com.magtonic.MagtonicWarehoouse.PositionScanBarcode"
+            const val ACTION_POSITION_FRAGMENT_REFRESH : String ="com.magtonic.MagtonicWarehoouse.PositionFragmentRefresh"
+            const val ACTION_POSITION_NOT_EXIST : String = "com.magtonic.MagtonicWarehoouse.PositionNotExist"
 
             //ip setting
             const val ACTION_WEBSERVICE_FTP_IP_ADDRESS_UPDATE_ACTION : String ="com.magtonic.MagtonicWarehoouse.WebserviceFtpIpAddressUpdateAction"

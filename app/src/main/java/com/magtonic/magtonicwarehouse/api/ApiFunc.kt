@@ -37,6 +37,7 @@ class ApiFunc {
     //private val outsideIP = "http://61.216.114.217/asmx/WebService.asmx/"
     private val outsideIP = Constants.WebServiceIpAddress.OUTSIDE_IP
     //api http address string define
+    private val testIP = "http://10.192.5.62/webs.asmx/"
 
     //1.Login
     private val apiStrLogin = baseIP + "Chk_zx01"
@@ -100,6 +101,8 @@ class ApiFunc {
     private val apiStrReturnOfGoodsDetail = iepIP + "webs_app_rvu02"
 
     private val apiStrReturnOfGoodsConfirm = iepIP + "webs_app_rvup01"
+
+    private val apiStrGetPosition = testIP + "webs_app_tc_pmn01"
 
     private object ContentType {
 
@@ -191,6 +194,12 @@ class ApiFunc {
 
     fun confirmReturnOfGoodsSign(getPara: HttpReturnOfGoodsConfirmGetPara, callback: Callback) {
         postWithParaPJsonStr(apiStrReturnOfGoodsConfirm, Gson().toJson(getPara), callback)
+    }
+
+    fun getPosition(para: HttpGetPositionPara, callback: Callback) {
+        Log.e(mTAG, "ApiFunc->getPosition")
+        postWithParaPJsonStr(apiStrGetPosition, Gson().toJson(para), callback)
+
     }
 
     // post with only one para  "p_json"

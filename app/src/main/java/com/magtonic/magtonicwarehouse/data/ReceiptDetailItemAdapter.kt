@@ -29,7 +29,7 @@ class ReceiptDetailItemAdapter(context: Context?, resource: Int, objects: ArrayL
         return items.size
     }
 
-    override fun getItem(position: Int): ReceiptDetailItem? {
+    override fun getItem(position: Int): ReceiptDetailItem {
         return items[position]
     }
 
@@ -127,7 +127,7 @@ class ReceiptDetailItemAdapter(context: Context?, resource: Int, objects: ArrayL
 
                 if (!oldString.contentEquals(newString)) {
                     //content changed
-                    receiptDetailItem.setContent(holder.itemEdit.text.toString().toUpperCase(Locale.ROOT))
+                    receiptDetailItem.setContent(holder.itemEdit.text.toString().uppercase(Locale.ROOT))
                     receiptDetailItem.getEditText()!!.setText(holder.itemEdit.text.toString())
                     receiptDetailItem.setChange(true)
 

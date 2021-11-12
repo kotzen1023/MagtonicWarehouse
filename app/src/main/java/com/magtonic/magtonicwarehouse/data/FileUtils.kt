@@ -7,14 +7,12 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.magtonic.magtonicwarehouse.persistence.SupplierData
 import org.apache.commons.io.IOUtils
 import org.w3c.dom.Document
@@ -349,7 +347,7 @@ class FileUtils {
         Log.e(mTAG, "=== writeXmlFile end ===")
     }
 
-    fun readXmlFromFile(ctx: Context?): ArrayList<SupplierData> {
+    fun readXmlFromFile(): ArrayList<SupplierData> {
         Log.e(mTAG, "=== readXmlFromFile start ===")
         val downloadFolder = "/storage/emulated/0/Download"
         val xmlFile = "$downloadFolder/suppliers.xml"

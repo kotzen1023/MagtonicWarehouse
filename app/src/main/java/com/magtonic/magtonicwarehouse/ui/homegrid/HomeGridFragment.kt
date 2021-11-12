@@ -91,7 +91,8 @@ class HomeGridFragment : Fragment() {
             appList.add(item9)
         }
 
-
+        //val item12 = HomeGridItem("GetPosition", R.drawable.baseline_find_in_page_black_48, R.string.wip_find_position)
+        //appList.add(item12)
 
 
 
@@ -179,6 +180,11 @@ class HomeGridFragment : Fragment() {
                     //val showIntent = Intent()
                     //showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_SUPPLIER_ACTION
                     //homeGridContext!!.sendBroadcast(showIntent)
+                }
+                "GetPosition" -> {
+                    val showIntent = Intent()
+                    showIntent.action = Constants.ACTION.ACTION_HOME_GO_TO_POSITION_ACTION
+                    homeGridContext!!.sendBroadcast(showIntent)
                 }
             }
 
@@ -334,11 +340,11 @@ class HomeGridFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    /*override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i(mTAG, "onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
-    }
+    }*/
 
     private fun toast(message: String) {
 

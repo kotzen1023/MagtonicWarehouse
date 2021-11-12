@@ -191,7 +191,7 @@ class StorageFragment: Fragment(), LifecycleObserver {
             val keypadHeight = screenHeight - r.bottom
             isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
 
-            Log.e(mTAG, "isKeyBoardShow = $isKeyBoardShow")
+            //Log.e(mTAG, "isKeyBoardShow = $isKeyBoardShow")
         }
 
 

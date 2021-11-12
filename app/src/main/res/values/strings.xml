@@ -238,4 +238,6 @@
     <string name="warehouse_empty_warnning">Please select warehouse</string>
     <string name="outsourced_signed">Signed</string>
     <string name="outsourced_process_dialog_user_input">Input key word</string>
+    <string name="wip_find_position">Position</string>
+    <string name="this_position_not_exist">This position is not exist</string>
 </resources>
