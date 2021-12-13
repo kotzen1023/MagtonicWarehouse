@@ -6,19 +6,41 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-        <TextView android:text="header"
-                android:id="@+id/returnOfGoodsItemHeader"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textStyle="bold"
-                android:textSize="@dimen/text_size_20"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"
                 android:layout_weight="1"
-                android:minHeight="60dp">
-        </TextView>
+                android:orientation="horizontal">
+
+            <TextView
+                    android:id="@+id/textViewReturnSignedNumber"
+                    android:layout_width="24dp"
+                    android:textStyle="bold"
+                    android:text=""
+                    android:textColor="@color/md_red_400"
+                    android:textSize="@dimen/text_size_20"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:visibility="gone"/>
+
+            <TextView android:text="header"
+                    android:id="@+id/returnOfGoodsItemHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_20"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="1"
+                    android:minHeight="60dp">
+            </TextView>
+        </LinearLayout>
+
+
 
         <TextView android:text="content"
                 android:id="@+id/returnOfGoodsItemHContent"

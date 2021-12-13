@@ -84,8 +84,7 @@ import kotlin.collections.HashMap
 import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedDataDB
 import com.magtonic.magtonicwarehouse.ui.homegrid.HomeGridFragment
 import android.view.ViewGroup
-
-
+import com.magtonic.magtonicwarehouse.persistence.ReturnOfGoodsSignedDataDB
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -209,6 +208,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         @JvmStatic var supplierDataList = ArrayList<SupplierData>()
         @JvmStatic var db: SupplierDataDB? = null
         @JvmStatic var dbOustsourcedSigned: OutsourcedSignedDataDB? = null
+        @JvmStatic var dbReturnOfGoodsSigned: ReturnOfGoodsSignedDataDB? = null
         //@JvmStatic var outsourcedSignedList = ArrayList<OutsourcedSignedData>()
         //for disable bluetooth
         @JvmStatic var isBluetoothPrinterEnable: Boolean = true
@@ -329,6 +329,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addMigrations(migration12)
             .build()
 
+        //load returnOfGoodsSignedDB
+        dbReturnOfGoodsSigned = Room.databaseBuilder(mContext as Context, ReturnOfGoodsSignedDataDB::class.java, ReturnOfGoodsSignedDataDB.DATABASE_NAME)
+            .allowMainThreadQueries()
+            .addMigrations(migration12)
+            .build()
+
         //clear data older than 7 days
         val currentTimeStamp= System.currentTimeMillis()
         val timeStampOlderThan7day = currentTimeStamp - 86400*7
@@ -337,6 +343,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.e(mTAG, "ret = $ret")
         //outsourcedSignedList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getAll() as ArrayList<OutsourcedSignedData>
         //Log.e(mTAG, "outsourcedSignedList = ${outsourcedSignedList.size}")
+        //return goods
+        val ret2 = dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().clearOlderThan7days(timeStampOlderThan7day)
+        Log.e(mTAG, "ret2 = $ret2")
+
 
 
         if (supplierDataList.size > 0) {
@@ -7449,10 +7459,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             textViewMsg.text = getString(R.string.version_string, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
         }
 
-        var msg = "1. [20210818]修正遇到伺服器掛掉時，出現程式跳掉的情形。\n"
-        msg += "2. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
-        msg += "3. [20211102]修正委外發料簽名，紀錄已簽過之發料單號與倉庫別(本機)\n"
-        msg += "4. [20211105]修正委外發料與倉退簽名，可輸入關鍵字過濾\n"
+        var msg = "1. [20211019]修正委外發料簽名，可選擇倉庫別來進行簽名\n"
+        msg += "2. [20211102]修正委外發料簽名，紀錄已簽過之發料單號與倉庫別(本機)\n"
+        msg += "3. [20211105]修正委外發料與倉退簽名，可輸入關鍵字過濾\n"
+        msg += "4. [20211213]修正倉退簽名，可選擇倉庫別來進行簽名\n"
 
         textViewFixMsg.text = msg
 

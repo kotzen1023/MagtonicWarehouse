@@ -18,29 +18,55 @@
                 android:layout_height="120dp"
                 android:orientation="vertical">
 
-            <TextView
-                    android:id="@+id/textViewReturnOfGoods"
+            <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textSize="@dimen/text_size_20"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:visibility="gone"
-                    android:textStyle="bold"/>
+                    android:layout_weight="1">
 
-            <EditText
-                    android:id="@+id/editTextReturnOfGoods"
+                <TextView
+                        android:id="@+id/textViewReturnOfGoods"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="@dimen/text_size_20"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:textStyle="bold"/>
+
+                <EditText
+                        android:id="@+id/editTextReturnOfGoods"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="@string/outsource_supplier_input_hint"
+                        android:textSize="@dimen/text_size_25"
+                        android:textAlignment="center"
+                        android:inputType="textCapCharacters"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:lines="1"
+                        android:layout_weight="1"
+                        />
+            </LinearLayout>
+
+            <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="@string/outsource_supplier_input_hint"
-                    android:textSize="@dimen/text_size_25"
-                    android:textAlignment="center"
-                    android:inputType="textCapCharacters"
-                    android:maxLines="1"
-                    android:minLines="1"
-                    android:lines="1"
                     android:layout_weight="1"
-                    />
+                    android:orientation="horizontal">
+
+                <Spinner
+                        android:id="@+id/returnStorageSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+                <!--Spinner
+                        android:id="@+id/warehouseSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" /-->
+
+            </LinearLayout>
         </LinearLayout>
 
         <View

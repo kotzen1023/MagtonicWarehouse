@@ -712,6 +712,7 @@ class SignActivity : AppCompatActivity() {
             val path = saveBitmap(this@SignActivity as Context, scaledImage,  uploadSignName)
 
             Log.e(mTAG, "===>$path")
+            //Log.e(mTAG, "===>$uploadSignName")
 
             if (path != "")
             {

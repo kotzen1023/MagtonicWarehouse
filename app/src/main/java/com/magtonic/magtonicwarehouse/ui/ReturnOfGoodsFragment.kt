@@ -23,12 +23,17 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbOustsourcedSigned
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbReturnOfGoodsSigned
+import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReturnOfGoodsInDetail
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.returnOfGoodsDetailList
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.returnOfGoodsListBySupplier
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
+import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
+import com.magtonic.magtonicwarehouse.persistence.ReturnOfGoodsSignedData
 import java.util.*
 
 class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
@@ -68,6 +73,19 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
     private var currentSelectedSupplier: Int = 0
 
     private var currentSelectSendOrder: Int = -1
+
+    private var storageSpinner: Spinner? = null
+    private val storageList = ArrayList<String>()
+    private val storageWarehouseList = ArrayList<String>()
+
+    private var storageFilter = ""
+    //private var warehouseFilter = ""
+
+    var returnOfGoodsFilterList = ArrayList<ReturnOfGoodsItem>()
+    private var currentWarehouse: String = ""
+
+    private var findWarehouseCode: String = ""
+    private var findWarehouseName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,7 +161,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
             val temp = screenHeight * 0.15
             Log.e(mTAG, "keypadHeight = $keypadHeight, screenHeight =$screenHeight, screenHeight * 0.15 = $temp")
 
-            MainActivity.isKeyBoardShow = keypadHeight > screenHeight * 0.15
+            isKeyBoardShow = keypadHeight > screenHeight * 0.15
 
             //MainActivity.isKeyBoardShow = (keypadHeight > screenHeight * 0.15)
 
@@ -162,11 +180,39 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
         listViewReturnOfGoods!!.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             Log.d(mTAG, "click $position")
 
-            if (!returnOfGoodsList[position].getIsSigned()) {
+            if (currentWarehouse == "") {
+                toast(getString(R.string.warehouse_empty_warnning))
+            } else {
+
+                storageSpinner!!.visibility = View.INVISIBLE
+
+                currentSelectSendOrder = position
+
+                val moreDetailIntent = Intent()
+                moreDetailIntent.action = Constants.ACTION.ACTION_RETURN_OF_GOODS_GET_DETAIL_BY_SEND_ORDER
+                if (currentWarehouse != "") {
+                    currentSendOrder = returnOfGoodsFilterList[position].getData2()
+                    findWarehouseCode = returnOfGoodsFilterList[position].getData4()
+                    findWarehouseName = returnOfGoodsFilterList[position].getData5()
+                    moreDetailIntent.putExtra("SEND_ORDER", returnOfGoodsFilterList[position].getData2())
+
+                } else {
+                    currentSendOrder = returnOfGoodsList[position].getData2()
+                    findWarehouseCode = returnOfGoodsList[position].getData4()
+                    findWarehouseName = returnOfGoodsList[position].getData5()
+                    moreDetailIntent.putExtra("SEND_ORDER", returnOfGoodsList[position].getData2())
+                }
+                returnOfGoodsContext?.sendBroadcast(moreDetailIntent)
+            }
+
+
+
+            /*if (!returnOfGoodsList[position].getIsSigned()) {
                 currentSelectSendOrder = position
 
                 currentSendOrder = returnOfGoodsList[position].getData2()
-
+                findWarehouseCode = returnOfGoodsList[position].getData4()
+                findWarehouseName = returnOfGoodsList[position].getData5()
                 //progressBar!!.indeterminateTintList = ColorStateList.valueOf(colorCodePink)
                 //progressBar!!.visibility = View.VISIBLE
 
@@ -185,12 +231,57 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                 returnOfGoodsContext?.sendBroadcast(moreDetailIntent)
             } else {
                 toast(getString(R.string.outsourced_process_sign_is_signed_already))
-            }
+            }*/
 
 
         }
 
+        storageSpinner = view.findViewById(R.id.returnStorageSpinner)
+        val storageAdapter: ArrayAdapter<String> = ArrayAdapter(returnOfGoodsContext as Context, R.layout.myspinner, storageWarehouseList)
+        storageSpinner?.adapter = storageAdapter
 
+        storageSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.e(mTAG, "onNothingSelected")
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.e(mTAG, "position = $position")
+
+                returnOfGoodsFilterList.clear()
+                //if (outsourcedProcessDetailItemAdapter != null) {
+                //    outsourcedProcessDetailItemAdapter?.notifyDataSetChanged()
+                //}
+
+
+                storageFilter = if (position == 0) {
+                    ""
+                } else {
+                    storageList[position]
+                }
+                currentWarehouse = storageFilter
+                if (storageFilter != "") {
+                    //val outsourcedSignedDataList = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(currentSendOrder) as ArrayList<OutsourcedSignedData>
+
+                    for (data in returnOfGoodsList) {
+                        if (data.getData4() == storageFilter) {
+                            returnOfGoodsFilterList.add(data)
+                        }
+                    }
+
+
+
+                    returnOfGoodsItemAdapter = ReturnOfGoodsItemAdapter(returnOfGoodsContext, R.layout.fragment_return_of_goods_item, returnOfGoodsFilterList)
+                    listViewReturnOfGoods!!.adapter = returnOfGoodsItemAdapter
+                } else {
+                    returnOfGoodsItemAdapter = ReturnOfGoodsItemAdapter(returnOfGoodsContext, R.layout.fragment_return_of_goods_item, returnOfGoodsList)
+                    listViewReturnOfGoods!!.adapter = returnOfGoodsItemAdapter
+                }
+
+
+            }
+
+        }
         /*linearLayoutIssuanceLookupMain!!.viewTreeObserver.addOnGlobalLayoutListener {
             val r = Rect()
             linearLayoutIssuanceLookupMain!!.getWindowVisibleDisplayFrame(r)
@@ -403,10 +494,18 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_RETURN_OF_GOODS_FRAGMENT_REFRESH")
 
-
                         progressBar!!.visibility = View.GONE
 
+                        if (isKeyBoardShow) {
+                            val hideIntent = Intent()
+                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
+                            returnOfGoodsContext!!.sendBroadcast(hideIntent)
+                        }
+
                         Log.e(mTAG, "returnOfGoodsListBySupplier.size = ${returnOfGoodsListBySupplier.size}")
+                        storageList.clear()
+                        storageWarehouseList.clear()
+                        storageAdapter.notifyDataSetChanged()
 
                         if (returnOfGoodsListBySupplier.size == 1 ) {
                             if (returnOfGoodsListBySupplier[0].result == "1") {
@@ -417,7 +516,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
 
                                 val rjReturnOfGoodsItem =  returnOfGoodsListBySupplier[0]
 
-                                val returnOfGoodsItem = ReturnOfGoodsItem(rjReturnOfGoodsItem.data1, rjReturnOfGoodsItem.data2, rjReturnOfGoodsItem.data3)
+                                val returnOfGoodsItem = ReturnOfGoodsItem(rjReturnOfGoodsItem.data1, rjReturnOfGoodsItem.data2, rjReturnOfGoodsItem.data3, rjReturnOfGoodsItem.data4, rjReturnOfGoodsItem.data5)
                                 returnOfGoodsList.add(returnOfGoodsItem)
                             }
 
@@ -426,7 +525,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                             linearLayoutReturnOfGoodsHeader!!.visibility = View.VISIBLE
                             for (rjReturnOfGoodsItem in returnOfGoodsListBySupplier) {
 
-                                val returnOfGoodsItem = ReturnOfGoodsItem(rjReturnOfGoodsItem.data1, rjReturnOfGoodsItem.data2, rjReturnOfGoodsItem.data3)
+                                val returnOfGoodsItem = ReturnOfGoodsItem(rjReturnOfGoodsItem.data1, rjReturnOfGoodsItem.data2, rjReturnOfGoodsItem.data3, rjReturnOfGoodsItem.data4, rjReturnOfGoodsItem.data5)
                                 returnOfGoodsList.add(returnOfGoodsItem)
 
                             }
@@ -440,10 +539,72 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                             returnOfGoodsItemAdapter?.notifyDataSetChanged()
                         }
 
-                        if (MainActivity.isKeyBoardShow) {
-                            val hideIntent = Intent()
-                            hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
-                            returnOfGoodsContext!!.sendBroadcast(hideIntent)
+                        //find return goods signed
+                        for (i in 0 until returnOfGoodsList.size) {
+                            //val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
+                            //var outsourcedSignedDataList: ArrayList<OutsourcedSignedData> ?= null
+                            val returnOfGoodsSignedDataList = dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().getReturnOfGoodsSignedBySendOrder(returnOfGoodsList[i].getData2()) as ArrayList<ReturnOfGoodsSignedData>
+
+                            Log.e(mTAG,"====>Same SendOrder but different warehouse list size = ${returnOfGoodsSignedDataList.size}")
+
+                            var signedCount = 0
+                            for (j in 0 until returnOfGoodsSignedDataList.size) {
+                                if (returnOfGoodsSignedDataList[j].getSendOrder() == returnOfGoodsList[i].getData2()) {
+                                    Log.e(mTAG, "sendOrder+warehouse: ${returnOfGoodsSignedDataList[j].getSendOrderWareHouse()}")
+                                    returnOfGoodsList[i].setIsSigned(true)
+                                    signedCount += 1
+                                }
+                            }
+                            returnOfGoodsList[i].setSignedNum(signedCount)
+                        }
+
+                        //find storage and warehouse
+                        if (returnOfGoodsList.size > 0) {
+                            storageList.clear()
+                            storageWarehouseList.clear()
+                            storageList.add(getString(R.string.please_select))
+                            storageWarehouseList.add(getString(R.string.please_select))
+
+                            for (rjReturnOfGoods in returnOfGoodsListBySupplier) {
+                                var foundStorage = false
+                                //var foundWarehouse = false
+                                for (storage in storageList) {
+                                    if (rjReturnOfGoods.data4 == storage) {
+                                        foundStorage = true
+                                        break
+                                    }
+                                }
+
+                                if (!foundStorage) {
+                                    storageList.add(rjReturnOfGoods.data4)
+                                    var combineString = rjReturnOfGoods.data4+" - "+rjReturnOfGoods.data5
+                                    /*if (outsourcedSignedDataList.size > 0) {
+                                        for (i in 0 until outsourcedSignedDataList.size) {
+                                            if (outsourcedSignedDataList[i].getWareHouse() == rjOutSourceProcessed.data9) {
+                                                combineString = getString(R.string.outsourced_signed)+"-"+combineString
+                                            }
+                                        }
+                                    }*/
+                                    storageWarehouseList.add(combineString)
+                                }
+
+
+
+                            }
+
+                            for (storage in storageList) {
+                                Log.e(mTAG, "[$storage]")
+                            }
+
+                            for (storageWarehouse in storageWarehouseList) {
+                                Log.e(mTAG, "[$storageWarehouse]")
+                            }
+
+
+
+                            storageAdapter.notifyDataSetChanged()
+
+
                         }
 
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_FRAGMENT_DETAIL_REFRESH, ignoreCase = true)) {
@@ -482,7 +643,10 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                             returnOfGoodsDetailShowList.add(item7)
                             val item8 = ReturnOfGoodsDetailItem("規格", returnOfGoodsDetailList[0].data8)
                             returnOfGoodsDetailShowList.add(item8)
-
+                            val item9 = ReturnOfGoodsDetailItem("倉庫代號", findWarehouseCode)
+                            returnOfGoodsDetailShowList.add(item9)
+                            val item10 = ReturnOfGoodsDetailItem("倉庫名稱", findWarehouseName)
+                            returnOfGoodsDetailShowList.add(item10)
                         }
 
                         //linearLayoutDetailHeader!!.visibility = View.INVISIBLE
@@ -504,6 +668,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                     } else if (intent.action!!.equals(Constants.ACTION.ACTION_RETURN_OF_GOODS_BACK_TO_LIST, ignoreCase = true)) {
                         Log.d(mTAG, "ACTION_RETURN_OF_GOODS_BACK_TO_LIST")
 
+                        storageSpinner!!.visibility = View.VISIBLE
                         linearLayoutReturnOfGoods!!.visibility = View.VISIBLE
                         linearLayoutReturnOfGoodsDetail!!.visibility = View.GONE
 
@@ -528,14 +693,70 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
 
                         Log.d(mTAG, "sendOrder = $sendOrder")
 
+                        //add to sqlite
+                        var returnOfGoodsSignedData: ReturnOfGoodsSignedData
+                        if (dbReturnOfGoodsSigned != null) {
+                            val combine = currentSendOrder + currentWarehouse
+                            returnOfGoodsSignedData = dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().getReturnOfGoodsSignedBySendOrderWareHouse(combine)
+                            //val c  = Calendar.getInstance(Locale.getDefault())
+                            //val dateTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                            //val dateTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                            //val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            //val dateString = date.format(c.time)
+                            //val dateTimeString = dateTime.format(c.time)
+                            //Log.e(mTAG, "outsourcedSignedData: ${outsourcedSignedData.getSendOrderWareHouse()}, ${outsourcedSignedData.getSendOrder()}, ${outsourcedSignedData.getWareHouse()}")
+                            val timeStamp= System.currentTimeMillis()
+                            if (returnOfGoodsSignedData != null) {
+                                Log.e(mTAG, "update signed!")
+                                //val combine = currentSendOrder + currentWarehouse
+                                returnOfGoodsSignedData.setSendOrderWareHouse(combine)
+                                returnOfGoodsSignedData.setSendOrder(currentSendOrder)
+                                returnOfGoodsSignedData.setWareHouse(currentWarehouse)
+                                returnOfGoodsSignedData.setTimeStamp(timeStamp)
+                                dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().update(returnOfGoodsSignedData)
+                            } else {
+                                Log.e(mTAG, "add new signed!")
+                                //val combine = currentSendOrder + currentWarehouse
+                                returnOfGoodsSignedData = ReturnOfGoodsSignedData(combine, currentSendOrder, currentWarehouse, timeStamp)
+                                dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().insert(returnOfGoodsSignedData)
 
+                                val returnOfGoodsSignedDataList = dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().getAll() as ArrayList<ReturnOfGoodsSignedData>
+                                Log.e(mTAG, "==>returnOfGoodsSignedDataList = ${returnOfGoodsSignedDataList.size}")
+                                //for (i in 0 until outsourcedSignedDataList.size) {
+                                //    Log.e(mTAG, "outsourcedSignedDataList[$i] = ${outsourcedSignedDataList[i].getSendOrderWareHouse()}")
+                                //}
+                            }
+
+                        }
+
+                        //update from sqlite and update view
                         for (i in 0 until returnOfGoodsList.size) {
+                            //val outsourcedSignedData = dbOustsourcedSigned!!.outsourcedSignedDataDao().getOutsourcedSignedBySendOrder(outsourcedProcessListBySupplier[i].getData2())
+                            //var outsourcedSignedDataList: ArrayList<OutsourcedSignedData> ?= null
+                            val returnOfGoodsSignedDataList = dbReturnOfGoodsSigned!!.returnOfGoodsSignedDataDao().getReturnOfGoodsSignedBySendOrder(returnOfGoodsList[i].getData2()) as ArrayList<ReturnOfGoodsSignedData>
+
+                            Log.e(mTAG,"====>Same SendOrder but different warehouse list size = ${returnOfGoodsSignedDataList.size}")
+
+                            var signedCount = 0
+                            for (j in 0 until returnOfGoodsSignedDataList.size) {
+                                if (returnOfGoodsSignedDataList[j].getSendOrder() == returnOfGoodsList[i].getData2()) {
+                                    Log.e(mTAG, "sendOrder+warehouse: ${returnOfGoodsSignedDataList[j].getSendOrderWareHouse()}")
+                                    returnOfGoodsList[i].setIsSigned(true)
+                                    signedCount += 1
+                                }
+                            }
+                            returnOfGoodsList[i].setSignedNum(signedCount)
+                            Log.e(mTAG, "returnOfGoodsList[$i] = ${returnOfGoodsList[i].getIsSigned()}")
+                        }
+
+
+                        /*for (i in 0 until returnOfGoodsList.size) {
                             Log.e(mTAG, returnOfGoodsList[i].getData1())
                             if (returnOfGoodsList[i].getData2() == sendOrder) {
                                 returnOfGoodsList[i].setIsSigned(true)
                             }
                             Log.e(mTAG, "returnOfGoodsList[$i] = ${returnOfGoodsList[i].getIsSigned()}")
-                        }
+                        }*/
 
                         listViewReturnOfGoods!!.invalidateViews()
 
@@ -648,9 +869,18 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
 
         //Log.e(mTAG, "send No. = $currentSendOrder")
 
-        textViewReturnOfGoodsOrderContent.text = returnOfGoodsList[currentSelectSendOrder].getData2()
-        textViewReturnOfGoodsTypeContent.text = returnOfGoodsList[currentSelectSendOrder].getData1()
-        textViewReturnOfGoodsDateContent.text = returnOfGoodsList[currentSelectSendOrder].getData3()
+        if (currentWarehouse != "") {
+            textViewReturnOfGoodsOrderContent.text = returnOfGoodsFilterList[currentSelectSendOrder].getData2()
+            textViewReturnOfGoodsTypeContent.text = returnOfGoodsFilterList[currentSelectSendOrder].getData1()
+            textViewReturnOfGoodsDateContent.text = returnOfGoodsFilterList[currentSelectSendOrder].getData3()
+
+        } else {
+            textViewReturnOfGoodsOrderContent.text = returnOfGoodsList[currentSelectSendOrder].getData2()
+            textViewReturnOfGoodsTypeContent.text = returnOfGoodsList[currentSelectSendOrder].getData1()
+            textViewReturnOfGoodsDateContent.text = returnOfGoodsList[currentSelectSendOrder].getData3()
+        }
+
+
         //textViewShouldContent.text = outsourcedProcessLowerList[position].getContentStatic()
         //textViewActualContent.inputType = (InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
         //textViewActualContent.setText(outsourcedProcessLowerList[position].getContentDynamic())
@@ -670,6 +900,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
             val intent = Intent(returnOfGoodsContext, SignActivity::class.java)
             intent.putExtra("SEND_ORDER", currentSendOrder)
             intent.putExtra("TITLE", getString(R.string.nav_return_of_goods))
+            intent.putExtra("WAREHOUSE", currentWarehouse)
             intent.putExtra("SEND_FRAGMENT", "RETURN_OF_GOODS")
             intent.putExtra("TYPE", textViewReturnOfGoodsTypeContent.text)
             intent.putExtra("DATE", textViewReturnOfGoodsDateContent.text)

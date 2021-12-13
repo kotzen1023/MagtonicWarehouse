@@ -60,6 +60,13 @@ class ReturnOfGoodsItemAdapter (context: Context?, resource: Int, objects: Array
             view.setBackgroundColor(Color.YELLOW)
         } else
             view.setBackgroundColor(Color.TRANSPARENT)
+
+        if (returnOfGoodsItem.getSignedNum() > 0) {
+            holder.itemSigned.visibility = View.VISIBLE
+            holder.itemSigned.text = returnOfGoodsItem.getSignedNum().toString()
+        } else {
+            holder.itemSigned.visibility = View.GONE
+        }
         //if (receiptDetailItem != null) {
         /*val workOrderSize = IssuanceLookupItem.getData2().length
         //val partNpSize = outsourcedProcessOrderDetailItem.getData3().length
@@ -105,6 +112,7 @@ class ReturnOfGoodsItemAdapter (context: Context?, resource: Int, objects: Array
     }*/
 
     class ViewHolder (view: View) {
+        var itemSigned: TextView = view.findViewById(R.id.textViewReturnSignedNumber)
         var itemHeader: TextView = view.findViewById(R.id.returnOfGoodsItemHeader)
         var itemContent: TextView = view.findViewById(R.id.returnOfGoodsItemHContent)
         //var itemQuantity: TextView = view.findViewById(R.id.outSourcedProcessOrderDetailQuantity)
