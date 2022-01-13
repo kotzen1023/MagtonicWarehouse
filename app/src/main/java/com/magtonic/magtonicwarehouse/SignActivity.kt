@@ -25,7 +25,6 @@ import com.magtonic.magtonicwarehouse.data.FTPUtils
 import com.magtonic.magtonicwarehouse.data.FileUtils
 import com.magtonic.magtonicwarehouse.data.PaintBoard
 import kotlinx.coroutines.*
-import org.xmlpull.v1.XmlPullParserException
 
 
 import java.io.IOException
@@ -683,10 +682,7 @@ class SignActivity : AppCompatActivity() {
         }
         btnConfirm!!.setOnClickListener {
 
-            /*val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-            val currentDateAndTime: String = sdf.format(Date())
-            uploadSignName = "$currentDateAndTime.jpg"*/
-            //uploadSignName = "$sendOrder.jpg"
+
 
             val scaledWidth = 320.0 //stick height to 512
             //val scaledHeight = 512.0 //stick height to 512

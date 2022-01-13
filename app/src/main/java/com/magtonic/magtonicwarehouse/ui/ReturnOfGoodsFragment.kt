@@ -23,7 +23,6 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleObserver
 import com.magtonic.magtonicwarehouse.MainActivity
-import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbOustsourcedSigned
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.dbReturnOfGoodsSigned
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isKeyBoardShow
 import com.magtonic.magtonicwarehouse.MainActivity.Companion.isReturnOfGoodsInDetail
@@ -32,7 +31,6 @@ import com.magtonic.magtonicwarehouse.MainActivity.Companion.returnOfGoodsListBy
 import com.magtonic.magtonicwarehouse.R
 import com.magtonic.magtonicwarehouse.SignActivity
 import com.magtonic.magtonicwarehouse.data.*
-import com.magtonic.magtonicwarehouse.persistence.OutsourcedSignedData
 import com.magtonic.magtonicwarehouse.persistence.ReturnOfGoodsSignedData
 import java.util.*
 
@@ -577,7 +575,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
 
                                 if (!foundStorage) {
                                     storageList.add(rjReturnOfGoods.data4)
-                                    var combineString = rjReturnOfGoods.data4+" - "+rjReturnOfGoods.data5
+                                    val combineString = rjReturnOfGoods.data4+" - "+rjReturnOfGoods.data5
                                     /*if (outsourcedSignedDataList.size > 0) {
                                         for (i in 0 until outsourcedSignedDataList.size) {
                                             if (outsourcedSignedDataList[i].getWareHouse() == rjOutSourceProcessed.data9) {
@@ -616,7 +614,7 @@ class ReturnOfGoodsFragment : Fragment(), LifecycleObserver {
                         //val idx = idxString?.toInt()
 
 
-                        if (MainActivity.isKeyBoardShow) {
+                        if (isKeyBoardShow) {
                             val hideIntent = Intent()
                             hideIntent.action = Constants.ACTION.ACTION_HIDE_KEYBOARD
                             returnOfGoodsContext!!.sendBroadcast(hideIntent)

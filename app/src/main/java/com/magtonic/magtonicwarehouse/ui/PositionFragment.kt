@@ -1,6 +1,5 @@
 package com.magtonic.magtonicwarehouse.ui
 
-import android.R
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.magtonic.magtonicwarehouse.data.Constants
 import com.magtonic.magtonicwarehouse.databinding.FragmentPositionBinding
 import java.util.*
@@ -21,7 +19,6 @@ import java.util.*
 class PositionFragment : Fragment() {
     private val mTAG = PositionFragment::class.java.name
 
-    //private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentPositionBinding? = null
 
     // This property is only valid between onCreateView and
@@ -36,8 +33,6 @@ class PositionFragment : Fragment() {
     private var mReceiver: BroadcastReceiver? = null
     private var isRegister = false
 
-    private var toastHandle: Toast? = null
-
     private var positionContext: Context? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +44,7 @@ class PositionFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         //homeViewModel =
         //    ViewModelProvider(this).get(HomeViewModel::class.java)
 
@@ -58,7 +53,7 @@ class PositionFragment : Fragment() {
 
         relativeLayout = binding.positionContainer
         linearLayout = binding.linearLayoutPosition
-        progressBar = ProgressBar(positionContext, null, R.attr.progressBarStyleLarge)
+        progressBar = ProgressBar(positionContext, null, android.R.attr.progressBarStyleLarge)
 
         barcodeInput = binding.editTextPoint
         //val textView: TextView = binding.textHome
@@ -126,58 +121,63 @@ class PositionFragment : Fragment() {
         mReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action != null) {
-                    if (intent.action!!.equals(Constants.ACTION.ACTION_BARCODE_NULL, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_BARCODE_NULL")
+                    when {
+                        intent.action!!.equals(Constants.ACTION.ACTION_BARCODE_NULL, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_BARCODE_NULL")
 
 
 
-                        progressBar!!.visibility = View.GONE
+                            progressBar!!.visibility = View.GONE
 
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_NETWORK_FAILED, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_NETWORK_FAILED")
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_NETWORK_FAILED, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_NETWORK_FAILED")
 
-                        progressBar!!.visibility = View.GONE
-
-
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_TIMEOUT, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_CONNECTION_TIMEOUT")
-
-                        progressBar!!.visibility = View.GONE
+                            progressBar!!.visibility = View.GONE
 
 
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_TIMEOUT, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_CONNECTION_TIMEOUT")
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_CONNECTION_NO_ROUTE_TO_HOST")
-
-                        progressBar!!.visibility = View.GONE
-
-
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_SERVER_ERROR")
-
-                        progressBar!!.visibility = View.GONE
+                            progressBar!!.visibility = View.GONE
 
 
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_CONNECTION_NO_ROUTE_TO_HOST, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_CONNECTION_NO_ROUTE_TO_HOST")
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_POSITION_SCAN_BARCODE, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_POSITION_SCAN_BARCODE")
-                        val barcodeByScan = intent.getStringExtra("BARCODE_BY_SCAN")
-                        //poBarcode = intent.getStringExtra("BARCODE") as String
-                        //poLine = intent.getStringExtra("LINE") as String
-                        barcodeInput!!.setText(barcodeByScan)
+                            progressBar!!.visibility = View.GONE
 
-                        //removeTimer()
-                        //stopTimer()
 
-                    } else if (intent.action!!.equals(Constants.ACTION.ACTION_POSITION_FRAGMENT_REFRESH, ignoreCase = true)) {
-                        Log.d(mTAG, "ACTION_POSITION_FRAGMENT_REFRESH")
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_SERVER_ERROR, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_SERVER_ERROR")
 
-                        val data1 = intent.getStringExtra("data1")
+                            progressBar!!.visibility = View.GONE
 
-                        Log.e(mTAG, "data1 = $data1")
 
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_POSITION_SCAN_BARCODE, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_POSITION_SCAN_BARCODE")
+                            val barcodeByScan = intent.getStringExtra("BARCODE_BY_SCAN")
+                            //poBarcode = intent.getStringExtra("BARCODE") as String
+                            //poLine = intent.getStringExtra("LINE") as String
+                            barcodeInput!!.setText(barcodeByScan)
+
+                            //removeTimer()
+                            //stopTimer()
+
+                        }
+                        intent.action!!.equals(Constants.ACTION.ACTION_POSITION_FRAGMENT_REFRESH, ignoreCase = true) -> {
+                            Log.d(mTAG, "ACTION_POSITION_FRAGMENT_REFRESH")
+
+                            val data1 = intent.getStringExtra("data1")
+
+                            Log.e(mTAG, "data1 = $data1")
+
+                        }
                     }
 
                 }

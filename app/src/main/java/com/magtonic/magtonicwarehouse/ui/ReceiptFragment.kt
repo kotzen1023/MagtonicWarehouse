@@ -59,7 +59,6 @@ class ReceiptFragment : Fragment(), LifecycleObserver {
     //private var currentItemReceipt: ItemReceipt? = null
 
     var buttonTextColor: ColorStateList? = null
-    //var textViewDefailtColor: ColorStateList? = null
 
     private var mReceiver: BroadcastReceiver? = null
     private var isRegister = false
